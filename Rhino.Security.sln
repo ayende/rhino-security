@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security.Tests", "Rhino.Security.Tests\Rhino.Security.Tests.csproj", "{558B3AE3-C408-4DB0-AC79-386BC12379BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security", "Rhino.Security\Rhino.Security.csproj", "{DBA372FE-3D52-45B3-AF82-B37696328764}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBA372FE-3D52-45B3-AF82-B37696328764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBA372FE-3D52-45B3-AF82-B37696328764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBA372FE-3D52-45B3-AF82-B37696328764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBA372FE-3D52-45B3-AF82-B37696328764}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

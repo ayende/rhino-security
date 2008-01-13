@@ -1,0 +1,43 @@
+namespace Rhino.Security.Tests
+{
+    using System;
+    using Castle.ActiveRecord;
+
+    [ActiveRecord]
+    public class User : IUser
+    {
+        private long id;
+        private Guid securityKey = Guid.NewGuid();
+        private string name;
+
+        [PrimaryKey]
+        public virtual long Id
+        {
+            get { return id; }
+            set { id = value; }
+        }
+
+        [Property(NotNull = true)]
+        public virtual Guid SecurityKey
+        {
+            get { return securityKey; }
+            set { securityKey = value; }
+        }
+
+        [Property(NotNull = true)]
+        public virtual string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the security info for this user
+        /// </summary>
+        /// <value>The security info.</value>
+        public SecurityInfo SecurityInfo
+        {
+            get { return new SecurityInfo(name, securityKey, "SecurityKey"); }
+        }
+    }
+}
