@@ -3,7 +3,7 @@ namespace Rhino.Security
     using System;
     using System.Collections.Generic;
     using Commons;
-    using NHibernate.Expression;
+    using NHibernate.Expressions;
 
     /// <summary>
     /// Allow to retrieve and remove permissions

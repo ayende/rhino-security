@@ -30,49 +30,57 @@
   <ItemGroup>
     <Reference Include="Castle.ActiveRecord, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\SharedLibs\Castle\Castle.ActiveRecord.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Castle\Castle.ActiveRecord.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\Castle.Core.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Build\Rhino.Commons\Castle.MicroKernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Build\Rhino.Commons\Castle.Windsor.dll</HintPath>
     </Reference>
     <Reference Include="Iesi.Collections, Version=1.0.0.3, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\SharedLibs\NHibernate\Iesi.Collections.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\Iesi.Collections.dll</HintPath>
     </Reference>
-    <Reference Include="MbUnit.Framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
+    <Reference Include="MbUnit.framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\SharedLibs\Tools\MbUnit\MbUnit.Framework.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Tools\MbUnit\MbUnit.framework.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate, Version=2.0.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\NHibernate.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Commons, Version=1.5.1082.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+    <Reference Include="Rhino.Commons, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\Rhino.Commons.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Commons.ActiveRecord, Version=1.5.1082.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+    <Reference Include="Rhino.Commons.ActiveRecord, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\Rhino.Commons.ActiveRecord.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.ActiveRecord.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Commons.Clr, Version=1.5.1082.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+    <Reference Include="Rhino.Commons.Clr, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\Rhino.Commons.Clr.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Clr.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Commons.NHibernate, Version=1.5.1082.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+    <Reference Include="Rhino.Commons.NHibernate, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\Rhino.Commons.NHibernate.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="Rhino.Commons.Test, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Test.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.35.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\System.Data.SQLite.DLL</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SqlServerCe, Version=9.0.242.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OSS\rhino-tools\Build\Rhino.Commons\System.Data.SqlServerCe.dll</HintPath>
+      <HintPath>..\..\Build\Rhino.Commons\System.Data.SQLite.DLL</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>

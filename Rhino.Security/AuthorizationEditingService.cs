@@ -5,7 +5,7 @@ namespace Rhino.Security
     using System.IO;
     using Castle.Components.Validator;
     using Commons;
-    using NHibernate.Expression;
+    using NHibernate.Expressions;
 
     /// <summary>
     /// Allows to edit the security information of the 

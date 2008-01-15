@@ -1,7 +1,7 @@
 namespace Rhino.Security
 {
     using NHibernate;
-    using NHibernate.Expression;
+    using NHibernate.Expressions;
 
     ///<summary>
     /// Implementors of this interface are able to answer
