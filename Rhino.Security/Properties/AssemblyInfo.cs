@@ -16,9 +16,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Rhino")]
 [assembly: AssemblyCopyright("Oren Eini (c) 2006 - 2008")]
 [assembly: AssemblyDescription("Rhino.Security")]
-[assembly: AssemblyInformationalVersion("0.9.1093")]
+[assembly: AssemblyInformationalVersion("0.9.1095")]
 [assembly: AssemblyTitle("Rhino.Security")]
 [assembly: CLSCompliant(false)]
-[assembly: AssemblyVersion("0.9.1093")]
+[assembly: AssemblyVersion("0.9.1095")]
 
 

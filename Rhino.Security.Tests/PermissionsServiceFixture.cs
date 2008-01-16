@@ -120,7 +120,7 @@ namespace Rhino.Security.Tests
         public void CanGetPermissionsByUserAndEntity()
         {
             permissionsBuilderService
-                .Allow("/Account/Edit")
+                .Deny("/Account/Edit")
                 .For(user)
                 .On(account)
                 .DefaultLevel()
