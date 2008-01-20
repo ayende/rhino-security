@@ -1,8 +1,9 @@
 namespace Rhino.Security
 {
     using System.Collections.Generic;
+    using System.Text;
 
-    /// <summary>
+	/// <summary>
     /// String utility methods
     /// </summary>
     public static class Strings
@@ -37,5 +38,23 @@ namespace Rhino.Security
             } while (operationName != "");
             return names.ToArray();
         }
+
+		/// <summary>
+		/// Joins the named of all the specified entities.
+		/// </summary>
+		/// <typeparam name="TNamedEntity">The type of the named entity.</typeparam>
+		/// <param name="entities">The entities.</param>
+		/// <returns></returns>
+    	public static string Join<TNamedEntity>(NamedEntity<TNamedEntity>[] entities) where TNamedEntity : NamedEntity<TNamedEntity>
+    	{
+			StringBuilder sb = new StringBuilder();
+			foreach (NamedEntity<TNamedEntity> entity in entities)
+			{
+				sb.Append(entity.Name).Append(", ");
+			}
+			if (sb.Length != 0)
+				sb.Remove(sb.Length - 2, 2);
+			return sb.ToString();
+    	}
     }
 }

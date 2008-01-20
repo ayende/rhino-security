@@ -84,10 +84,9 @@ namespace Rhino.Security
         /// <param name="user">The user.</param>
         public virtual UsersGroup[] GetAssociatedUsersGroupFor(IUser user)
         {
-            string userSecurityId = "user." + user.SecurityInfo.SecurityKeyPropertyName;
-            DetachedCriteria criteria = DetachedCriteria.For<UsersGroup>()
+        	DetachedCriteria criteria = DetachedCriteria.For<UsersGroup>()
                 .CreateAlias("Users", "user")
-                .Add(Expression.Eq(userSecurityId, user.SecurityInfo.SecurityKey));
+                .Add(Expression.Eq("user.id", user.SecurityInfo.Identifier));
             ICollection<UsersGroup> usersGroups = usersGroupRepository.FindAll(criteria);
             return Collection.ToArray<UsersGroup>(usersGroups);
         }
@@ -172,6 +171,9 @@ namespace Rhino.Security
 
             Operation op = new Operation();
             op.Name = operationName;
+
+			if(validator.IsValid(op)==false)
+				throw new ValidationException(validator.GetErrorSummary(op));
 
             string parentOperationName = Strings.GetParentOperationName(operationName);
             if (parentOperationName != string.Empty)//we haven't got to the root

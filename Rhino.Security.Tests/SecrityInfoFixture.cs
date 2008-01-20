@@ -6,39 +6,26 @@ namespace Rhino.Security.Tests
     [TestFixture]
     public class SecrityInfoFixture
     {
-        [Test]
-        [ExpectedException(typeof(ArgumentException), "SecurityKey must not be an empty guid")]
-        public void WillNotAcceptEmptyGuid()
-        {
-            new SecurityInfo("2", Guid.Empty, "1");
-        }
-
+     
         [Test]
         [ExpectedException(typeof(ArgumentException),"Name must have a value")]
         public void WillNotAcceptNullName()
         {
-            new SecurityInfo(null, Guid.NewGuid(), "1");
+            new SecurityInfo(null, "1");
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException), "Name must have a value")]
         public void WillNotAcceptEmptyName()
         {
-            new SecurityInfo("", Guid.NewGuid(), "1");
+            new SecurityInfo("",  "1");
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException), "SecurityKeyPropertyName must have a value")]
-        public void WillNotAcceptNullSecurityPropertyId()
+        [ExpectedException(typeof(ArgumentException), "Identifier must not be null")]
+        public void WillNotAcceptNullIdentifier()
         {
-            new SecurityInfo("a", Guid.NewGuid(), null);
-        }
-
-        [Test]
-        [ExpectedException(typeof(ArgumentException), "SecurityKeyPropertyName must have a value")]
-        public void WillNotAcceptEmptySecurityPropertyId()
-        {
-            new SecurityInfo("a", Guid.NewGuid(), "");
+            new SecurityInfo("a", null);
         }
     }
 }

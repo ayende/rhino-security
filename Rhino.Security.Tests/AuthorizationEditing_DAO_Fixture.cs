@@ -1,252 +1,222 @@
 namespace Rhino.Security.Tests
 {
-    using System;
-    using Commons;
-    using MbUnit.Framework;
-    using NHibernate;
-    using Rhino.Commons.ForTesting;
+	using System;
+	using Commons;
+	using MbUnit.Framework;
 
-    [TestFixture]
-    public class AuthorizationEditing_DAO_Fixture : DatabaseFixture
-    {
-        [Test]
-        public void CanSaveUser()
-        {
-            using (ISession session = CurrentContext.CreateSession())
-            {
-                User user = new User();
-                user.Name = "ayende";
-                Assert.AreNotEqual(Guid.Empty, user.SecurityKey);
-                session.Save(user);
-                session.Flush();
-                session.Evict(user);
+	[TestFixture]
+	public class AuthorizationEditing_DAO_Fixture : DatabaseFixture
+	{
+		[Test]
+		public void CanSaveUser()
+		{
+			User ayende = new User();
+			ayende.Name = "ayende";
+			UnitOfWork.CurrentSession.Save(ayende);
+			UnitOfWork.CurrentSession.Flush();
+			UnitOfWork.CurrentSession.Evict(ayende);
 
-                User fromDb = session.Get<User>(user.Id);
-                Assert.IsNotNull(fromDb);
-                Assert.AreEqual(user.Name, fromDb.Name);
-                Assert.AreEqual(fromDb.SecurityKey, user.SecurityKey);
-            }
-        }
+			User fromDb = UnitOfWork.CurrentSession.Get<User>(ayende.Id);
+			Assert.IsNotNull(fromDb);
+			Assert.AreEqual(ayende.Name, fromDb.Name);
+		}
 
-        [Test]
-        public void CanSaveAccount()
-        {
-            using (ISession session = CurrentContext.CreateSession())
-            {
-                Account account = new Account();
-                account.Name = "ayende";
-                Assert.AreNotEqual(Guid.Empty, account.SecurityKey);
-                session.Save(account);
-                session.Flush();
-                session.Evict(account);
+		[Test]
+		public void CanSaveAccount()
+		{
+			Account ayende = new Account();
+			ayende.Name = "ayende";
+			Assert.AreNotEqual(Guid.Empty, ayende.SecurityKey);
+			UnitOfWork.CurrentSession.Save(ayende);
+			UnitOfWork.CurrentSession.Flush();
+			UnitOfWork.CurrentSession.Evict(ayende);
 
-                Account fromDb = session.Get<Account>(account.Id);
-                Assert.IsNotNull(fromDb);
-                Assert.AreEqual(account.Name, fromDb.Name);
-                Assert.AreEqual(fromDb.SecurityKey, account.SecurityKey);
-            }
-        }
+			Account fromDb = UnitOfWork.CurrentSession.Get<Account>(ayende.Id);
+			Assert.IsNotNull(fromDb);
+			Assert.AreEqual(ayende.Name, fromDb.Name);
+			Assert.AreEqual(fromDb.SecurityKey, ayende.SecurityKey);
+		}
 
-        [Test]
-        public void CanCreateUsersGroup()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
+		[Test]
+		public void CanCreateUsersGroup()
+		{
+			UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
 
-            UnitOfWork.Current.TransactionalFlush();
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            UsersGroup groupFromDb = Repository<UsersGroup>.Get(group.Id);
-            Assert.IsNotNull(groupFromDb);
-            Assert.AreEqual(group.Name, groupFromDb.Name);
-        }
+			UsersGroup groupFromDb = Repository<UsersGroup>.Get(group.Id);
+			Assert.IsNotNull(groupFromDb);
+			Assert.AreEqual(group.Name, groupFromDb.Name);
+		}
 
-        [Test]
-        public void CanCreateEntitesGroup()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void CanCreateEntitesGroup()
+		{
+			EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            EntitiesGroup groupFromDb = Repository<EntitiesGroup>.Get(group.Id);
-            Assert.IsNotNull(groupFromDb);
-            Assert.AreEqual(group.Name, groupFromDb.Name);
-        }
+			EntitiesGroup groupFromDb = Repository<EntitiesGroup>.Get(group.Id);
+			Assert.IsNotNull(groupFromDb);
+			Assert.AreEqual(group.Name, groupFromDb.Name);
+		}
 
-        [Test]
-        [ExpectedException(typeof(ValidationException))]
-        public void CannotCreateEntitiesGroupWithSameName()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            authorizationEditingService.CreateEntitiesGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateEntitiesGroup("Admininstrators");
-        }
+		[Test]
+		[ExpectedException(typeof (ValidationException))]
+		public void CannotCreateEntitiesGroupWithSameName()
+		{
+			authorizationEditingService.CreateEntitiesGroup("Admininstrators");
+			UnitOfWork.Current.TransactionalFlush();
+			authorizationEditingService.CreateEntitiesGroup("Admininstrators");
+		}
 
-        [Test]
-        [ExpectedException(typeof(ValidationException))]
-        public void CannotCreateUsersGroupsWithSameName()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            authorizationEditingService.CreateUsersGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateUsersGroup("Admininstrators");
-        }
+		[Test]
+		[ExpectedException(typeof (ValidationException))]
+		public void CannotCreateUsersGroupsWithSameName()
+		{
+			authorizationEditingService.CreateUsersGroup("Admininstrators");
+			UnitOfWork.Current.TransactionalFlush();
+			authorizationEditingService.CreateUsersGroup("Admininstrators");
+		}
 
-        [Test]
-        public void CanGetUsersGroupByName()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void CanGetUsersGroupByName()
+		{
+			UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
-            Assert.IsNotNull(group);
-        }
+			group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
+			Assert.IsNotNull(group);
+		}
 
-        [Test]
-        public void CanGetEntitiesGroupByName()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void CanGetEntitiesGroupByName()
+		{
+			EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
-            Assert.IsNotNull(group);
-        }
+			group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
+			Assert.IsNotNull(group);
+		}
 
-        [Test]
-        public void CannotChangeUsersGroupName()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void CannotChangeUsersGroupName()
+		{
+			UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
-            group.Name = "2";
-            UnitOfWork.Current.TransactionalFlush();
+			group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
+			group.Name = "2";
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetUsersGroupByName("2");
-            Assert.IsNull(group);
-            group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
-            Assert.IsNotNull(group);
-        }
+			group = authorizationEditingService.GetUsersGroupByName("2");
+			Assert.IsNull(group);
+			group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
+			Assert.IsNotNull(group);
+		}
 
-        [Test]
-        public void CannotChangeEntitiesGroupName()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void CannotChangeEntitiesGroupName()
+		{
+			EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
-            group.Name = "2";
-            UnitOfWork.Current.TransactionalFlush();
+			group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
+			group.Name = "2";
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+			UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetEntitiesGroupByName("2");
-            Assert.IsNull(group);
-            group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
-            Assert.IsNotNull(group);
-        }
+			group = authorizationEditingService.GetEntitiesGroupByName("2");
+			Assert.IsNull(group);
+			group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
+			Assert.IsNotNull(group);
+		}
 
-        [Test]
-        public void CanAssociateUserWithGroup()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            using (ISession session = CurrentContext.CreateSession())
-            {
-                User user = new User();
-                user.Name = "ayende";
+		[Test]
+		public void CanAssociateUserWithGroup()
+		{
+			User ayende = new User();
+			ayende.Name = "ayende";
 
-                session.Save(user);
-                UsersGroup group = authorizationEditingService.CreateUsersGroup("Admins");
-                UnitOfWork.Current.TransactionalFlush();
+			UnitOfWork.CurrentSession.Save(ayende);
+			UsersGroup group = authorizationEditingService.CreateUsersGroup("Admins");
+			UnitOfWork.Current.TransactionalFlush();
 
-                authorizationEditingService.AssociateUserWith(user, "Admins");
-                UnitOfWork.Current.TransactionalFlush();
+			authorizationEditingService.AssociateUserWith(ayende, "Admins");
+			UnitOfWork.Current.TransactionalFlush();
 
-                session.Evict(user);
-                session.Evict(group);
+			UnitOfWork.CurrentSession.Evict(ayende);
+			UnitOfWork.CurrentSession.Evict(group);
 
-                UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
-                Assert.AreEqual(1, groups.Length);
-                Assert.AreEqual("Admins", groups[0].Name);
-            }
-        }
+			UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(ayende);
+			Assert.AreEqual(1, groups.Length);
+			Assert.AreEqual("Admins", groups[0].Name);
+		}
 
-        [Test]
-        public void CanAssociateAccountWithGroup()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            using (ISession session = CurrentContext.CreateSession())
-            {
-                Account account = new Account();
-                account.Name = "ayende";
 
-                session.Save(account);
-                EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
-                UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void CanAssociateAccountWithGroup()
+		{
+			Account ayende = new Account();
+			ayende.Name = "ayende";
 
-                authorizationEditingService.AssociateEntityWith(account, "Accounts");
+			UnitOfWork.CurrentSession.Save(ayende);
+			EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+			UnitOfWork.Current.TransactionalFlush();
 
-                UnitOfWork.Current.TransactionalFlush();
+			authorizationEditingService.AssociateEntityWith(ayende, "Accounts");
 
-                session.Evict(account);
-                session.Evict(group);
+			UnitOfWork.Current.TransactionalFlush();
 
-                EntitiesGroup[] groups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(account);
-                Assert.AreEqual(1, groups.Length);
-                Assert.AreEqual("Accounts", groups[0].Name);
-            }
-        }
+			UnitOfWork.CurrentSession.Evict(ayende);
+			UnitOfWork.CurrentSession.Evict(group);
 
-        [Test]
-        public void CanCreateOperation()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            authorizationEditingService.CreateOperation("/Account/Edit");
-            UnitOfWork.Current.TransactionalFlush();
-            Operation operation = authorizationEditingService.GetOperationByName("/Account/Edit");
-            Assert.IsNotNull(operation);
-        }
+			EntitiesGroup[] groups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(ayende);
+			Assert.AreEqual(1, groups.Length);
+			Assert.AreEqual("Accounts", groups[0].Name);
+		}
 
-        [Test]
-        public void WhenCreatingNestedOperation_WillCreateParentOperation_IfDoesNotExists()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            Operation operation = authorizationEditingService.CreateOperation("/Account/Edit");
-            UnitOfWork.Current.TransactionalFlush();
-            Operation parentOperation = authorizationEditingService.GetOperationByName("/Account");
-            Assert.IsNotNull(parentOperation);
-            Assert.AreEqual(operation.Parent, parentOperation);
-        }
+		[Test]
+		public void CanCreateOperation()
+		{
+			authorizationEditingService.CreateOperation("/hAccount/Delete");
+			UnitOfWork.Current.TransactionalFlush();
+			Operation operation = authorizationEditingService.GetOperationByName("/Account/Delete");
+			Assert.IsNotNull(operation, "Could not create operation");
+		}
 
-        [Test]
-        public void WhenCreatingNestedOperation_WillLinkToParentOperation()
-        {
-            IAuthorizationEditingService authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            authorizationEditingService.CreateOperation("/Account");
-            UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateOperation("/Account/Edit");
-            UnitOfWork.Current.TransactionalFlush();
-            Operation parentOperation = authorizationEditingService.GetOperationByName("/Account");
-            Assert.IsNotNull(parentOperation);
-            Assert.AreEqual(1, parentOperation.Children.Count);
-        }
-    }
+		[Test]
+		public void WhenCreatingNestedOperation_WillCreateParentOperation_IfDoesNotExists()
+		{
+			Operation operation = authorizationEditingService.CreateOperation("/Account/Delete");
+			UnitOfWork.Current.TransactionalFlush();
+			Operation parentOperation = authorizationEditingService.GetOperationByName("/Account");
+			Assert.IsNotNull(parentOperation);
+			Assert.AreEqual(operation.Parent, parentOperation);
+		}
+
+		[Test]
+		public void WhenCreatingNestedOperation_WillLinkToParentOperation()
+		{
+			authorizationEditingService.CreateOperation("/Account/Delete");
+			UnitOfWork.Current.TransactionalFlush();
+			Operation parentOperation = authorizationEditingService.GetOperationByName("/Account");
+			Assert.IsNotNull(parentOperation);// was created in setup
+			Assert.AreEqual(2, parentOperation.Children.Count);// /Edit, /Delete
+		}
+	}
 }

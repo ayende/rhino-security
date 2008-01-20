@@ -111,7 +111,17 @@ namespace Rhino.Security
                 return this;
             }
 
-            /// <summary>
+
+			/// <summary>
+			/// Set this permission to be application to everything
+			/// </summary>
+			/// <returns></returns>
+        	public ILevelPermissionBuilder OnEverything()
+        	{
+        		return this;
+        	}
+
+        	/// <summary>
             /// Define the level of this permission
             /// </summary>
             /// <param name="level">The level.</param>

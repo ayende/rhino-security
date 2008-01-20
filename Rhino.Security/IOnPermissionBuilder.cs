@@ -19,5 +19,11 @@ namespace Rhino.Security
         /// <param name="entitiesGroupName">Name of the entities group.</param>
         /// <returns></returns>
         ILevelPermissionBuilder On(string entitiesGroupName);
+
+		/// <summary>
+		/// Set this permission to be application to everything
+		/// </summary>
+		/// <returns></returns>
+    	ILevelPermissionBuilder OnEverything();
     }
 }

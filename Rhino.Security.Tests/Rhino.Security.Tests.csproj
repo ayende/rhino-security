@@ -54,7 +54,7 @@
     </Reference>
     <Reference Include="NHibernate, Version=2.0.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\NHibernate.dll</HintPath>
+      <HintPath>..\..\SharedLibs\NHibernate\NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Commons, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -88,6 +88,8 @@
     <Compile Include="Account.cs" />
     <Compile Include="AccountSecurityKeyExtractor.cs" />
     <Compile Include="AuthorizationEditing_DAO_Fixture.cs" />
+    <Compile Include="AuthorizationServiceFixture.cs" />
+    <Compile Include="AuthorizationService_Explainations_Fixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

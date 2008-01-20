@@ -1,180 +1,192 @@
 namespace Rhino.Security.Tests
 {
-    using System.Collections.Generic;
-    using Commons;
-    using MbUnit.Framework;
+	using System.Collections.Generic;
+	using Commons;
+	using MbUnit.Framework;
 
-    [TestFixture]
-    public class PermissionsServiceFixture : DatabaseFixture
-    {
-        private IPermissionsService permissionService;
-        private IAuthorizationEditingService authorizationEditingService;
-        private IPermissionsBuilderService permissionsBuilderService;
-        private Account account;
-        private User user;
+	[TestFixture]
+	public class PermissionsServiceFixture : DatabaseFixture
+	{
+		[Test]
+		public void CanCreatePermission()
+		{
+			Permission permission = permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For(user)
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
+			UnitOfWork.CurrentSession.Evict(permission);
+			ICollection<Permission> all = Repository<Permission>.FindAll();
 
-        public override void SetUp()
-        {
-            base.SetUp();
+			Assert.AreEqual(1, all.Count);
+		}
 
-            user = new User();
-            this.user.Name = "Ayende";
-            account = new Account();
-            this.account.Name = "south sand";
+		[Test]
+		public void CanGetPermissionByUser()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For(user)
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Save(user);
-            UnitOfWork.CurrentSession.Save(account);
+			Permission[] permissions = permissionService.GetPermissionsFor(user);
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-            permissionService = IoC.Resolve<IPermissionsService>();
-            permissionsBuilderService = IoC.Resolve<IPermissionsBuilderService>();
-            authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            authorizationEditingService.CreateUsersGroup("Administrators");
-            authorizationEditingService.CreateEntitiesGroup("Important Accounts");
-            authorizationEditingService.CreateOperation("/Account/Edit");
+		[Test]
+		public void CanGetPermissionsByUser_WhenDefinedOnGroup()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For("Administrators")
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.Current.TransactionalFlush();
+			Permission[] permissions = permissionService.GetPermissionsFor(user);
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-            authorizationEditingService.AssociateUserWith(this.user, "Administrators");
-            authorizationEditingService.AssociateEntityWith(this.account, "Important Accounts");
+		[Test]
+		public void CanGetPermissionsByEntity()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For("Administrators")
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.Current.TransactionalFlush();
-        }
+			Permission[] permissions = permissionService.GetPermissionsFor(account);
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-        [Test]
-        public void CanCreatePermission()
-        {
-            Permission permission = permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For(user)
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
-            UnitOfWork.CurrentSession.Evict(permission);
-            ICollection<Permission> all = Repository<Permission>.FindAll();
+		[Test]
+		public void CanGetPermissionsByEntity_WhenDefinedOnEntityGroup()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For("Administrators")
+				.On("Important Accounts")
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            Assert.AreEqual(1, all.Count);
-        }
+			Permission[] permissions = permissionService.GetPermissionsFor(account);
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-        [Test]
-        public void CanGetPermissionByUser()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For(user)
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
-            
-            Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.AreEqual(1, permissions.Length);
-        }
+		[Test]
+		public void CanGetPermissionsByUserAndEntity()
+		{
+			permissionsBuilderService
+				.Deny("/Account/Edit")
+				.For(user)
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-        [Test]
-        public void CanGetPermissionsByUser_WhenDefinedOnGroup()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For("Administrators")
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			Permission[] permissions = permissionService.GetPermissionsFor(user, account);
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-            Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.AreEqual(1, permissions.Length);
-        }
+		[Test]
+		public void CanGetPermissionsByUserAndOperationName()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For(user)
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-        [Test]
-        public void CanGetPermissionsByEntity()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For("Administrators")
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			Permission[] permissions = permissionService.GetPermissionsFor(user, "/Account/Edit");
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-            Permission[] permissions = permissionService.GetPermissionsFor(account);
-            Assert.AreEqual(1, permissions.Length);
-        }
+		[Test]
+		public void CanGetPermissionsByUserAndOperationName_WhenParentOperationWasGranted()
+		{
+			permissionsBuilderService
+				.Allow("/Account")
+				.For(user)
+				.On(account)
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-        [Test]
-        public void CanGetPermissionsByEntity_WhenDefinedOnEntityGroup()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For("Administrators")
-                .On("Important Accounts")
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			Permission[] permissions = permissionService.GetPermissionsFor(user, "/Account/Edit");
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-            Permission[] permissions = permissionService.GetPermissionsFor(account);
-            Assert.AreEqual(1, permissions.Length);
-        }
+		[Test]
+		public void CanGetPermissionByUserEntityAndOperation()
+		{
 
-        [Test]
-        public void CanGetPermissionsByUserAndEntity()
-        {
-            permissionsBuilderService
-                .Deny("/Account/Edit")
-                .For(user)
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			permissionsBuilderService
+				.Allow("/Account")
+				.For(user)
+				.On("Important Accounts")
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            Permission[] permissions = permissionService.GetPermissionsFor(user, account);
-            Assert.AreEqual(1, permissions.Length);
-        }
+			Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
+			Assert.AreEqual(1, permissions.Length);
+		}
 
-        [Test]
-        public void CanGetPermissionsByUserAndOperationName()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For(user)
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void PermissionsAreOrderedByLevelAndThenByDenyOrAllow()
+		{
+			permissionsBuilderService
+			   .Allow("/Account")
+			   .For(user)
+			   .On("Important Accounts")
+			   .DefaultLevel()
+			   .Save();
+			permissionsBuilderService
+			   .Deny("/Account/Edit")
+			   .For(user)
+			   .On("Important Accounts")
+			   .DefaultLevel()
+			   .Save();
+			permissionsBuilderService
+			   .Allow("/Account/Edit")
+			   .For(user)
+			   .On("Important Accounts")
+			   .Level(20)
+			   .Save();
+			permissionsBuilderService
+				.Deny("/Account/Edit")
+				.For(user)
+				.On("Important Accounts")
+				.Level(20)
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            Permission[] permissions = permissionService.GetPermissionsFor(user, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
-        }
+			Permission[] permissions = permissionService.GetPermissionsFor(user);
+			Assert.AreEqual(4, permissions.Length);
 
-        [Test]
-        public void CanGetPermissionsByUserAndOperationName_WhenParentOperationWasGranted()
-        {
-            permissionsBuilderService
-                .Allow("/Account")
-                .For(user)
-                .On(account)
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			Assert.AreEqual(20, permissions[0].Level);
+			Assert.IsFalse(permissions[0].Allow);
 
-            Permission[] permissions = permissionService.GetPermissionsFor(user, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
-        }
+			Assert.AreEqual(20, permissions[1].Level);
+			Assert.IsTrue(permissions[1].Allow);
 
-        [Test]
-        public void CanGetPermissionByUserEntityAndOperation()
-        {
+			Assert.AreEqual(1, permissions[2].Level);
+			Assert.IsFalse(permissions[2].Allow);
 
-            permissionsBuilderService
-                .Allow("/Account")
-                .For(user)
-                .On("Important Accounts")
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
-
-            Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
-        }
-    }
+			Assert.AreEqual(1, permissions[3].Level);
+			Assert.IsTrue(permissions[3].Allow);
+		}
+	}
 }

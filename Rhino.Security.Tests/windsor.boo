@@ -3,6 +3,7 @@ import Rhino.Security
 import Rhino.Security.Tests
 import Castle.Components.Validator
 
+component IAuthorizationService, AuthorizationService
 component IAuthorizationEditingService, AuthorizationEditingService
 component IPermissionsBuilderService , PermissionsBuilderService 
 component ValidatorRunner
