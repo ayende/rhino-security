@@ -193,7 +193,7 @@ namespace Rhino.Security.Tests
 		[Test]
 		public void CanCreateOperation()
 		{
-			authorizationEditingService.CreateOperation("/hAccount/Delete");
+			authorizationEditingService.CreateOperation("/Account/Delete");
 			UnitOfWork.Current.TransactionalFlush();
 			Operation operation = authorizationEditingService.GetOperationByName("/Account/Delete");
 			Assert.IsNotNull(operation, "Could not create operation");
