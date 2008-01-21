@@ -1,6 +1,8 @@
 namespace Rhino.Security
 {
     using System;
+    using System.Collections.Generic;
+    using System.Reflection;
     using Castle.ActiveRecord;
     using Castle.ActiveRecord.Framework;
     using Castle.ActiveRecord.Framework.Internal;
@@ -91,12 +93,61 @@ namespace Rhino.Security
         /// <typeparam name="TEntity">The type of the entity.</typeparam>
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
-        public static Guid ExtractKey<TEntity>(TEntity entity) 
+        public static Guid ExtractKey<TEntity>(TEntity entity)
             where TEntity : class
         {
             Guard.Against<ArgumentNullException>(entity == null, "Entity cannot be null");
-            IEntitySecurityKeyExtractor<TEntity> keyExtractor = IoC.Resolve<IEntitySecurityKeyExtractor<TEntity>>();
-            return keyExtractor.GetSecurityKeyFor(entity);
+            IEntityInformationExtractor<TEntity> extractor = IoC.Resolve<IEntityInformationExtractor<TEntity>>();
+            return extractor.GetSecurityKeyFor(entity);
+        }
+
+        /// <summary>
+        /// Gets a human readable description for the specified security key
+        /// </summary>
+        /// <param name="entityType">Type of the entity.</param>
+        /// <param name="securityKey">The security key.</param>
+        /// <returns></returns>
+        public static string GetDescription(Type entityType, Guid securityKey)
+        {
+            Guard.Against<ArgumentException>(securityKey == Guid.Empty, "Security Key cannot be empty");
+            GetDescriptionsHelper.Delegate getDescription;
+            if (GetDescriptionsHelper.Cache.TryGetValue(entityType, out getDescription) == false)
+            {
+                MethodInfo getDescriptionInternal = typeof(GetDescriptionsHelper).GetMethod("GetDescriptionInternal", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+                MethodInfo getDescriptionInternalGeneric = getDescriptionInternal.MakeGenericMethod(entityType);
+                getDescription = (GetDescriptionsHelper.Delegate)Delegate.CreateDelegate(
+                    typeof(GetDescriptionsHelper.Delegate),
+                    getDescriptionInternalGeneric);
+
+                GetDescriptionsHelper.Cache[entityType] = getDescription;
+            }
+            return getDescription(securityKey);
+        }
+
+        /// <summary>
+        /// Used to hold all the description strong typed delegates
+        /// </summary>
+        internal class GetDescriptionsHelper
+        {
+
+            /// <summary>
+            /// Gets the description using strongly typed generics.
+            /// This is invoked using reflection only, by means of the delegate and strongly
+            /// typing at runtime.
+            /// </summary>
+            /// <typeparam name="TEntity">The type of the entity.</typeparam>
+            /// <param name="securityKey">The security key.</param>
+            /// <returns></returns>
+            public static string GetDescriptionInternal<TEntity>(Guid securityKey)
+            {
+                IEntityInformationExtractor<TEntity> extractor = IoC.Resolve<IEntityInformationExtractor<TEntity>>();
+                return extractor.GetDescription(securityKey);
+            }
+
+            public delegate string Delegate(Guid securityKey);
+
+            public static readonly Dictionary<Type, Delegate> Cache =
+                new Dictionary<Type, Delegate>();
         }
     }
 }

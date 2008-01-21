@@ -98,9 +98,12 @@ namespace Rhino.Security
 			EntitiesGroup[] entitiesGroups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
 			UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
 
-			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
+		    AbstractCriterion onCriteria =
+		        (Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups)) ||
+		        (Expression.IsNull("EntitiesGroup") && Expression.IsNull("EntitySecurityKey"));
+		    DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", usersGroups))
-				.Add(Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups))
+				.Add(onCriteria)
 			 .CreateAlias("Operation", "op")
 				.Add(Expression.In("op.Name", operationNames));
 

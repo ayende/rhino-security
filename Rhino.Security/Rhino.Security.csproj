@@ -78,7 +78,7 @@
     <Compile Include="EntityReference.cs" />
     <Compile Include="IAuthorizationEditingService.cs" />
     <Compile Include="IAuthorizationService.cs" />
-    <Compile Include="IEntitySecurityKeyExtractor.cs" />
+    <Compile Include="IEntityInformationExtractor.cs" />
     <Compile Include="IForPermissionBuilder.cs" />
     <Compile Include="ILevelPermissionBuilder.cs" />
     <Compile Include="InvalidEntityException.cs" />

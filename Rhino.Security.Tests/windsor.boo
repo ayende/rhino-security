@@ -10,7 +10,7 @@ component ValidatorRunner
 component IValidatorRegistry, CachedValidationRegistry
 component IPermissionsService, PermissionsService
 
-component IEntitySecurityKeyExtractor of Account, AccountSecurityKeyExtractor
+component IEntityInformationExtractor of Account, AccountInfromationExtractor
 
 component IRepository, ARRepository
 component IUnitOfWorkFactory, ActiveRecordUnitOfWorkFactory

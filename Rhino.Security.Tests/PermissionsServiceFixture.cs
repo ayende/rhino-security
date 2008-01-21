@@ -188,5 +188,20 @@ namespace Rhino.Security.Tests
 			Assert.AreEqual(1, permissions[3].Level);
 			Assert.IsTrue(permissions[3].Allow);
 		}
+
+	    [Test]
+	    public void CanSetPermissionOnEverythingAndGetItOnEntity()
+	    {
+            permissionsBuilderService
+            .Allow("/Account")
+            .For(user)
+            .OnEverything()
+            .DefaultLevel()
+            .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
+            Assert.AreEqual(1, permissions.Length);
+	    }
 	}
 }

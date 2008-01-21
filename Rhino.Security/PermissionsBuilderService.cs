@@ -90,6 +90,7 @@ namespace Rhino.Security
             /// <returns></returns>
             public ILevelPermissionBuilder On<TEntity>(TEntity entity) where TEntity : class
             {
+                permission.SetEntityType(typeof (TEntity));
                 permission.EntitySecurityKey = Security.ExtractKey(entity);
                 return this;
             }
@@ -102,7 +103,8 @@ namespace Rhino.Security
             /// <returns></returns>
             public ILevelPermissionBuilder On(string entitiesGroupName)
             {
-                EntitiesGroup entitiesGroup = permissionBuilderService
+                EntitiesGroup entitiesGroup = 
+                    permissionBuilderService
                     .authorizationEditingService
                     .GetEntitiesGroupByName(entitiesGroupName);
                 Guard.Against<ArgumentException>(entitiesGroup == null,

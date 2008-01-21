@@ -61,15 +61,6 @@ namespace Rhino.Security.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to entity with security key: &apos;{0}&apos;.
-        /// </summary>
-        internal static string EntityWithKey {
-            get {
-                return ResourceManager.GetString("EntityWithKey", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to everything.
         /// </summary>
         internal static string Everything {

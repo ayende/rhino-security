@@ -17,6 +17,7 @@ namespace Rhino.Security
         private IUser user;
         private UsersGroup usersGroup;
         private int level;
+        private string entityTypeName;
 
         /// <summary>
         /// Gets or sets the operation this permission applies to
@@ -95,6 +96,29 @@ namespace Rhino.Security
         {
             get { return level; }
             set { level = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the type of the entity.
+        /// </summary>
+        /// <value>The type of the entity.</value>
+        [Property]
+        public virtual string EntityTypeName
+        {
+            get { return entityTypeName; }
+            set { entityTypeName = value; }
+        }
+
+        /// <summary>
+        /// Sets the type of the entity.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <remarks>
+        /// This uses the weak assembly name to protect us from versioning issues
+        /// </remarks>
+        public virtual void SetEntityType(Type type)
+        {
+            EntityTypeName = type.FullName + ", " + type.Assembly.GetName().Name;
         }
     }
 }

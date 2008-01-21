@@ -37,7 +37,7 @@ namespace Rhino.Security
         /// <returns>
         /// 	<c>true</c> if the specified user is allowed; otherwise, <c>false</c>.
         /// </returns>
-        bool IsAllowed<TEntity>(IUser user, TEntity entity, string operation);
+        bool IsAllowed<TEntity>(IUser user, TEntity entity, string operation) where TEntity : class;
 
         /// <summary>
         /// Determines whether the specified user is allowed to perform the
@@ -68,6 +68,6 @@ namespace Rhino.Security
         /// <param name="entity">The entity.</param>
         /// <param name="operation">The operation.</param>
         /// <returns></returns>
-        AuthorizationInformation GetAuthorizationInformation<TEntity>(IUser user, TEntity entity, string operation);
+        AuthorizationInformation GetAuthorizationInformation<TEntity>(IUser user, TEntity entity, string operation) where TEntity : class;
     }
 }
