@@ -113,18 +113,36 @@ namespace Rhino.Security
             GetDescriptionsHelper.Delegate getDescription;
             if (GetDescriptionsHelper.Cache.TryGetValue(entityType, out getDescription) == false)
             {
-                MethodInfo getDescriptionInternal = typeof(GetDescriptionsHelper).GetMethod("GetDescriptionInternal", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
-                MethodInfo getDescriptionInternalGeneric = getDescriptionInternal.MakeGenericMethod(entityType);
-                getDescription = (GetDescriptionsHelper.Delegate)Delegate.CreateDelegate(
-                    typeof(GetDescriptionsHelper.Delegate),
-                    getDescriptionInternalGeneric);
+            	lock (GetDescriptionsHelper.Cache)
+            	{
+					if (GetDescriptionsHelper.Cache.TryGetValue(entityType, out getDescription) == false)
+					{
+						MethodInfo getDescriptionInternal =
+							typeof (GetDescriptionsHelper).GetMethod("GetDescriptionInternal", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+						MethodInfo getDescriptionInternalGeneric = getDescriptionInternal.MakeGenericMethod(entityType);
+						getDescription = (GetDescriptionsHelper.Delegate) Delegate.CreateDelegate(
+						                                                  	typeof (GetDescriptionsHelper.Delegate),
+						                                                  	getDescriptionInternalGeneric);
 
-                GetDescriptionsHelper.Cache[entityType] = getDescription;
+						GetDescriptionsHelper.Cache[entityType] = getDescription;
+					}
+            	}
             }
             return getDescription(securityKey);
         }
 
-        /// <summary>
+		/// <summary>
+		/// Gets a human readable description for the specified entity
+		/// </summary>
+		/// <typeparam name="TEntity">The type of the entity.</typeparam>
+		/// <param name="entity">The entity.</param>
+		/// <returns></returns>
+		 public static string GetDescription<TEntity>(TEntity entity) where TEntity : class
+		{
+			return GetDescriptionsHelper.GetDescriptionInternal<TEntity>(ExtractKey(entity));
+		}
+
+    	/// <summary>
         /// Used to hold all the description strong typed delegates
         /// </summary>
         internal class GetDescriptionsHelper
@@ -132,7 +150,7 @@ namespace Rhino.Security
 
             /// <summary>
             /// Gets the description using strongly typed generics.
-            /// This is invoked using reflection only, by means of the delegate and strongly
+            /// This is also invoked, by means of the delegate and strongly
             /// typing at runtime.
             /// </summary>
             /// <typeparam name="TEntity">The type of the entity.</typeparam>

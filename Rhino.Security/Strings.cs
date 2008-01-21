@@ -2,6 +2,7 @@ namespace Rhino.Security
 {
     using System.Collections.Generic;
     using System.Text;
+    using Properties;
 
 	/// <summary>
     /// String utility methods
@@ -52,8 +53,9 @@ namespace Rhino.Security
 			{
 				sb.Append(entity.Name).Append(", ");
 			}
-			if (sb.Length != 0)
-				sb.Remove(sb.Length - 2, 2);
+			if (sb.Length == 0)
+				return Resources.NotAssociatedWithAnyGroup;
+			sb.Remove(sb.Length - 2, 2);
 			return sb.ToString();
     	}
     }

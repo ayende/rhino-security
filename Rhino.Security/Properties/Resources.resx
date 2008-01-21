@@ -120,6 +120,9 @@
   <data name="Everything" xml:space="preserve">
     <value>everything</value>
   </data>
+  <data name="NotAssociatedWithAnyGroup" xml:space="preserve">
+    <value>not assoicated with any group</value>
+  </data>
   <data name="OperationNotDefined" xml:space="preserve">
     <value>Operation '{0}' was not defined</value>
     <comment>0 - Operation Name</comment>
@@ -144,6 +147,14 @@
     <comment>0 - Operation Name
 1 - User Name
 2 - Groups</comment>
+  </data>
+  <data name="PermissionForOperationNotGrantedToUserOnEntity" xml:space="preserve">
+    <value>Permission for operation '{0}' was not granted to user '{1}' or to the groups '{1}' is associated with ('{2}') on '{3}' or any of the groups '{3}' is associated with ('{4}')</value>
+    <comment>0 - Operation Name
+1 - User Name
+2 - Users Groups
+4 - Entity Name
+4 - Entities Groups</comment>
   </data>
   <data name="PermissionGrantedForUser" xml:space="preserve">
     <value>Permission (level {3}) for operation '{0}' was granted to '{1}' on '{2}'</value>

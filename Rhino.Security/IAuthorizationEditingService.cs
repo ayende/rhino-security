@@ -73,5 +73,21 @@ namespace Rhino.Security
         /// <param name="operationName">Name of the operation.</param>
         /// <returns></returns>
         Operation GetOperationByName(string operationName);
+
+		/// <summary>
+		/// Removes the user from the specified group
+		/// </summary>
+		/// <param name="user">The user.</param>
+		/// <param name="usersGroupName">Name of the users group.</param>
+    	void DetachUserFromGroup(IUser user, string usersGroupName);
+
+		/// <summary>
+		/// Removes the entities from the specified group
+		/// </summary>
+		/// <typeparam name="TEntity">The type of the entity.</typeparam>
+		/// <param name="entity">The entity.</param>
+		/// <param name="entitiesGroupName">Name of the entities group.</param>
+    	void DetachEntityFromGroup<TEntity>(TEntity entity, string entitiesGroupName)
+			where TEntity : class;
     }
 }

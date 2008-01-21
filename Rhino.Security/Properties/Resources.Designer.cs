@@ -70,6 +70,15 @@ namespace Rhino.Security.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to not assoicated with any group.
+        /// </summary>
+        internal static string NotAssociatedWithAnyGroup {
+            get {
+                return ResourceManager.GetString("NotAssociatedWithAnyGroup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operation &apos;{0}&apos; was not defined.
         /// </summary>
         internal static string OperationNotDefined {
@@ -102,6 +111,15 @@ namespace Rhino.Security.Properties {
         internal static string PermissionForOperationNotGrantedToUser {
             get {
                 return ResourceManager.GetString("PermissionForOperationNotGrantedToUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permission for operation &apos;{0}&apos; was not granted to user &apos;{1}&apos; or to the groups &apos;{1}&apos; is associated with (&apos;{2}&apos;) on &apos;{3}&apos; or any of the groups &apos;{3}&apos; is associated with (&apos;{4}&apos;).
+        /// </summary>
+        internal static string PermissionForOperationNotGrantedToUserOnEntity {
+            get {
+                return ResourceManager.GetString("PermissionForOperationNotGrantedToUserOnEntity", resourceCulture);
             }
         }
         
