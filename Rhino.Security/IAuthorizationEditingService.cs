@@ -89,5 +89,24 @@ namespace Rhino.Security
 		/// <param name="entitiesGroupName">Name of the entities group.</param>
     	void DetachEntityFromGroup<TEntity>(TEntity entity, string entitiesGroupName)
 			where TEntity : class;
+
+
+        /// <summary>
+        /// Creates the users group as a child of <paramref name="parentGroupName"/>.
+        /// </summary>
+        /// <param name="parentGroupName">Name of the parent group.</param>
+        /// <param name="usersGroupName">Name of the users group.</param>
+        /// <returns></returns>
+        UsersGroup CreateChildUserGroupOf(string parentGroupName, string usersGroupName);
+
+        /// <summary>
+        /// Gets the ancestry association of a user with the named users group.
+        /// This allows to track how a user is associated to a group through 
+        /// their ancestry.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="usersGroupName">Name of the users group.</param>
+        /// <returns></returns>
+        UsersGroup[] GetAncestryAssociation(IUser user, string usersGroupName);
     }
 }

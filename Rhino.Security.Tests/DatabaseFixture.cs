@@ -1,6 +1,7 @@
 namespace Rhino.Security.Tests
 {
-	using Commons;
+    using System.IO;
+    using Commons;
 	using MbUnit.Framework;
 	using Rhino.Commons.ForTesting;
 
@@ -55,6 +56,16 @@ namespace Rhino.Security.Tests
 		public void TearDown()
 		{
 			CurrentContext.DisposeUnitOfWork();
+            try
+            {
+                File.Copy("TempDB.sdf", "CopyTempDB.dsf");
+            }
+            catch
+            {
+                // we ignore this, because we are doing this to allow us
+                // to lock the copy of the temp db without breaking all the tests
+                // this make it easier to jump between the DB and the tests
+            }
 		}
 	}
 }

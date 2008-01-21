@@ -162,11 +162,159 @@ namespace Rhino.Security.Tests
 			UnitOfWork.CurrentSession.Evict(ayende);
 			UnitOfWork.CurrentSession.Evict(group);
 
-			UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(ayende);
+            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(ayende);
 			Assert.AreEqual(1, groups.Length);
 			Assert.AreEqual("Admins", groups[0].Name);
 		}
 
+        [Test]
+        public void CanAssociateUserWithNestedGroup()
+        {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+            UsersGroup group = authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+            
+            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UnitOfWork.CurrentSession.Evict(ayende);
+            UnitOfWork.CurrentSession.Evict(group);
+
+            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(ayende);
+            Assert.AreEqual(2, groups.Length);
+            Assert.AreEqual("Admins", groups[0].Name);
+            Assert.AreEqual("DBA", groups[1].Name);
+
+        }
+
+
+	    [Test]
+	    public void CanGetAncestryAssociationOfUserWithGroupWithNested()
+	    {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            Assert.AreEqual(2, groups.Length);
+            Assert.AreEqual("DBA", groups[0].Name);
+            Assert.AreEqual("Admins", groups[1].Name);
+	    }
+
+        [Test]
+        public void CanGetAncestryAssociationOfUserWithGroupDirect()
+        {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationEditingService.AssociateUserWith(ayende, "Admins");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            Assert.AreEqual(1, groups.Length);
+            Assert.AreEqual("Admins", groups[0].Name);
+        }
+
+        [Test]
+        public void CanGetAncestryAssociationOfUserWithGroupWhereNonExists()
+        {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+
+
+            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            Assert.AreEqual(0, groups.Length);
+        }
+
+        [Test]
+        public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsDirectPathShouldSelectThat()
+        {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.AssociateUserWith(ayende, "Admins");
+            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            Assert.AreEqual(1, groups.Length);
+            Assert.AreEqual("Admins", groups[0].Name);
+        }
+
+        [Test]
+        public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsTwoLevelNesting()
+        {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.CreateChildUserGroupOf("DBA", "SQLite DBA");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.AssociateUserWith(ayende, "SQLite DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            Assert.AreEqual(3, groups.Length);
+            Assert.AreEqual("SQLite DBA", groups[0].Name);
+            Assert.AreEqual("DBA", groups[1].Name);
+            Assert.AreEqual("Admins", groups[2].Name);
+        }
+
+        [Test]
+        public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsMoreThanOneIndirectPathShouldSelectShortest()
+        {
+            User ayende = new User();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            authorizationEditingService.CreateUsersGroup("Admins");
+            UnitOfWork.Current.TransactionalFlush();
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.CreateChildUserGroupOf("DBA", "SQLite DBA");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            authorizationEditingService.AssociateUserWith(ayende, "SQLite DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            Assert.AreEqual(2, groups.Length);
+            Assert.AreEqual("DBA", groups[0].Name);
+            Assert.AreEqual("Admins", groups[1].Name);
+        }
 
 		[Test]
 		public void CanAssociateAccountWithGroup()

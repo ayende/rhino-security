@@ -40,23 +40,35 @@ namespace Rhino.Security
             return names.ToArray();
         }
 
-		/// <summary>
-		/// Joins the named of all the specified entities.
-		/// </summary>
-		/// <typeparam name="TNamedEntity">The type of the named entity.</typeparam>
-		/// <param name="entities">The entities.</param>
-		/// <returns></returns>
-    	public static string Join<TNamedEntity>(NamedEntity<TNamedEntity>[] entities) where TNamedEntity : NamedEntity<TNamedEntity>
+        /// <summary>
+        /// Joins the names of all the specified entities.
+        /// </summary>
+        /// <typeparam name="TNamedEntity">The type of the named entity.</typeparam>
+        /// <param name="entities">The entities.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns></returns>
+    	public static string Join<TNamedEntity>(NamedEntity<TNamedEntity>[] entities, string separator) where TNamedEntity : NamedEntity<TNamedEntity>
     	{
 			StringBuilder sb = new StringBuilder();
 			foreach (NamedEntity<TNamedEntity> entity in entities)
 			{
-				sb.Append(entity.Name).Append(", ");
+				sb.Append(entity.Name).Append(separator);
 			}
 			if (sb.Length == 0)
 				return Resources.NotAssociatedWithAnyGroup;
-			sb.Remove(sb.Length - 2, 2);
+            sb.Remove(sb.Length - separator.Length, separator.Length);
 			return sb.ToString();
     	}
+
+        /// <summary>
+        /// Joins the names of all the specified entities.
+        /// </summary>
+        /// <typeparam name="TNamedEntity">The type of the named entity.</typeparam>
+        /// <param name="entities">The entities.</param>
+        /// <returns></returns>
+        public static string Join<TNamedEntity>(NamedEntity<TNamedEntity>[] entities) where TNamedEntity : NamedEntity<TNamedEntity>
+        {
+            return Join(entities, ", ");
+        }
     }
 }

@@ -52,7 +52,7 @@ namespace Rhino.Security
 		/// <returns></returns>
 		public Permission[] GetPermissionsFor(IUser user, string operationName)
 		{
-			UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups))
@@ -73,7 +73,7 @@ namespace Rhino.Security
 		{
 			Guid key = Security.ExtractKey(entity);
 			EntitiesGroup[] entitiesGroups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
-			UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
 
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", usersGroups))
@@ -96,7 +96,7 @@ namespace Rhino.Security
 			Guid key = Security.ExtractKey(entity);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
 			EntitiesGroup[] entitiesGroups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
-			UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
 
 		    AbstractCriterion onCriteria =
 		        (Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups)) ||

@@ -106,7 +106,7 @@ namespace Rhino.Security.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Permission (level {4}) for operation &apos;{0}&apos; was denied to group &apos;{1}&apos; on &apos;{2}&apos; (&apos;{3}&apos; is a member of &apos;{1}&apos;).
+        ///   Looks up a localized string similar to Permission (level {4}) for operation &apos;{0}&apos; was denied to group &apos;{1}&apos; on &apos;{2}&apos; (&apos;{3}&apos; is a member of &apos;{5}&apos;).
         /// </summary>
         internal static string PermissionDeniedForUsersGroup {
             get {
@@ -142,7 +142,7 @@ namespace Rhino.Security.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Permission (level {4}) for operation &apos;{0}&apos; was granted to group &apos;{1}&apos; on &apos;{2}&apos; (&apos;{3}&apos; is a member of &apos;{1}&apos;).
+        ///   Looks up a localized string similar to Permission (level {4}) for operation &apos;{0}&apos; was granted to group &apos;{1}&apos; on &apos;{2}&apos; (&apos;{3}&apos; is a member of &apos;{5}&apos;).
         /// </summary>
         internal static string PermissionGrantedForUsersGroup {
             get {

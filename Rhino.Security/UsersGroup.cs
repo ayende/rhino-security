@@ -11,7 +11,9 @@ namespace Rhino.Security
     public class UsersGroup : NamedEntity<UsersGroup>
     {
         private UsersGroup parent;
-        private ISet<UsersGroup> children = new HashedSet<UsersGroup>();
+        private ISet<UsersGroup> directChildren = new HashedSet<UsersGroup>();
+        private ISet<UsersGroup> allChildren = new HashedSet<UsersGroup>();
+        private ISet<UsersGroup> allParent = new HashedSet<UsersGroup>();
         private ISet<IUser> users = new HashedSet<IUser>();
 
         /// <summary>
@@ -41,14 +43,47 @@ namespace Rhino.Security
         }
 
         /// <summary>
-        /// Gets or sets the children of this group
+        /// Gets or sets the direct children of this group (nested one level)
         /// </summary>
-        /// <value>The children.</value>
+        /// <value>The directChildren.</value>
         [HasMany(Inverse = true)]
-        public virtual ISet<UsersGroup> Children
+        public virtual ISet<UsersGroup> Directchildren
         {
-            get { return children; }
-            set { children = value; }
+            get { return directChildren; }
+            set { directChildren = value; }
+        }
+
+
+        /// <summary>
+        /// Gets or sets all children of this users group, at all nesting levels
+        /// </summary>
+        /// <value>All children.</value>
+        [HasAndBelongsToMany(
+            Table = "UsersGroupsHierarchy",
+            ColumnKey = "ParentGroup",
+            ColumnRef = "ChildGroup",
+            Inverse = true
+            )]
+        public virtual ISet<UsersGroup> AllChildren
+        {
+            get { return allChildren; }
+            set { allChildren = value; }
+        }
+
+
+        /// <summary>
+        /// Gets or sets all parent of this users group, at all nesting levels
+        /// </summary>
+        /// <value>All children.</value>
+        [HasAndBelongsToMany(
+            Table = "UsersGroupsHierarchy",
+            ColumnRef = "ParentGroup",
+           ColumnKey = "ChildGroup"
+            )]
+        public virtual ISet<UsersGroup> AllParents
+        {
+            get { return allParent; }
+            set { allParent = value; }
         }
     }
 }

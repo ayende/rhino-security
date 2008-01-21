@@ -184,13 +184,15 @@ namespace Rhino.Security
             return false;
         }
 
-        private static void AddUserGroupLevelPermissionMessage(string operation, AuthorizationInformation info,
+        private void AddUserGroupLevelPermissionMessage(string operation, AuthorizationInformation info,
                                                                IUser user, Permission permission,
                                                                string entityDescription,
                                                                string entitiesGroupsDescription)
         {
             if (permission.UsersGroup != null)
             {
+                UsersGroup[] ancestryAssociation = authorizationEditingService.GetAncestryAssociation(user, permission.UsersGroup.Name);
+                string groupAncestry = Strings.Join(ancestryAssociation, " -> ");
                 if (permission.Allow)
                 {
                     info.AddAllow(Resources.PermissionGrantedForUsersGroup,
@@ -198,7 +200,8 @@ namespace Rhino.Security
                                   permission.UsersGroup.Name,
                                   GetPermissionTarget(permission,entityDescription, entitiesGroupsDescription),
                                   user.SecurityInfo.Name,
-                                  permission.Level);
+                                  permission.Level,
+                                  groupAncestry);
                 }
                 else
                 {
@@ -207,7 +210,8 @@ namespace Rhino.Security
                                  permission.UsersGroup.Name,
                                  GetPermissionTarget(permission, entityDescription, entitiesGroupsDescription),
                                  user.SecurityInfo.Name,
-                                 permission.Level);
+                                 permission.Level,
+                                 groupAncestry);
                 }
             }
         }
