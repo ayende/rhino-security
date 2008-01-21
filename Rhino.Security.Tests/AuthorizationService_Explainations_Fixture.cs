@@ -305,11 +305,28 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
 			AuthorizationInformation information =
 				authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
 			string expected =
-				@"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'Important Accounts' ('Ayende' is a member of 'Administrators')
+                @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')' ('Ayende' is a member of 'Administrators')
 ";
-			Assert.Fail("Account should be in important accounts");
 			Assert.AreEqual(expected, information.ToString());
 		}
+
+        [Test]
+        public void ExplainWhyAllowedIfPermissionWasGrantedToUsersGroupAssociatedWithUser()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For("Administrators")
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+            AuthorizationInformation information =
+                authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
+            string expected =
+                @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'Important Accounts' ('Ayende' is a member of 'Administrators')
+";
+            Assert.AreEqual(expected, information.ToString());
+        }
 
 		[Test]
 		public void ExplainWhyDeniedOnAccountIfNoPermissionIsDefined()

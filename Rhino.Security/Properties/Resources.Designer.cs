@@ -61,6 +61,15 @@ namespace Rhino.Security.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; (&apos;{1}&apos; is a member of &apos;{2}&apos;).
+        /// </summary>
+        internal static string EntityWithGroups {
+            get {
+                return ResourceManager.GetString("EntityWithGroups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to everything.
         /// </summary>
         internal static string Everything {
