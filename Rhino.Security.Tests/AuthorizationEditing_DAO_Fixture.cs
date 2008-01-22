@@ -513,5 +513,20 @@ namespace Rhino.Security.Tests
             Repository<User>.Delete(user);
             UnitOfWork.Current.TransactionalFlush();
         }
+
+        [Test]
+        public void RemovingUserWillAlsoRemoveAssociatedPermissions()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationEditingService.RemoveUser(user);
+            Repository<User>.Delete(user);
+            UnitOfWork.Current.TransactionalFlush();
+        }
     }
 }
