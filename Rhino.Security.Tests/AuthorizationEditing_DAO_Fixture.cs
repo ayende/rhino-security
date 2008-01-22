@@ -505,5 +505,13 @@ namespace Rhino.Security.Tests
 
             Assert.AreEqual(0, parent.Children.Count);
         }
+
+        [Test]
+        public void CanRemoveUser()
+        {
+            authorizationEditingService.RemoveUser(user);
+            Repository<User>.Delete(user);
+            UnitOfWork.Current.TransactionalFlush();
+        }
     }
 }

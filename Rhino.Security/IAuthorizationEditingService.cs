@@ -130,5 +130,15 @@ namespace Rhino.Security
         /// </summary>
         /// <param name="operationName">The operation N ame.</param>
         void RemoveOperation(string operationName);
+
+        /// <summary>
+        /// Removes the user from rhino security.
+        /// This does NOT delete the user itself, merely reset all the
+        /// information that rhino security knows about it.
+        /// It also allows it to be removed by external API without violating
+        /// FK constraints
+        /// </summary>
+        /// <param name="user">The user.</param>
+        void RemoveUser(IUser user);
     }
 }

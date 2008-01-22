@@ -396,6 +396,28 @@ namespace Rhino.Security
             entitiesGroup.Entities.Remove(reference);
         }
 
+
+        /// <summary>
+        /// Removes the user from rhino security.
+        /// This does NOT delete the user itself, merely reset all the
+        /// information that rhino security knows about it.
+        /// It also allows it to be removed by external API without violating
+        /// FK constraints
+        /// </summary>
+        /// <param name="user">The user.</param>
+        public void RemoveUser(IUser user)
+        {
+            ICollection<UsersGroup> groups = usersGroupRepository.FindAll(GetDirectUserGroupsCriteria(user));
+            foreach (UsersGroup group in groups)
+            {
+                group.Users.Remove(user);
+            }
+
+            DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
+                .Add(Expression.Eq("User", user));
+            permissionssRepository.DeleteAll(permissionsToRemove);
+        }
+
         #endregion
 
         private static List<UsersGroup> Min(List<UsersGroup> first, List<UsersGroup> second)
