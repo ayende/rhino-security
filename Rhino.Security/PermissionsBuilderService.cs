@@ -77,6 +77,16 @@ namespace Rhino.Security
 
                 Guard.Against<ArgumentException>(usersGroup == null, "There is not users group named: " + usersGroup);
 
+                return For(usersGroup);
+            }
+
+            /// <summary>
+            /// Set the users group that this permission is built for
+            /// </summary>
+            /// <param name="usersGroup">The users group.</param>
+            /// <returns></returns>
+            public IOnPermissionBuilder For(UsersGroup usersGroup)
+            {
                 permission.UsersGroup = usersGroup;
 
                 return this;
