@@ -90,6 +90,7 @@
     <Compile Include="AuthorizationEditing_DAO_Fixture.cs" />
     <Compile Include="AuthorizationServiceFixture.cs" />
     <Compile Include="AuthorizationService_Explainations_Fixture.cs" />
+    <Compile Include="AuthorizationService_Queries_Fixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

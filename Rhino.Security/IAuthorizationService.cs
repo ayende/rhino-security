@@ -16,7 +16,7 @@ namespace Rhino.Security
         /// <param name="user">The user.</param>
         /// <param name="criteria">The criteria.</param>
         /// <param name="operation">The operation.</param>
-        void AddPermissionsToQuery(IUser user, ICriteria criteria, string operation);
+        void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria);
 
         /// <summary>
         /// Adds the permissions to the criteria query.
@@ -24,7 +24,7 @@ namespace Rhino.Security
         /// <param name="user">The user.</param>
         /// <param name="criteria">The criteria.</param>
         /// <param name="operation">The operation.</param>
-        void AddPermissionsToQuery(IUser user,DetachedCriteria criteria,string operation);
+        void AddPermissionsToQuery(IUser user, string operation, DetachedCriteria criteria);
 
         /// <summary>
         /// Determines whether the specified user is allowed to perform the specified 

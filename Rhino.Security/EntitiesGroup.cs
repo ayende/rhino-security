@@ -11,7 +11,7 @@ namespace Rhino.Security
     [ActiveRecord]
     public class EntitiesGroup : NamedEntity<EntitiesGroup>
     {
-        private ISet<EntityReference> entitiesKeys = new HashedSet<EntityReference>();
+        private ISet<EntityReference> entities = new HashedSet<EntityReference>();
 
         /// <summary>
         /// Gets or sets the entities security keys beloging to this entities group
@@ -24,8 +24,8 @@ namespace Rhino.Security
             )]
         public virtual ISet<EntityReference> Entities
         {
-            get { return entitiesKeys; }
-            set { entitiesKeys = value; }
+            get { return entities; }
+            set { entities = value; }
         }
     }
 }

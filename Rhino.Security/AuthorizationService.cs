@@ -1,8 +1,8 @@
 namespace Rhino.Security
 {
-    using System;
     using NHibernate;
     using NHibernate.Expressions;
+    using NHibernate.SqlCommand;
     using Properties;
 
     /// <summary>
@@ -35,9 +35,11 @@ namespace Rhino.Security
         /// <param name="user">The user.</param>
         /// <param name="criteria">The criteria.</param>
         /// <param name="operation">The operation.</param>
-        public void AddPermissionsToQuery(IUser user, ICriteria criteria, string operation)
+        public void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria)
         {
-            throw new NotImplementedException();
+            string securityKeyProperty = criteria.RootAlias + ".SecurityKey"; //TODO: get from infor extractor
+            ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
+            criteria.Add(allowed);
         }
 
         /// <summary>
@@ -46,9 +48,11 @@ namespace Rhino.Security
         /// <param name="user">The user.</param>
         /// <param name="criteria">The criteria.</param>
         /// <param name="operation">The operation.</param>
-        public void AddPermissionsToQuery(IUser user, DetachedCriteria criteria, string operation)
+        public void AddPermissionsToQuery(IUser user, string operation, DetachedCriteria criteria)
         {
-            throw new NotImplementedException();
+            string securityKeyProperty = criteria.RootAlias + ".SecurityKey"; //TODO: get from infor extractor
+            ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
+            criteria.Add(allowed);
         }
 
         /// <summary>
@@ -126,6 +130,28 @@ namespace Rhino.Security
 
         #endregion
 
+        private ICriterion GetPermissionQueryInternal(IUser user, string operation, string securityKeyProperty)
+        {
+            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
+            DetachedCriteria criteria = DetachedCriteria.For<Permission>("permission")
+                .CreateAlias("Operation", "op")
+                .CreateAlias("EntitiesGroup", "entityGroup", JoinType.LeftOuterJoin)
+                .CreateAlias("entityGroup.Entities", "entityKey", JoinType.LeftOuterJoin)
+                .SetProjection(Projections.Property("Allow"))
+                .Add(Expression.In("op.Name", operationNames))
+                .Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups))
+                .Add(
+                    Property.ForName(securityKeyProperty).EqProperty("permission.EntitySecurityKey") ||
+                    Property.ForName(securityKeyProperty).EqProperty("entityKey.Id") ||
+                    (
+                        Expression.IsNull("permission.EntitySecurityKey") &&
+                        Expression.IsNull("permission.EntitiesGroup")
+                    )
+                );
+            return Subqueries.In(true, criteria);
+        }
+
         private void AddPermissionDescriptionToAuthorizationInformation<TEntity>(string operation,
                                                                                  AuthorizationInformation info,
                                                                                  IUser user, Permission[] permissions,
@@ -185,20 +211,21 @@ namespace Rhino.Security
         }
 
         private void AddUserGroupLevelPermissionMessage(string operation, AuthorizationInformation info,
-                                                               IUser user, Permission permission,
-                                                               string entityDescription,
-                                                               string entitiesGroupsDescription)
+                                                        IUser user, Permission permission,
+                                                        string entityDescription,
+                                                        string entitiesGroupsDescription)
         {
             if (permission.UsersGroup != null)
             {
-                UsersGroup[] ancestryAssociation = authorizationEditingService.GetAncestryAssociation(user, permission.UsersGroup.Name);
+                UsersGroup[] ancestryAssociation =
+                    authorizationEditingService.GetAncestryAssociation(user, permission.UsersGroup.Name);
                 string groupAncestry = Strings.Join(ancestryAssociation, " -> ");
                 if (permission.Allow)
                 {
                     info.AddAllow(Resources.PermissionGrantedForUsersGroup,
                                   operation,
                                   permission.UsersGroup.Name,
-                                  GetPermissionTarget(permission,entityDescription, entitiesGroupsDescription),
+                                  GetPermissionTarget(permission, entityDescription, entitiesGroupsDescription),
                                   user.SecurityInfo.Name,
                                   permission.Level,
                                   groupAncestry);
@@ -253,9 +280,9 @@ namespace Rhino.Security
             {
                 if (string.IsNullOrEmpty(entitiesGroupsDescription) == false)
                 {
-                    return string.Format(Resources.EntityWithGroups, 
-                        permission.EntitiesGroup.Name,
-                        entityDescription, entitiesGroupsDescription);
+                    return string.Format(Resources.EntityWithGroups,
+                                         permission.EntitiesGroup.Name,
+                                         entityDescription, entitiesGroupsDescription);
                 }
                 else
                 {

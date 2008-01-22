@@ -16,10 +16,9 @@ namespace Rhino.Security.Tests
 		[Test]
 		public void WillReturnFalseIfOperationNotDefined()
 		{
-			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
+			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Delete");
 			Assert.IsFalse(isAllowed);
 		}
-
 
 		[Test]
 		public void WillReturnTrueIfAllowPermissionWasDefined()
