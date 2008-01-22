@@ -109,12 +109,22 @@ namespace Rhino.Security
                     .GetEntitiesGroupByName(entitiesGroupName);
                 Guard.Against<ArgumentException>(entitiesGroup == null,
                                                  "There is no entities group named: " + entitiesGroupName);
+                return On(entitiesGroup);
+            }
+
+            /// <summary>
+            /// Set the entity group this permission is built for
+            /// </summary>
+            /// <param name="entitiesGroup">The entities group.</param>
+            /// <returns></returns>
+            public ILevelPermissionBuilder On(EntitiesGroup entitiesGroup)
+            {
                 permission.EntitiesGroup = entitiesGroup;
                 return this;
             }
 
 
-			/// <summary>
+            /// <summary>
 			/// Set this permission to be application to everything
 			/// </summary>
 			/// <returns></returns>
@@ -163,7 +173,7 @@ namespace Rhino.Security
         {
             Operation operation = authorizationEditingService.GetOperationByName(operationName);
             Guard.Against<ArgumentException>(operation == null, "There is no operation named: " + operationName);
-            return new FluentPermissionBuilder(this, true, operation);
+            return Allow(operation);
         }
 
         /// <summary>
@@ -175,6 +185,27 @@ namespace Rhino.Security
         {
             Operation operation = authorizationEditingService.GetOperationByName(operationName);
             Guard.Against<ArgumentException>(operation == null, "There is no operation named: " + operationName);
+            return Deny(operation);
+        }
+
+
+        /// <summary>
+        /// Allow permission for the specified operation.
+        /// </summary>
+        /// <param name="operation">The operation.</param>
+        /// <returns></returns>
+        public IForPermissionBuilder Allow(Operation operation)
+        {
+            return new FluentPermissionBuilder(this, true, operation);
+        }
+
+        /// <summary>
+        /// Deny permission for the specified operation
+        /// </summary>
+        /// <param name="operation">The operation.</param>
+        /// <returns></returns>
+        public IForPermissionBuilder Deny(Operation operation)
+        {
             return new FluentPermissionBuilder(this, false, operation);
         }
     }

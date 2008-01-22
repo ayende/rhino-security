@@ -54,11 +54,27 @@ namespace Rhino.Security
         void AssociateEntityWith<TEntity>(TEntity entity, string groupName) where TEntity : class;
 
         /// <summary>
+        /// Associates the entity with the specified group
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="entity">The entity.</param>
+        /// <param name="group">The group.</param>
+        void AssociateEntityWith<TEntity>(TEntity entity, EntitiesGroup group) where TEntity : class;
+
+        /// <summary>
         /// Associates the user with a group with the specified name
         /// </summary>
         /// <param name="user">The user.</param>
         /// <param name="groupName">Name of the group.</param>
         void AssociateUserWith(IUser user, string groupName);
+
+        /// <summary>
+        /// Associates the user with a group with the specified name
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="group">The group.</param>
+        void AssociateUserWith(IUser user, UsersGroup group);
+
 
         /// <summary>
         /// Creates the operation with the given name

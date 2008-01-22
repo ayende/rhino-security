@@ -16,6 +16,13 @@ namespace Rhino.Security
         /// <summary>
         /// Set the entity group this permission is built for
         /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns></returns>
+        ILevelPermissionBuilder On(EntitiesGroup entity);
+
+        /// <summary>
+        /// Set the entity group this permission is built for
+        /// </summary>
         /// <param name="entitiesGroupName">Name of the entities group.</param>
         /// <returns></returns>
         ILevelPermissionBuilder On(string entitiesGroupName);

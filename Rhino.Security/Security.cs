@@ -112,5 +112,33 @@ namespace Rhino.Security
             IEntityInformationExtractor<TEntity> extractor = IoC.Resolve<IEntityInformationExtractor<TEntity>>();
             return extractor.GetDescription(ExtractKey(entity));
 		}
+
+        /// <summary>
+        /// Gets the security key property for the specified entity type
+        /// </summary>
+        /// <param name="entityType">Type of the entity.</param>
+        /// <returns></returns>
+        public static string GetSecurityKeyProperty(Type entityType)
+        {
+            lock(GetSecurityKeyPropertyCache)
+            {
+                Func<string> func;
+                if (GetSecurityKeyPropertyCache.TryGetValue(entityType, out func))
+                    return func();
+                func = (Func<string>)
+                    Delegate.CreateDelegate(typeof (Func<string>), 
+                        getSecurityKeyMethod.MakeGenericMethod(entityType));
+                GetSecurityKeyPropertyCache[entityType] = func;
+                return func();
+            }
+        }
+
+        internal static string GetSecurityKeyPropertyInternal<TEntity>()
+        {
+            return IoC.Resolve<IEntityInformationExtractor<TEntity>>().SecurityKeyPropertyName;
+        }
+
+        private readonly static Dictionary<Type, Func<string>> GetSecurityKeyPropertyCache = new Dictionary<Type, Func<string>>();
+        private readonly static MethodInfo getSecurityKeyMethod = typeof(Security).GetMethod("GetSecurityKeyPropertyInternal", BindingFlags.NonPublic | BindingFlags.Static);
     }
 }

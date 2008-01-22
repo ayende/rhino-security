@@ -304,6 +304,17 @@ namespace Rhino.Security
             EntitiesGroup entitiesGroup = GetEntitiesGroupByName(groupName);
             Guard.Against<ArgumentException>(entitiesGroup == null, "There is no entities group named: " + groupName);
 
+            AssociateEntityWith(entity, entitiesGroup);
+        }
+
+        /// <summary>
+        /// Associates the entity with the specified group
+        /// </summary>
+        /// <typeparam name="TEntity">The type of the entity.</typeparam>
+        /// <param name="entity">The entity.</param>
+        /// <param name="entitiesGroup">The entities group.</param>
+        public void AssociateEntityWith<TEntity>(TEntity entity, EntitiesGroup entitiesGroup) where TEntity : class
+        {
             Guid key = Security.ExtractKey(entity);
 
             EntityReference reference = GetOrCreateEntityReference<TEntity>(key);
@@ -321,9 +332,18 @@ namespace Rhino.Security
             UsersGroup group = GetUsersGroupByName(groupName);
             Guard.Against(group == null, "There is no users group named: " + groupName);
 
-            group.Users.Add(user);
+            AssociateUserWith(user, group);
         }
 
+        /// <summary>
+        /// Associates the user with a group with the specified name
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="group">The group.</param>
+        public void AssociateUserWith(IUser user, UsersGroup group)
+        {
+            group.Users.Add(user);
+        }
 
         /// <summary>
         /// Creates the operation with the given name

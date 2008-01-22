@@ -23,5 +23,11 @@ namespace Rhino.Security
         /// <param name="securityKey">The security key.</param>
         /// <returns></returns>
         string GetDescription(Guid securityKey);
+
+        /// <summary>
+        /// Gets the name of the security key property.
+        /// </summary>
+        /// <value>The name of the security key property.</value>
+        string SecurityKeyPropertyName { get; }
     }
 }

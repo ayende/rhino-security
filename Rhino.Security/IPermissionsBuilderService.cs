@@ -18,5 +18,17 @@ namespace Rhino.Security
         /// <param name="operationName">Name of the operation.</param>
         /// <returns></returns>
         IForPermissionBuilder Deny(string operationName);
+
+        /// <summary>
+        /// Allow permission for the specified operation.
+        /// </summary>
+        /// <param name="operation">The operation.</param>
+        IForPermissionBuilder Allow(Operation operation);
+
+        /// <summary>
+        /// Deny permission for the specified operation 
+        /// </summary>
+        /// <param name="operation">The operation.</param>
+        IForPermissionBuilder Deny(Operation operation);
     }
 }

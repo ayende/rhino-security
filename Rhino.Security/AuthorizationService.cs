@@ -37,7 +37,7 @@ namespace Rhino.Security
         /// <param name="operation">The operation.</param>
         public void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria)
         {
-            string securityKeyProperty = criteria.RootAlias + ".SecurityKey"; //TODO: get from infor extractor
+            string securityKeyProperty = criteria.RootAlias+"." + Security.GetSecurityKeyProperty(criteria.CriteriaClass);
             ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
             criteria.Add(allowed);
         }
@@ -50,7 +50,7 @@ namespace Rhino.Security
         /// <param name="operation">The operation.</param>
         public void AddPermissionsToQuery(IUser user, string operation, DetachedCriteria criteria)
         {
-            string securityKeyProperty = criteria.RootAlias + ".SecurityKey"; //TODO: get from infor extractor
+            string securityKeyProperty = criteria.RootAlias + "." + Security.GetSecurityKeyProperty(criteria.CriteriaClass);
             ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
             criteria.Add(allowed);
         }

@@ -23,5 +23,14 @@ namespace Rhino.Security.Tests
             Account account = accountsRepository.FindOne(Expression.Eq("SecurityKey", securityKey));
             return string.Format("Account: {0}", account.Name);
         }
+
+        /// <summary>
+        /// Gets the name of the security key property.
+        /// </summary>
+        /// <value>The name of the security key property.</value>
+        public string SecurityKeyPropertyName
+        {
+            get { return "SecurityKey"; }
+        }
     }
 }
