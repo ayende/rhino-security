@@ -20,7 +20,7 @@ namespace Rhino.Security
         /// afterward.
         /// </remarks>
         [Property(NotNull = true, Length = 255, Update = false, Unique = true)]
-        [ValidateIsUnique, ValidateNonEmpty, ValidateLength(0, 255)]
+        [ValidateNonEmpty, ValidateLength(0, 255), ValidateIsUniqueInSameTransaction]
         public virtual string Name
         {
             get { return name; }

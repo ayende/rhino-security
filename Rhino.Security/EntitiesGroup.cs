@@ -2,6 +2,7 @@ namespace Rhino.Security
 {
     using System;
     using Castle.ActiveRecord;
+    using Castle.Components.Validator;
     using Commons;
     using Iesi.Collections.Generic;
 

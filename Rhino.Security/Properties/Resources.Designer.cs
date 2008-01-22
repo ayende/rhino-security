@@ -79,6 +79,15 @@ namespace Rhino.Security.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Names must be unique.
+        /// </summary>
+        internal static string NonUniqueName {
+            get {
+                return ResourceManager.GetString("NonUniqueName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to not assoicated with any group.
         /// </summary>
         internal static string NotAssociatedWithAnyGroup {

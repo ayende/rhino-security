@@ -148,7 +148,8 @@ namespace Rhino.Security
                         Expression.IsNull("permission.EntitySecurityKey") &&
                         Expression.IsNull("permission.EntitiesGroup")
                     )
-                );
+                )
+                .SetMaxResults(1);
             return Subqueries.In(true, criteria);
         }
 

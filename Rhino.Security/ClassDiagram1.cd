@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Font Name="Tahoma" Size="8.25" />
+  <Interface Name="Rhino.Security.IAuthorizationEditingService">
+    <Position X="0.75" Y="6.75" Width="5.25" />
+    <TypeIdentifier>
+      <FileName>IAuthorizationEditingService.cs</FileName>
+      <HashCode>AAEACEABAAAAEAEAAQAAAEAAAgAAAAAAAAAIIgQCBBg=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.Security.IAuthorizationService">
+    <Position X="0.5" Y="4.5" Width="6.25" />
+    <TypeIdentifier>
+      <FileName>IAuthorizationService.cs</FileName>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIABAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.Security.IPermissionsBuilderService">
+    <Position X="6.25" Y="2.75" Width="3.25" />
+    <TypeIdentifier>
+      <FileName>IPermissionsBuilderService.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAEAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.Security.IPermissionsService">
+    <Position X="0.5" Y="2.5" Width="5.5" />
+    <TypeIdentifier>
+      <FileName>IPermissionsService.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAgAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+</ClassDiagram>

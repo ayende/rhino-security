@@ -126,6 +126,9 @@
   <data name="Everything" xml:space="preserve">
     <value>everything</value>
   </data>
+  <data name="NonUniqueName" xml:space="preserve">
+    <value>Names must be unique</value>
+  </data>
   <data name="NotAssociatedWithAnyGroup" xml:space="preserve">
     <value>not assoicated with any group</value>
   </data>

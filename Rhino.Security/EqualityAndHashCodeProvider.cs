@@ -9,7 +9,7 @@ namespace Rhino.Security
     /// if you are going to deal with objects outside the current Unit of Work.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class EqualityAndHashCodeProvider<T>
+    public abstract class EqualityAndHashCodeProvider<T> : IIDentifiable
         where T : EqualityAndHashCodeProvider<T>
     {
         private int? oldHashCode;

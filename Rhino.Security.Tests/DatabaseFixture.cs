@@ -46,7 +46,7 @@ namespace Rhino.Security.Tests
 			Security.UseSecuritySchema = false;
 			Security.PrepareForActiveRecordInitialization<User>();
 			MappingInfo from = MappingInfo.From(typeof (IUser).Assembly, typeof (User).Assembly);
-			FixtureInitialize(PersistenceFramework.ActiveRecord, "windsor.boo", DatabaseEngine.MsSqlCe, from);
+			FixtureInitialize(PersistenceFramework.ActiveRecord, "windsor.boo", DatabaseEngine.SQLite, from);
 			CurrentContext.CreateUnitOfWork();
 
 			SetupEntities();
@@ -56,16 +56,6 @@ namespace Rhino.Security.Tests
 		public void TearDown()
 		{
 			CurrentContext.DisposeUnitOfWork();
-            try
-            {
-                File.Copy("TempDB.sdf", "CopyTempDB.dsf");
-            }
-            catch
-            {
-                // we ignore this, because we are doing this to allow us
-                // to lock the copy of the temp db without breaking all the tests
-                // this make it easier to jump between the DB and the tests
-            }
 		}
 	}
 }
