@@ -3,7 +3,10 @@ namespace Rhino.Security.Tests
     using System.IO;
     using Commons;
 	using MbUnit.Framework;
-	using Rhino.Commons.ForTesting;
+    using NHibernate;
+    using NHibernate.Cache;
+    using NHibernate.Cfg;
+    using Rhino.Commons.ForTesting;
 
 	public class DatabaseFixture : TestFixtureBase
 	{
@@ -57,6 +60,19 @@ namespace Rhino.Security.Tests
 
             UnitOfWork.Current.TransactionalFlush();
         }
+	}
 
+	public class EnableTestCaching : INHibernateInitializationAware
+	{
+		public void Configured(Configuration cfg)
+		{
+			cfg.Properties[Environment.UseQueryCache] = "true";
+			cfg.Properties[Environment.UseSecondLevelCache] = "true";
+			cfg.Properties[Environment.CacheProvider] = typeof (HashtableCacheProvider).AssemblyQualifiedName;
+		}
+
+		public void Initialized(Configuration cfg, ISessionFactory sessionFactory)
+		{
+		}
 	}
 }

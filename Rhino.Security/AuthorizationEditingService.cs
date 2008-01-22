@@ -201,7 +201,7 @@ namespace Rhino.Security
             {
                 List<UsersGroup> path = new List<UsersGroup>();
                 UsersGroup current = usersGroup;
-                while (current.Parent != null && current != desiredGroup)
+                while (current != null && current != desiredGroup)
                 {
                     path.Add(current);
                     current = current.Parent;

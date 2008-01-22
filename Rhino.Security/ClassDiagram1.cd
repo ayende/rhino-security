@@ -1,6 +1,60 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+<ClassDiagram MajorVersion="1" MinorVersion="1">
   <Font Name="Tahoma" Size="8.25" />
+  <Class Name="Rhino.Security.EntitiesGroup">
+    <Position X="7.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>EntitiesGroup.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAEAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="entities" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="Rhino.Security.Operation">
+    <Position X="7.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>Operation.cs</FileName>
+      <HashCode>AAQAAAAEAAAAAARAAAAEQAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="children" Hidden="true" />
+      <Field Name="comment" Hidden="true" />
+      <Field Name="parent" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="Rhino.Security.Permission">
+    <Position X="11" Y="6.5" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>Permission.cs</FileName>
+      <HashCode>AAQFAAAABAAAAAAEAgAAAAIAAAEABAAhQAEAJAABAQA=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="allow" Hidden="true" />
+      <Field Name="entitiesGroup" Hidden="true" />
+      <Field Name="entitySecurityKey" Hidden="true" />
+      <Field Name="entityTypeName" Hidden="true" />
+      <Field Name="level" Hidden="true" />
+      <Field Name="operation" Hidden="true" />
+      <Method Name="SetEntityType" Hidden="true" />
+      <Field Name="user" Hidden="true" />
+      <Field Name="usersGroup" Hidden="true" />
+    </Members>
+  </Class>
+  <Class Name="Rhino.Security.UsersGroup">
+    <Position X="9.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>UsersGroup.cs</FileName>
+      <HashCode>IAAACCAAAAAAAAJAAAAAQAAAAAAAAAIAAQAAAAAAAAg=</HashCode>
+    </TypeIdentifier>
+    <Members>
+      <Field Name="allChildren" Hidden="true" />
+      <Field Name="allParent" Hidden="true" />
+      <Field Name="directChildren" Hidden="true" />
+      <Field Name="parent" Hidden="true" />
+      <Field Name="users" Hidden="true" />
+    </Members>
+  </Class>
   <Interface Name="Rhino.Security.IAuthorizationEditingService">
     <Position X="0.75" Y="6.75" Width="5.25" />
     <TypeIdentifier>
@@ -27,6 +81,20 @@
     <TypeIdentifier>
       <FileName>IPermissionsService.cs</FileName>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAgAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.Security.IUser">
+    <Position X="16" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <FileName>IUser.cs</FileName>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ=</HashCode>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Rhino.Security.IEntityInformationExtractor&lt;TEntity&gt;">
+    <Position X="17.75" Y="2.5" Width="2.75" />
+    <TypeIdentifier>
+      <FileName>IEntityInformationExtractor.cs</FileName>
+      <HashCode>AAAAAAAAAAAAIAAAIAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Interface>
 </ClassDiagram>
