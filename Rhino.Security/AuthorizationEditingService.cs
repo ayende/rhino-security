@@ -17,6 +17,7 @@ namespace Rhino.Security
         private readonly IRepository<EntityReference> entityReferenceRepository;
         private readonly IRepository<EntityType> entityTypesRepository;
         private readonly IRepository<Operation> operationsRepository;
+        private readonly IRepository<Permission> permissionssRepository;
         private readonly IRepository<UsersGroup> usersGroupRepository;
         private readonly ValidatorRunner validator;
 
@@ -29,13 +30,16 @@ namespace Rhino.Security
         /// <param name="entityReferenceRepository">The entity reference repository.</param>
         /// <param name="entityTypesRepository">The entity types repository.</param>
         /// <param name="operationsRepository">The operations repository.</param>
+        /// <param name="permissionssRepository">The permissionss repository.</param>
         public AuthorizationEditingService(IRepository<UsersGroup> usersGroupRepository,
                                            IRepository<EntitiesGroup> entitiesGroupRepository, ValidatorRunner validator,
                                            IRepository<EntityReference> entityReferenceRepository,
                                            IRepository<EntityType> entityTypesRepository,
-                                           IRepository<Operation> operationsRepository)
+                                           IRepository<Operation> operationsRepository,
+                                           IRepository<Permission> permissionssRepository)
         {
             this.usersGroupRepository = usersGroupRepository;
+            this.permissionssRepository = permissionssRepository;
             this.operationsRepository = operationsRepository;
             this.entityTypesRepository = entityTypesRepository;
             this.entityReferenceRepository = entityReferenceRepository;
@@ -62,14 +66,13 @@ namespace Rhino.Security
             return ug;
         }
 
-
         /// <summary>
         /// Creates the users group as a child of <paramref name="parentGroupName"/>.
         /// </summary>
         /// <param name="parentGroupName">Name of the parent group.</param>
         /// <param name="usersGroupName">Name of the users group.</param>
         /// <returns></returns>
-        public UsersGroup CreateChildUserGroupOf(string parentGroupName, string usersGroupName)
+        public virtual UsersGroup CreateChildUserGroupOf(string parentGroupName, string usersGroupName)
         {
             UsersGroup parent = GetUsersGroupByName(parentGroupName);
             Guard.Against<ArgumentException>(parent == null,
@@ -79,11 +82,92 @@ namespace Rhino.Security
             group.Parent = parent;
             group.AllParents.AddAll(parent.AllParents);
             group.AllParents.Add(parent);
-            parent.Directchildren.Add(group);
+            parent.DirectChildren.Add(group);
             parent.AllChildren.Add(group);
             return group;
         }
 
+        /// <summary>
+        /// temporary string
+        /// </summary>
+        /// <param name="usersGroupName">Name of the users group.</param>
+        public virtual void RemoveUsersGroup(string usersGroupName)
+        {
+            UsersGroup group = GetUsersGroupByName(usersGroupName);
+            if (group == null)
+                return;
+
+            Guard.Against(group.DirectChildren.Count != 0, "Cannot remove users group '"+usersGroupName+"' because is has child groups. Remove those groups and try again.");
+
+            DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
+                .Add(Expression.Eq("UsersGroup", group));
+
+            permissionssRepository.DeleteAll(permissionsToRemove);
+            // we have to do this in order to ensure that we play
+            // nicely with the second level cache and collection removals
+            if (group.Parent!=null)
+            {
+                group.Parent.DirectChildren.Remove(group);
+            }
+            foreach (UsersGroup parent in group.AllParents)
+            {
+                parent.AllChildren.Remove(group);
+            }
+            group.AllParents.Clear();
+            group.Users.Clear();
+
+            usersGroupRepository.Delete(group);
+        }
+
+
+        /// <summary>
+        /// Removes the specified entities group.
+        /// Will also delete all permissions that are associated with this group.
+        /// </summary>
+        /// <param name="entitesGroupName">Name of the entites group.</param>
+        public virtual void RemoveEntitiesGroup(string entitesGroupName)
+        {
+            EntitiesGroup group = GetEntitiesGroupByName(entitesGroupName);
+            if(group==null)
+                return;
+
+            DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
+               .Add(Expression.Eq("EntitiesGroup", group));
+
+            permissionssRepository.DeleteAll(permissionsToRemove);
+
+            group.Entities.Clear();
+
+            entitiesGroupRepository.Delete(group);
+        }
+
+
+        /// <summary>
+        /// Removes the specified operation.
+        /// Will also delete all permissions for this operation
+        /// </summary>
+        /// <param name="operationName">The operation N ame.</param>
+        public virtual void RemoveOperation(string operationName)
+        {
+            Operation operation = GetOperationByName(operationName);
+            if(operation==null)
+                return;
+
+            Guard.Against(operation.Children.Count != 0, "Cannot remove operation '"+operationName+"' because it has child operations. Remove those operations and try again.");
+
+            DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
+                .Add(Expression.Eq("Operation", operation));
+
+            permissionssRepository.DeleteAll(permissionsToRemove);
+            
+            // so we can play safely with the 2nd level cache & collections
+            if(operation.Parent!=null)
+            {
+                operation.Parent.Children.Remove(operation);
+            }
+
+            operationsRepository.Delete(operation);
+        }
 
         /// <summary>
         /// Gets the ancestry association of a user with the named users group.
@@ -93,18 +177,19 @@ namespace Rhino.Security
         /// <param name="user">The user.</param>
         /// <param name="usersGroupName">Name of the users group.</param>
         /// <returns></returns>
-        public UsersGroup[] GetAncestryAssociation(IUser user, string usersGroupName)
+        public virtual UsersGroup[] GetAncestryAssociation(IUser user, string usersGroupName)
         {
             UsersGroup desiredGroup = GetUsersGroupByName(usersGroupName);
             ICollection<UsersGroup> directGroups =
                 usersGroupRepository.FindAll(GetDirectUserGroupsCriteria(user));
             if (directGroups.Contains(desiredGroup))
             {
-                return new UsersGroup[] { desiredGroup };
+                return new UsersGroup[] {desiredGroup};
             }
             // as a nice benefit, this does an eager load of all the groups in the hierarchy
-            // in an efficent way, so we don't have SELECT N + 1 here, nor do we need
+            // in an efficient way, so we don't have SELECT N + 1 here, nor do we need
             // to load the Users collection (which may be very large) to check if we are associated
+            // directly or not
             UsersGroup[] associatedGroups = GetAssociatedUsersGroupFor(user);
             if (Array.IndexOf(associatedGroups, desiredGroup) == -1)
             {
@@ -345,12 +430,12 @@ namespace Rhino.Security
         private EntityType GetOrCreateEntityType<TEntity>()
         {
             EntityType entityType = entityTypesRepository.FindOne(
-                Expression.Eq("Name", typeof(TEntity).FullName)
+                Expression.Eq("Name", typeof (TEntity).FullName)
                 );
             if (entityType == null)
             {
                 entityType = new EntityType();
-                entityType.Name = typeof(TEntity).FullName;
+                entityType.Name = typeof (TEntity).FullName;
                 entityTypesRepository.Save(entityType);
             }
             return entityType;

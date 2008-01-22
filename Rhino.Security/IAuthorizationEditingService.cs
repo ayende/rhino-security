@@ -108,5 +108,27 @@ namespace Rhino.Security
         /// <param name="usersGroupName">Name of the users group.</param>
         /// <returns></returns>
         UsersGroup[] GetAncestryAssociation(IUser user, string usersGroupName);
+
+        /// <summary>
+        /// Removes the specified users group.
+        /// Cannot remove parent users groups, you must remove them first.
+        /// Will also delete all permissions that are related to this group.
+        /// </summary>
+        /// <param name="usersGroupName">Name of the users group.</param>
+        void RemoveUsersGroup(string usersGroupName);
+
+        /// <summary>
+        /// Removes the specified entities group.
+        /// Will also delete all permissions that are associated with this group.
+        /// </summary>
+        /// <param name="entitesGroupName">Name of the entites group.</param>
+        void RemoveEntitiesGroup(string entitesGroupName);
+
+        /// <summary>
+        /// Removes the specified operation.
+        /// Will also delete all permissions for this operation
+        /// </summary>
+        /// <param name="operationName">The operation N ame.</param>
+        void RemoveOperation(string operationName);
     }
 }

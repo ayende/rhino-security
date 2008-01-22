@@ -47,7 +47,7 @@ namespace Rhino.Security
         /// </summary>
         /// <value>The directChildren.</value>
         [HasMany(Inverse = true)]
-        public virtual ISet<UsersGroup> Directchildren
+        public virtual ISet<UsersGroup> DirectChildren
         {
             get { return directChildren; }
             set { directChildren = value; }

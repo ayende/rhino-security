@@ -129,7 +129,7 @@ namespace Rhino.Security
 			return FindResults(criteria);
 		}
 
-		#endregion
+	    #endregion
 
 		private Permission[] FindResults(DetachedCriteria criteria)
 		{
