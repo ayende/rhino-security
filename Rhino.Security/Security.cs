@@ -36,6 +36,7 @@ namespace Rhino.Security
                     {
                         if (model.Type.Assembly != typeof(IUser).Assembly)
                             continue;
+                        model.ActiveRecordAtt.Cache = CacheEnum.ReadWrite;
                         if (UseSecuritySchema)
                             model.ActiveRecordAtt.Schema = "security";
                         else
@@ -49,6 +50,8 @@ namespace Rhino.Security
                         }
                         foreach (HasAndBelongsToManyModel hasAndBelongsToManyModel in model.HasAndBelongsToMany)
                         {
+                            hasAndBelongsToManyModel.HasManyAtt.Cache = CacheEnum.ReadWrite;
+                            
                             if (UseSecuritySchema)
                             {
                                 hasAndBelongsToManyModel.HasManyAtt.Schema = "security";
@@ -65,6 +68,8 @@ namespace Rhino.Security
                         }
                         foreach (HasManyModel hasManyModel in model.HasMany)
                         {
+                            hasManyModel.HasManyAtt.Cache = CacheEnum.ReadWrite;
+
                             if (hasManyModel.HasManyAtt.MapType == typeof(IUser))
                             {
                                 hasManyModel.HasManyAtt.MapType = userType;
