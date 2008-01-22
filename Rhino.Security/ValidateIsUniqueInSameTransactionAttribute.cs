@@ -21,14 +21,6 @@ namespace Rhino.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="ValidateIsUniqueInSameTransactionAttribute"/> class.
         /// </summary>
-        /// <param name="errorMessage">The error message.</param>
-        public ValidateIsUniqueInSameTransactionAttribute(string errorMessage) : base(errorMessage)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ValidateIsUniqueInSameTransactionAttribute"/> class.
-        /// </summary>
         public ValidateIsUniqueInSameTransactionAttribute()
         {
         }
@@ -60,10 +52,6 @@ namespace Rhino.Security
             public override bool IsValid(object instance, object fieldValue)
             {
                 IIDentifiable identifiable = (IIDentifiable)instance;
-                if(instance == null) // not this validator job
-                    return true;
-                if(fieldValue == null) // will not match anything anyway
-                    return true;
                 IList list = UnitOfWork.CurrentSession.CreateCriteria(instance.GetType())
                     .Add(Expression.Eq(Property.Name, fieldValue))
                     .Add(Expression.Not(Expression.IdEq(identifiable.Id)))

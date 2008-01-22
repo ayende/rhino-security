@@ -143,14 +143,16 @@ namespace Rhino.Security
                 .Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups))
                 .Add(
                     Property.ForName(securityKeyProperty).EqProperty("permission.EntitySecurityKey") ||
-                    Property.ForName(securityKeyProperty).EqProperty("entityKey.Id") ||
+                    Property.ForName(securityKeyProperty).EqProperty("entityKey.EntitySecurityKey") ||
                     (
                         Expression.IsNull("permission.EntitySecurityKey") &&
                         Expression.IsNull("permission.EntitiesGroup")
                     )
                 )
-                .SetMaxResults(1);
-            return Subqueries.In(true, criteria);
+                .SetMaxResults(1)
+                .AddOrder(Order.Desc("Level"))
+                .AddOrder(Order.Asc("Allow"));
+            return Subqueries.Eq(true, criteria);
         }
 
         private void AddPermissionDescriptionToAuthorizationInformation<TEntity>(string operation,

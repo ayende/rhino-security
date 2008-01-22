@@ -14,32 +14,6 @@ namespace Rhino.Security.Tests
 		protected IPermissionsService permissionService;
 		protected User user;
 
-		private void SetupEntities()
-		{
-			user = new User();
-			user.Name = "Ayende";
-			account = new Account();
-			account.Name = "south sand";
-
-			UnitOfWork.CurrentSession.Save(user);
-			UnitOfWork.CurrentSession.Save(account);
-
-			authorizationService = IoC.Resolve<IAuthorizationService>();
-			permissionService = IoC.Resolve<IPermissionsService>();
-			permissionsBuilderService = IoC.Resolve<IPermissionsBuilderService>();
-			authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-			authorizationEditingService.CreateUsersGroup("Administrators");
-			authorizationEditingService.CreateEntitiesGroup("Important Accounts");
-			authorizationEditingService.CreateOperation("/Account/Edit");
-
-			UnitOfWork.Current.TransactionalFlush();
-
-			authorizationEditingService.AssociateUserWith(user, "Administrators");
-			authorizationEditingService.AssociateEntityWith(account, "Important Accounts");
-
-			UnitOfWork.Current.TransactionalFlush();
-		}
-
 		[SetUp]
 		public virtual void SetUp()
 		{
@@ -57,5 +31,32 @@ namespace Rhino.Security.Tests
 		{
 			CurrentContext.DisposeUnitOfWork();
 		}
+
+        private void SetupEntities()
+        {
+            user = new User();
+            user.Name = "Ayende";
+            account = new Account();
+            account.Name = "south sand";
+
+            UnitOfWork.CurrentSession.Save(user);
+            UnitOfWork.CurrentSession.Save(account);
+
+            authorizationService = IoC.Resolve<IAuthorizationService>();
+            permissionService = IoC.Resolve<IPermissionsService>();
+            permissionsBuilderService = IoC.Resolve<IPermissionsBuilderService>();
+            authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
+            authorizationEditingService.CreateUsersGroup("Administrators");
+            authorizationEditingService.CreateEntitiesGroup("Important Accounts");
+            authorizationEditingService.CreateOperation("/Account/Edit");
+
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationEditingService.AssociateUserWith(user, "Administrators");
+            authorizationEditingService.AssociateEntityWith(account, "Important Accounts");
+
+            UnitOfWork.Current.TransactionalFlush();
+        }
+
 	}
 }
