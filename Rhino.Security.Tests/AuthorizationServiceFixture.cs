@@ -1,5 +1,6 @@
 namespace Rhino.Security.Tests
 {
+	using System.Data;
 	using Commons;
 	using MbUnit.Framework;
 
@@ -240,6 +241,56 @@ namespace Rhino.Security.Tests
             bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
             Assert.IsTrue(isAllowed);
         }
+
+		[Test, Ignore]
+        public void UseSecondLevelCacheForSecurityQuestions()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+            Assert.IsTrue(isAllowed);
+
+			// remove from DB without going through NHibernate
+			using (IDbCommand command = UnitOfWork.CurrentSession.Connection.CreateCommand())
+			{
+				command.CommandText = "DELETE FROM security_Permissions";
+				command.ExecuteNonQuery();
+			}
+
+			// should return true since it loads from cache
+			isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+            Assert.IsTrue(isAllowed);
+        }
+
+		
+		[Test]
+        public void UseSecondLevelCacheForSecurityQuestions_WillBeUpdatedWhenGoingThroughNHiberante()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+            Assert.IsTrue(isAllowed);
+
+			Repository<Permission>.DeleteAll();
+			UnitOfWork.Current.TransactionalFlush();
+			
+			// should return true since it loads from cache
+			isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+            Assert.IsFalse(isAllowed);
+        }
+
 
 	    [Test]
 	    public void WillReturnFalseIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()

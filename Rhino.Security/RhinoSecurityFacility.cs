@@ -16,25 +16,27 @@ namespace Rhino.Security
         ///</summary>
         protected override void Init()
         {
+			Kernel.AddComponent<AddCachingInterceptor>();
+
             Kernel.AddComponentEx<IAuthorizationService>()
                 .WithImplementation<AuthorizationService>()
                 .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor)))
-                .Registration.Register();
+                .Anywhere.Register();
 
             Kernel.AddComponentEx<IAuthorizationEditingService>()
                 .WithImplementation<AuthorizationEditingService>()
                 .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor)))
-                .Registration.Register();
+                .Anywhere.Register();
 
             Kernel.AddComponentEx<IPermissionsBuilderService>()
                 .WithImplementation<PermissionsBuilderService>()
                 .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor)))
-                .Registration.Register();
+                .Anywhere.Register();
 
             Kernel.AddComponentEx<IPermissionsService>()
                 .WithImplementation<PermissionsService>()
                 .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor)))
-                .Registration.Register();
+                .Anywhere.Register();
 
             if (Kernel.HasComponent(typeof(IValidatorRegistry)) == false)
             {
