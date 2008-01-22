@@ -224,5 +224,26 @@ namespace Rhino.Security.Tests
             Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
             Assert.AreEqual(1, permissions.Length);
         }
+
+        [Test]
+        public void CanRemovePermission()
+        {
+            Permission permission = permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For("Administrators")
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
+            Assert.AreEqual(1, permissions.Length);
+
+            permissionService.RemovePermission(permission);
+            UnitOfWork.Current.TransactionalFlush();
+
+            permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
+            Assert.AreEqual(0, permissions.Length);
+        }
     }
 }

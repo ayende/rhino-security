@@ -129,6 +129,16 @@ namespace Rhino.Security
 			return FindResults(criteria);
 		}
 
+
+	    /// <summary>
+	    /// Removes the specified permission.
+	    /// </summary>
+	    /// <param name="permission">The permission.</param>
+	    public void RemovePermission(Permission permission)
+	    {
+	        permissionRepository.Delete(permission);
+	    }
+
 	    #endregion
 
 		private Permission[] FindResults(DetachedCriteria criteria)
