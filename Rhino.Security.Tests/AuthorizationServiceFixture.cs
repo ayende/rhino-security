@@ -212,49 +212,49 @@ namespace Rhino.Security.Tests
 			Assert.IsFalse(isAllowed);
 		}
 
-        [Test]
-        public void WillReturnFalseOnAccountIfPermissionWasDeniedToUserOnTheGroupTheEntityIsAssociatedWith()
-        {
-            permissionsBuilderService
-                .Deny("/Account/Edit")
-                .For(user)
-                .On("Important Accounts")
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void WillReturnFalseOnAccountIfPermissionWasDeniedToUserOnTheGroupTheEntityIsAssociatedWith()
+		{
+			permissionsBuilderService
+				.Deny("/Account/Edit")
+				.For(user)
+				.On("Important Accounts")
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsFalse(isAllowed);
-        }
+			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+			Assert.IsFalse(isAllowed);
+		}
 
-        [Test]
-        public void WillReturnTrueOnAccountIfPermissionWasAllowedToUserOnTheGroupTheEntityIsAssociatedWith()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For(user)
-                .On("Important Accounts")
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void WillReturnTrueOnAccountIfPermissionWasAllowedToUserOnTheGroupTheEntityIsAssociatedWith()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For(user)
+				.On("Important Accounts")
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsTrue(isAllowed);
-        }
+			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+			Assert.IsTrue(isAllowed);
+		}
 
-		[Test, Ignore]
-        public void UseSecondLevelCacheForSecurityQuestions()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For(user)
-                .On("Important Accounts")
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void UseSecondLevelCacheForSecurityQuestions()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For(user)
+				.On("Important Accounts")
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsTrue(isAllowed);
+			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+			Assert.IsTrue(isAllowed);
 
 			// remove from DB without going through NHibernate
 			using (IDbCommand command = UnitOfWork.CurrentSession.Connection.CreateCommand())
@@ -262,74 +262,77 @@ namespace Rhino.Security.Tests
 				command.CommandText = "DELETE FROM security_Permissions";
 				command.ExecuteNonQuery();
 			}
+			// using a new connection, so doesn't have access to it
+			using (UnitOfWork.Start(UnitOfWorkNestingOptions.CreateNewOrNestUnitOfWork))
+			{
+				// should return true since it loads from cache
+				isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+				Assert.IsTrue(isAllowed);
+			}
+		}
 
-			// should return true since it loads from cache
-			isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsTrue(isAllowed);
-        }
 
-		
 		[Test]
-        public void UseSecondLevelCacheForSecurityQuestions_WillBeUpdatedWhenGoingThroughNHiberante()
-        {
-            permissionsBuilderService
-                .Allow("/Account/Edit")
-                .For(user)
-                .On("Important Accounts")
-                .DefaultLevel()
-                .Save();
-            UnitOfWork.Current.TransactionalFlush();
+		public void UseSecondLevelCacheForSecurityQuestions_WillBeUpdatedWhenGoingThroughNHiberante()
+		{
+			permissionsBuilderService
+				.Allow("/Account/Edit")
+				.For(user)
+				.On("Important Accounts")
+				.DefaultLevel()
+				.Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsTrue(isAllowed);
+			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+			Assert.IsTrue(isAllowed);
 
 			Repository<Permission>.DeleteAll();
 			UnitOfWork.Current.TransactionalFlush();
-			
+
 			// should return true since it loads from cache
 			isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsFalse(isAllowed);
-        }
+			Assert.IsFalse(isAllowed);
+		}
 
 
-	    [Test]
-	    public void WillReturnFalseIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
-	    {
-	        authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void WillReturnFalseIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
+		{
+			authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+			UnitOfWork.Current.TransactionalFlush();
 
-	        permissionsBuilderService
-               .Allow("/Account/Edit")
-               .For("Helpdesk")
-               .On("Important Accounts")
-               .DefaultLevel()
-               .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			permissionsBuilderService
+			   .Allow("/Account/Edit")
+			   .For("Helpdesk")
+			   .On("Important Accounts")
+			   .DefaultLevel()
+			   .Save();
+			UnitOfWork.Current.TransactionalFlush();
 
-            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsFalse(isAllowed);
-	    }
+			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+			Assert.IsFalse(isAllowed);
+		}
 
-        [Test]
-        public void WillReturnTrueIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
-        {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush(); 
-            
-            authorizationEditingService.DetachUserFromGroup(user, "Administrators");
-            authorizationEditingService.AssociateUserWith(user, "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+		[Test]
+		public void WillReturnTrueIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
+		{
+			authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+			UnitOfWork.Current.TransactionalFlush();
 
-            permissionsBuilderService
-               .Allow("/Account/Edit")
-               .For("Administrators")
-               .On("Important Accounts")
-               .DefaultLevel()
-               .Save();
-            UnitOfWork.Current.TransactionalFlush();
+			authorizationEditingService.DetachUserFromGroup(user, "Administrators");
+			authorizationEditingService.AssociateUserWith(user, "Helpdesk");
+			UnitOfWork.Current.TransactionalFlush();
 
-            bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-            Assert.IsTrue(isAllowed);
-        }
+			permissionsBuilderService
+			   .Allow("/Account/Edit")
+			   .For("Administrators")
+			   .On("Important Accounts")
+			   .DefaultLevel()
+			   .Save();
+			UnitOfWork.Current.TransactionalFlush();
+
+			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
+			Assert.IsTrue(isAllowed);
+		}
 	}
 }
