@@ -28,7 +28,7 @@ namespace Rhino.Security
         public static void PrepareForActiveRecordInitialization<TUser>()
             where TUser : IUser
         {
-            ActiveRecordStarter.ModelsCreated +=
+            ActiveRecordStarter.ModelsValidated +=
                 delegate(ActiveRecordModelCollection models, IConfigurationSource source)
                 {
                     Type userType = typeof(TUser);
