@@ -243,36 +243,6 @@ namespace Rhino.Security.Tests
 		}
 
 		[Test]
-		public void UseSecondLevelCacheForSecurityQuestions()
-		{
-			permissionsBuilderService
-				.Allow("/Account/Edit")
-				.For(user)
-				.On("Important Accounts")
-				.DefaultLevel()
-				.Save();
-			UnitOfWork.Current.TransactionalFlush();
-
-			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
-
-			// remove from DB without going through NHibernate
-			using (IDbCommand command = UnitOfWork.CurrentSession.Connection.CreateCommand())
-			{
-				command.CommandText = "DELETE FROM security_Permissions";
-				command.ExecuteNonQuery();
-			}
-			// using a new connection, so doesn't have access to it
-			using (UnitOfWork.Start(UnitOfWorkNestingOptions.CreateNewOrNestUnitOfWork))
-			{
-				// should return true since it loads from cache
-				isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-				Assert.IsTrue(isAllowed);
-			}
-		}
-
-
-		[Test]
 		public void UseSecondLevelCacheForSecurityQuestions_WillBeUpdatedWhenGoingThroughNHiberante()
 		{
 			permissionsBuilderService
@@ -298,7 +268,7 @@ namespace Rhino.Security.Tests
 		[Test]
 		public void WillReturnFalseIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
 		{
-			authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+			authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
 			UnitOfWork.Current.TransactionalFlush();
 
 			permissionsBuilderService
@@ -316,11 +286,11 @@ namespace Rhino.Security.Tests
 		[Test]
 		public void WillReturnTrueIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
 		{
-			authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+			authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
 			UnitOfWork.Current.TransactionalFlush();
 
-			authorizationEditingService.DetachUserFromGroup(user, "Administrators");
-			authorizationEditingService.AssociateUserWith(user, "Helpdesk");
+			authorizationRepository.DetachUserFromGroup(user, "Administrators");
+			authorizationRepository.AssociateUserWith(user, "Helpdesk");
 			UnitOfWork.Current.TransactionalFlush();
 
 			permissionsBuilderService

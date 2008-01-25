@@ -11,18 +11,18 @@ namespace Rhino.Security
 	/// </summary>
 	public class PermissionsService : IPermissionsService
 	{
-		private readonly IAuthorizationEditingService authorizationEditingService;
+		private readonly IAuthorizationRepository authorizationRepository;
 		private readonly IRepository<Permission> permissionRepository;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PermissionsService"/> class.
 		/// </summary>
-		/// <param name="authorizationEditingService">The authorization editing service.</param>
+		/// <param name="authorizationRepository">The authorization editing service.</param>
 		/// <param name="permissionRepository">The permission repository.</param>
-		public PermissionsService(IAuthorizationEditingService authorizationEditingService,
+		public PermissionsService(IAuthorizationRepository authorizationRepository,
 								  IRepository<Permission> permissionRepository)
 		{
-			this.authorizationEditingService = authorizationEditingService;
+			this.authorizationRepository = authorizationRepository;
 			this.permissionRepository = permissionRepository;
 		}
 
@@ -35,7 +35,7 @@ namespace Rhino.Security
 		/// <returns></returns>
 		public Permission[] GetPermissionsFor(IUser user)
 		{
-			UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+			UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups));
@@ -52,7 +52,7 @@ namespace Rhino.Security
 		/// <returns></returns>
 		public Permission[] GetPermissionsFor(IUser user, string operationName)
 		{
-            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups))
@@ -72,8 +72,8 @@ namespace Rhino.Security
 		public Permission[] GetPermissionsFor<TEntity>(IUser user, TEntity entity) where TEntity : class
 		{
 			Guid key = Security.ExtractKey(entity);
-			EntitiesGroup[] entitiesGroups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
-            UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+			EntitiesGroup[] entitiesGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
+            UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", usersGroups))
@@ -95,8 +95,8 @@ namespace Rhino.Security
 		{
 			Guid key = Security.ExtractKey(entity);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
-			EntitiesGroup[] entitiesGroups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
-            UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+			EntitiesGroup[] entitiesGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
+            UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 
 		    AbstractCriterion onCriteria =
 		        (Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups)) ||
@@ -122,22 +122,13 @@ namespace Rhino.Security
 				return GetPermissionsFor((IUser)entity);
 
 			Guid key = Security.ExtractKey(entity);
-			EntitiesGroup[] groups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
+			EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", groups));
 
 			return FindResults(criteria);
 		}
 
-
-	    /// <summary>
-	    /// Removes the specified permission.
-	    /// </summary>
-	    /// <param name="permission">The permission.</param>
-	    public void RemovePermission(Permission permission)
-	    {
-	        permissionRepository.Delete(permission);
-	    }
 
 	    #endregion
 

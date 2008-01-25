@@ -11,18 +11,18 @@ namespace Rhino.Security
     /// Allows to edit the security information of the 
     /// system
     /// </summary>
-    public class AuthorizationEditingService : IAuthorizationEditingService
+    public class AuthorizationRepository : IAuthorizationRepository
     {
         private readonly IRepository<EntitiesGroup> entitiesGroupRepository;
         private readonly IRepository<EntityReference> entityReferenceRepository;
         private readonly IRepository<EntityType> entityTypesRepository;
         private readonly IRepository<Operation> operationsRepository;
-        private readonly IRepository<Permission> permissionssRepository;
+        private readonly IRepository<Permission> permissionsRepository;
         private readonly IRepository<UsersGroup> usersGroupRepository;
         private readonly ValidatorRunner validator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthorizationEditingService"/> class.
+        /// Initializes a new instance of the <see cref="AuthorizationRepository"/> class.
         /// </summary>
         /// <param name="usersGroupRepository">The users group repository.</param>
         /// <param name="entitiesGroupRepository">The entities group repository.</param>
@@ -30,16 +30,16 @@ namespace Rhino.Security
         /// <param name="entityReferenceRepository">The entity reference repository.</param>
         /// <param name="entityTypesRepository">The entity types repository.</param>
         /// <param name="operationsRepository">The operations repository.</param>
-        /// <param name="permissionssRepository">The permissionss repository.</param>
-        public AuthorizationEditingService(IRepository<UsersGroup> usersGroupRepository,
+        /// <param name="permissionsRepository">The permissionss repository.</param>
+        public AuthorizationRepository(IRepository<UsersGroup> usersGroupRepository,
                                            IRepository<EntitiesGroup> entitiesGroupRepository, ValidatorRunner validator,
                                            IRepository<EntityReference> entityReferenceRepository,
                                            IRepository<EntityType> entityTypesRepository,
                                            IRepository<Operation> operationsRepository,
-                                           IRepository<Permission> permissionssRepository)
+                                           IRepository<Permission> permissionsRepository)
         {
             this.usersGroupRepository = usersGroupRepository;
-            this.permissionssRepository = permissionssRepository;
+            this.permissionsRepository = permissionsRepository;
             this.operationsRepository = operationsRepository;
             this.entityTypesRepository = entityTypesRepository;
             this.entityReferenceRepository = entityReferenceRepository;
@@ -47,7 +47,7 @@ namespace Rhino.Security
             this.validator = validator;
         }
 
-        #region IAuthorizationEditingService Members
+        #region IAuthorizationRepository Members
 
         /// <summary>
         /// Creates a new users group.
@@ -102,7 +102,7 @@ namespace Rhino.Security
             DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
                 .Add(Expression.Eq("UsersGroup", group));
 
-            permissionssRepository.DeleteAll(permissionsToRemove);
+            permissionsRepository.DeleteAll(permissionsToRemove);
             // we have to do this in order to ensure that we play
             // nicely with the second level cache and collection removals
             if (group.Parent!=null)
@@ -134,7 +134,7 @@ namespace Rhino.Security
             DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
                .Add(Expression.Eq("EntitiesGroup", group));
 
-            permissionssRepository.DeleteAll(permissionsToRemove);
+            permissionsRepository.DeleteAll(permissionsToRemove);
 
             group.Entities.Clear();
 
@@ -158,7 +158,7 @@ namespace Rhino.Security
             DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
                 .Add(Expression.Eq("Operation", operation));
 
-            permissionssRepository.DeleteAll(permissionsToRemove);
+            permissionsRepository.DeleteAll(permissionsToRemove);
             
             // so we can play safely with the 2nd level cache & collections
             if(operation.Parent!=null)
@@ -435,7 +435,17 @@ namespace Rhino.Security
 
             DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
                 .Add(Expression.Eq("User", user));
-            permissionssRepository.DeleteAll(permissionsToRemove);
+            permissionsRepository.DeleteAll(permissionsToRemove);
+        }
+
+
+        /// <summary>
+        /// Removes the specified permission.
+        /// </summary>
+        /// <param name="permission">The permission.</param>
+        public void RemovePermission(Permission permission)
+        {
+            permissionsRepository.Delete(permission);
         }
 
         #endregion

@@ -9,16 +9,16 @@ namespace Rhino.Security
     public class PermissionsBuilderService : IPermissionsBuilderService
     {
         private readonly IRepository<Permission> permissionRepository;
-        private readonly IAuthorizationEditingService authorizationEditingService;
+        private readonly IAuthorizationRepository authorizationRepository;
         /// <summary>
         /// Initializes a new instance of the <see cref="PermissionsBuilderService"/> class.
         /// </summary>
         /// <param name="permissionRepository">The permission repository.</param>
-        /// <param name="authorizationEditingService">The authorization editing service.</param>
-        public PermissionsBuilderService(IRepository<Permission> permissionRepository, IAuthorizationEditingService authorizationEditingService)
+        /// <param name="authorizationRepository">The authorization editing service.</param>
+        public PermissionsBuilderService(IRepository<Permission> permissionRepository, IAuthorizationRepository authorizationRepository)
         {
             this.permissionRepository = permissionRepository;
-            this.authorizationEditingService = authorizationEditingService;
+            this.authorizationRepository = authorizationRepository;
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Rhino.Security
             public IOnPermissionBuilder For(string usersGroupName)
             {
                 UsersGroup usersGroup = permissionBuilderService
-                    .authorizationEditingService
+                    .authorizationRepository
                     .GetUsersGroupByName(usersGroupName);
 
                 Guard.Against<ArgumentException>(usersGroup == null, "There is not users group named: " + usersGroup);
@@ -115,7 +115,7 @@ namespace Rhino.Security
             {
                 EntitiesGroup entitiesGroup = 
                     permissionBuilderService
-                    .authorizationEditingService
+                    .authorizationRepository
                     .GetEntitiesGroupByName(entitiesGroupName);
                 Guard.Against<ArgumentException>(entitiesGroup == null,
                                                  "There is no entities group named: " + entitiesGroupName);
@@ -181,7 +181,7 @@ namespace Rhino.Security
         /// <returns></returns>
         public IForPermissionBuilder Allow(string operationName)
         {
-            Operation operation = authorizationEditingService.GetOperationByName(operationName);
+            Operation operation = authorizationRepository.GetOperationByName(operationName);
             Guard.Against<ArgumentException>(operation == null, "There is no operation named: " + operationName);
             return Allow(operation);
         }
@@ -193,7 +193,7 @@ namespace Rhino.Security
         /// <returns></returns>
         public IForPermissionBuilder Deny(string operationName)
         {
-            Operation operation = authorizationEditingService.GetOperationByName(operationName);
+            Operation operation = authorizationRepository.GetOperationByName(operationName);
             Guard.Against<ArgumentException>(operation == null, "There is no operation named: " + operationName);
             return Deny(operation);
         }

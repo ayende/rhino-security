@@ -47,11 +47,5 @@ namespace Rhino.Security
         /// <param name="entity">The entity.</param>
         /// <returns></returns>
         Permission[] GetPermissionsFor<TEntity>(TEntity entity) where TEntity : class;
-
-        /// <summary>
-        /// Removes the specified permission.
-        /// </summary>
-        /// <param name="permission">The permission.</param>
-        void RemovePermission(Permission permission);
     }
 }

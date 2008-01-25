@@ -5,7 +5,7 @@ namespace Rhino.Security.Tests
     using MbUnit.Framework;
 
     [TestFixture]
-    public class AuthorizationEditing_DAO_Fixture : DatabaseFixture
+    public class AuthorizationRepositoryFixture : DatabaseFixture
     {
         [Test]
         public void CanSaveUser()
@@ -40,7 +40,7 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanCreateUsersGroup()
         {
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
 
             UnitOfWork.Current.TransactionalFlush();
 
@@ -54,7 +54,7 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanCreateEntitesGroup()
         {
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
@@ -68,81 +68,81 @@ namespace Rhino.Security.Tests
         [ExpectedException(typeof (ValidationException))]
         public void CannotCreateEntitiesGroupWithSameName()
         {
-            authorizationEditingService.CreateEntitiesGroup("Admininstrators");
+            authorizationRepository.CreateEntitiesGroup("Admininstrators");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateEntitiesGroup("Admininstrators");
+            authorizationRepository.CreateEntitiesGroup("Admininstrators");
         }
 
         [Test]
         [ExpectedException(typeof (ValidationException))]
         public void CannotCreateUsersGroupsWithSameName()
         {
-            authorizationEditingService.CreateUsersGroup("Admininstrators");
+            authorizationRepository.CreateUsersGroup("Admininstrators");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateUsersGroup("Admininstrators");
+            authorizationRepository.CreateUsersGroup("Admininstrators");
         }
 
         [Test]
         public void CanGetUsersGroupByName()
         {
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
+            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
             Assert.IsNotNull(group);
         }
 
         [Test]
         public void CanGetEntitiesGroupByName()
         {
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
+            group = authorizationRepository.GetEntitiesGroupByName("Accounts");
             Assert.IsNotNull(group);
         }
 
         [Test]
         public void CannotChangeUsersGroupName()
         {
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
+            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
             group.Name = "2";
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetUsersGroupByName("2");
+            group = authorizationRepository.GetUsersGroupByName("2");
             Assert.IsNull(group);
-            group = authorizationEditingService.GetUsersGroupByName("Admininstrators");
+            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
             Assert.IsNotNull(group);
         }
 
         [Test]
         public void CannotChangeEntitiesGroupName()
         {
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
+            group = authorizationRepository.GetEntitiesGroupByName("Accounts");
             group.Name = "2";
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationEditingService.GetEntitiesGroupByName("2");
+            group = authorizationRepository.GetEntitiesGroupByName("2");
             Assert.IsNull(group);
-            group = authorizationEditingService.GetEntitiesGroupByName("Accounts");
+            group = authorizationRepository.GetEntitiesGroupByName("Accounts");
             Assert.IsNotNull(group);
         }
 
@@ -153,16 +153,16 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            UsersGroup group = authorizationEditingService.CreateUsersGroup("Admins");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.AssociateUserWith(ayende, "Admins");
+            authorizationRepository.AssociateUserWith(ayende, "Admins");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(ayende);
             UnitOfWork.CurrentSession.Evict(group);
 
-            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(ayende);
+            UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(ayende);
             Assert.AreEqual(1, groups.Length);
             Assert.AreEqual("Admins", groups[0].Name);
         }
@@ -174,18 +174,18 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
-            UsersGroup group = authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            UsersGroup group = authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            authorizationRepository.AssociateUserWith(ayende, "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(ayende);
             UnitOfWork.CurrentSession.Evict(group);
 
-            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(ayende);
+            UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(ayende);
             Assert.AreEqual(2, groups.Length);
             Assert.AreEqual("Admins", groups[0].Name);
             Assert.AreEqual("DBA", groups[1].Name);
@@ -199,15 +199,15 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
-
-            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            authorizationRepository.AssociateUserWith(ayende, "DBA");
+            UnitOfWork.Current.TransactionalFlush();
+
+            UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.AreEqual(2, groups.Length);
             Assert.AreEqual("DBA", groups[0].Name);
             Assert.AreEqual("Admins", groups[1].Name);
@@ -220,13 +220,13 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.AssociateUserWith(ayende, "Admins");
+            authorizationRepository.AssociateUserWith(ayende, "Admins");
             UnitOfWork.Current.TransactionalFlush();
 
-            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.AreEqual(1, groups.Length);
             Assert.AreEqual("Admins", groups[0].Name);
         }
@@ -238,11 +238,11 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
 
 
-            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.AreEqual(0, groups.Length);
         }
 
@@ -253,16 +253,16 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.AssociateUserWith(ayende, "Admins");
-            authorizationEditingService.AssociateUserWith(ayende, "DBA");
+            authorizationRepository.AssociateUserWith(ayende, "Admins");
+            authorizationRepository.AssociateUserWith(ayende, "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.AreEqual(1, groups.Length);
             Assert.AreEqual("Admins", groups[0].Name);
         }
@@ -274,17 +274,17 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateChildUserGroupOf("DBA", "SQLite DBA");
+            authorizationRepository.CreateChildUserGroupOf("DBA", "SQLite DBA");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.AssociateUserWith(ayende, "SQLite DBA");
+            authorizationRepository.AssociateUserWith(ayende, "SQLite DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.AreEqual(3, groups.Length);
             Assert.AreEqual("SQLite DBA", groups[0].Name);
             Assert.AreEqual("DBA", groups[1].Name);
@@ -298,18 +298,18 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            authorizationEditingService.CreateUsersGroup("Admins");
+            authorizationRepository.CreateUsersGroup("Admins");
             UnitOfWork.Current.TransactionalFlush();
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateChildUserGroupOf("Admins", "DBA");
+            authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.CreateChildUserGroupOf("DBA", "SQLite DBA");
+            authorizationRepository.CreateChildUserGroupOf("DBA", "SQLite DBA");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.AssociateUserWith(ayende, "DBA");
-            authorizationEditingService.AssociateUserWith(ayende, "SQLite DBA");
+            authorizationRepository.AssociateUserWith(ayende, "DBA");
+            authorizationRepository.AssociateUserWith(ayende, "SQLite DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            UsersGroup[] groups = authorizationEditingService.GetAncestryAssociation(ayende, "Admins");
+            UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.AreEqual(2, groups.Length);
             Assert.AreEqual("DBA", groups[0].Name);
             Assert.AreEqual("Admins", groups[1].Name);
@@ -322,17 +322,17 @@ namespace Rhino.Security.Tests
             ayende.Name = "ayende";
 
             UnitOfWork.CurrentSession.Save(ayende);
-            EntitiesGroup group = authorizationEditingService.CreateEntitiesGroup("Accounts");
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.AssociateEntityWith(ayende, "Accounts");
+            authorizationRepository.AssociateEntityWith(ayende, "Accounts");
 
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(ayende);
             UnitOfWork.CurrentSession.Evict(group);
 
-            EntitiesGroup[] groups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(ayende);
+            EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(ayende);
             Assert.AreEqual(1, groups.Length);
             Assert.AreEqual("Accounts", groups[0].Name);
         }
@@ -340,18 +340,18 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanCreateOperation()
         {
-            authorizationEditingService.CreateOperation("/Account/Delete");
+            authorizationRepository.CreateOperation("/Account/Delete");
             UnitOfWork.Current.TransactionalFlush();
-            Operation operation = authorizationEditingService.GetOperationByName("/Account/Delete");
+            Operation operation = authorizationRepository.GetOperationByName("/Account/Delete");
             Assert.IsNotNull(operation, "Could not create operation");
         }
 
         [Test]
         public void WhenCreatingNestedOperation_WillCreateParentOperation_IfDoesNotExists()
         {
-            Operation operation = authorizationEditingService.CreateOperation("/Account/Delete");
+            Operation operation = authorizationRepository.CreateOperation("/Account/Delete");
             UnitOfWork.Current.TransactionalFlush();
-            Operation parentOperation = authorizationEditingService.GetOperationByName("/Account");
+            Operation parentOperation = authorizationRepository.GetOperationByName("/Account");
             Assert.IsNotNull(parentOperation);
             Assert.AreEqual(operation.Parent, parentOperation);
         }
@@ -359,9 +359,9 @@ namespace Rhino.Security.Tests
         [Test]
         public void WhenCreatingNestedOperation_WillLinkToParentOperation()
         {
-            authorizationEditingService.CreateOperation("/Account/Delete");
+            authorizationRepository.CreateOperation("/Account/Delete");
             UnitOfWork.Current.TransactionalFlush();
-            Operation parentOperation = authorizationEditingService.GetOperationByName("/Account");
+            Operation parentOperation = authorizationRepository.GetOperationByName("/Account");
             Assert.IsNotNull(parentOperation); // was created in setup
             Assert.AreEqual(2, parentOperation.Children.Count); // /Edit, /Delete
         }
@@ -369,10 +369,10 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanRemoveUserGroup()
         {
-            authorizationEditingService.RemoveUsersGroup("Administrators");
+            authorizationRepository.RemoveUsersGroup("Administrators");
             UnitOfWork.Current.TransactionalFlush();
 
-            Assert.IsNull(authorizationEditingService.GetUsersGroupByName("Administrators"));
+            Assert.IsNull(authorizationRepository.GetUsersGroupByName("Administrators"));
         }
 
         [Test]
@@ -381,9 +381,9 @@ namespace Rhino.Security.Tests
             )]
         public void RemovingParentUserGroupWillFail()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "DBA");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.RemoveUsersGroup("Administrators");
+            authorizationRepository.RemoveUsersGroup("Administrators");
         }
 
 
@@ -401,7 +401,7 @@ namespace Rhino.Security.Tests
             Permission[] permissions = permissionService.GetPermissionsFor(user);
             Assert.IsNotEmpty(permissions);
 
-            authorizationEditingService.RemoveUsersGroup("Administrators");
+            authorizationRepository.RemoveUsersGroup("Administrators");
             UnitOfWork.Current.TransactionalFlush();
 
             permissions = permissionService.GetPermissionsFor(user);
@@ -411,16 +411,16 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanRemoveNestedUserGroup()
         {
-            UsersGroup dbaGroup = authorizationEditingService.CreateChildUserGroupOf("Administrators", "DBA");
+            UsersGroup dbaGroup = authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.RemoveUsersGroup("DBA");
+            authorizationRepository.RemoveUsersGroup("DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            Assert.IsNull(authorizationEditingService.GetUsersGroupByName("DBA"));
+            Assert.IsNull(authorizationRepository.GetUsersGroupByName("DBA"));
 
             UsersGroup administratorsGroup = 
-                authorizationEditingService.GetUsersGroupByName("Administrators");
+                authorizationRepository.GetUsersGroupByName("Administrators");
             Assert.AreEqual(0,
                             administratorsGroup.DirectChildren.Count
                 );
@@ -434,29 +434,29 @@ namespace Rhino.Security.Tests
         [Test]
         public void UsersAreNotAssociatedWithRemovedGroups()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "DBA");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.AssociateUserWith(user, "DBA");
+            authorizationRepository.AssociateUserWith(user, "DBA");
             UnitOfWork.Current.TransactionalFlush();
 
-            UsersGroup[] associedGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            UsersGroup[] associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
             Assert.AreEqual(2, associedGroups.Length);
 
-            authorizationEditingService.RemoveUsersGroup("DBA");
+            authorizationRepository.RemoveUsersGroup("DBA");
             UnitOfWork.Current.TransactionalFlush();
 
 
-            associedGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
             Assert.AreEqual(1, associedGroups.Length);
         }
 
         [Test]
         public void CanRemoveEntitiesGroup()
         {
-            authorizationEditingService.RemoveEntitiesGroup("Important Accounts");
+            authorizationRepository.RemoveEntitiesGroup("Important Accounts");
             UnitOfWork.Current.TransactionalFlush();
-            Assert.IsNull(authorizationEditingService.GetEntitiesGroupByName("Important Accounts")); ;
+            Assert.IsNull(authorizationRepository.GetEntitiesGroupByName("Important Accounts")); ;
         }
 
 
@@ -474,7 +474,7 @@ namespace Rhino.Security.Tests
             Permission[] permissions = permissionService.GetPermissionsFor(user);
             Assert.IsNotEmpty(permissions);
 
-            authorizationEditingService.RemoveEntitiesGroup("Important Accounts");
+            authorizationRepository.RemoveEntitiesGroup("Important Accounts");
             UnitOfWork.Current.TransactionalFlush();
 
             permissions = permissionService.GetPermissionsFor(user);
@@ -484,24 +484,24 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanRemoveOperation()
         {
-            authorizationEditingService.RemoveOperation("/Account/Edit");
+            authorizationRepository.RemoveOperation("/Account/Edit");
             UnitOfWork.Current.TransactionalFlush();
-            Assert.IsNull(authorizationEditingService.GetOperationByName("/Account/Edit"));
+            Assert.IsNull(authorizationRepository.GetOperationByName("/Account/Edit"));
         }
 
         [Test]
         [ExpectedException(typeof(InvalidOperationException), "Cannot remove operation '/Account' because it has child operations. Remove those operations and try again.")]
         public void CannotRemoveParentOperatio()
         {
-            authorizationEditingService.RemoveOperation("/Account");
+            authorizationRepository.RemoveOperation("/Account");
         }
 
         [Test]
         public void CanRemoveNestedOperation()
         {
-            authorizationEditingService.RemoveOperation("/Account/Edit");
+            authorizationRepository.RemoveOperation("/Account/Edit");
             UnitOfWork.Current.TransactionalFlush();
-            Operation parent = authorizationEditingService.GetOperationByName("/Account");
+            Operation parent = authorizationRepository.GetOperationByName("/Account");
 
             Assert.AreEqual(0, parent.Children.Count);
         }
@@ -509,7 +509,7 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanRemoveUser()
         {
-            authorizationEditingService.RemoveUser(user);
+            authorizationRepository.RemoveUser(user);
             Repository<User>.Delete(user);
             UnitOfWork.Current.TransactionalFlush();
         }
@@ -524,7 +524,7 @@ namespace Rhino.Security.Tests
                 .DefaultLevel()
                 .Save();
             UnitOfWork.Current.TransactionalFlush();
-            authorizationEditingService.RemoveUser(user);
+            authorizationRepository.RemoveUser(user);
             Repository<User>.Delete(user);
             UnitOfWork.Current.TransactionalFlush();
         }

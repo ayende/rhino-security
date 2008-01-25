@@ -14,18 +14,24 @@ namespace Rhino.Security
     /// </summary>
     public class Security
     {
-        /// <summary>
-        /// A flag that determains how the security tables should be treated.
-        /// In a separate schema or using a naming convention.
-        /// The default is to put them in a separate schema.
-        /// </summary>
-        public static bool UseSecuritySchema = true;
 
         /// <summary>
         /// Prepares to change all internal reference in the security system
         /// from IUser to the user implementation of the project
         /// </summary>
         public static void PrepareForActiveRecordInitialization<TUser>()
+            where TUser : IUser
+        {
+                PrepareForActiveRecordInitialization<TUser>(SecurityTableStructure.Schema);
+        }
+
+        /// <summary>
+        /// Prepares to change all internal reference in the security system
+        /// from IUser to the user implementation of the project
+        /// </summary>
+        /// <typeparam name="TUser">The type of the user.</typeparam>
+        /// <param name="tableStructure">The table structure.</param>
+        public static void PrepareForActiveRecordInitialization<TUser>(SecurityTableStructure tableStructure)
             where TUser : IUser
         {
             ActiveRecordStarter.ModelsValidated +=
@@ -37,7 +43,7 @@ namespace Rhino.Security
                         if (model.Type.Assembly != typeof(IUser).Assembly)
                             continue;
                         model.ActiveRecordAtt.Cache = CacheEnum.ReadWrite;
-                        if (UseSecuritySchema)
+                        if (tableStructure==SecurityTableStructure.Schema)
                             model.ActiveRecordAtt.Schema = "security";
                         else
                             model.ActiveRecordAtt.Table = "security_" + model.ActiveRecordAtt.Table;
@@ -51,8 +57,8 @@ namespace Rhino.Security
                         foreach (HasAndBelongsToManyModel hasAndBelongsToManyModel in model.HasAndBelongsToMany)
                         {
                             hasAndBelongsToManyModel.HasManyAtt.Cache = CacheEnum.ReadWrite;
-                            
-                            if (UseSecuritySchema)
+
+                            if (tableStructure == SecurityTableStructure.Schema)
                             {
                                 hasAndBelongsToManyModel.HasManyAtt.Schema = "security";
                             }
@@ -146,4 +152,6 @@ namespace Rhino.Security
         private readonly static Dictionary<Type, Func<string>> GetSecurityKeyPropertyCache = new Dictionary<Type, Func<string>>();
         private readonly static MethodInfo getSecurityKeyMethod = typeof(Security).GetMethod("GetSecurityKeyPropertyInternal", BindingFlags.NonPublic | BindingFlags.Static);
     }
+
+    // <summary>
 }

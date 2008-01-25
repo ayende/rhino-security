@@ -76,12 +76,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddCachingInterceptor.cs" />
-    <Compile Include="AuthorizationEditingService.cs" />
+    <Compile Include="AuthorizationRepository.cs" />
     <Compile Include="AuthorizationInformation.cs" />
     <Compile Include="AuthorizationService.cs" />
     <Compile Include="EntitiesGroup.cs" />
     <Compile Include="EntityReference.cs" />
-    <Compile Include="IAuthorizationEditingService.cs" />
+    <Compile Include="IAuthorizationRepository.cs" />
     <Compile Include="IAuthorizationService.cs" />
     <Compile Include="IEntityInformationExtractor.cs" />
     <Compile Include="IForPermissionBuilder.cs" />
@@ -106,6 +106,7 @@
     <Compile Include="NamedEntity.cs" />
     <Compile Include="SecurityInfo.cs" />
     <Compile Include="SecurityKeyType.cs" />
+    <Compile Include="SecurityTableStructure.cs" />
     <Compile Include="Strings.cs" />
     <Compile Include="UsersGroup.cs" />
     <Compile Include="IUser.cs" />

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ClassDiagram MajorVersion="1" MinorVersion="1">
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
   <Font Name="Tahoma" Size="8.25" />
   <Class Name="Rhino.Security.EntitiesGroup">
     <Position X="7.5" Y="6.75" Width="1.5" />
@@ -55,11 +55,11 @@
       <Field Name="users" Hidden="true" />
     </Members>
   </Class>
-  <Interface Name="Rhino.Security.IAuthorizationEditingService">
+  <Interface Name="Rhino.Security.IAuthorizationRepository">
     <Position X="0.75" Y="6.75" Width="5.25" />
     <TypeIdentifier>
-      <FileName>IAuthorizationEditingService.cs</FileName>
-      <HashCode>AAEACEABAAAAEAEAAQAAAEAAAgAAAAAAAAAIIgQCBBg=</HashCode>
+      <FileName>IAuthorizationRepository.cs</FileName>
+      <HashCode>AAEACEABAAAAEAEAAQAAAEAAggAAAAAAAAAIIgQCBBg=</HashCode>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Rhino.Security.IAuthorizationService">
@@ -80,7 +80,7 @@
     <Position X="0.5" Y="2.5" Width="5.5" />
     <TypeIdentifier>
       <FileName>IPermissionsService.cs</FileName>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAgAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAA=</HashCode>
     </TypeIdentifier>
   </Interface>
   <Interface Name="Rhino.Security.IUser">

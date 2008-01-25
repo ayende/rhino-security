@@ -4,7 +4,7 @@ namespace Rhino.Security
     /// Allows to edit the security information of the 
     /// system
     /// </summary>
-    public interface IAuthorizationEditingService
+    public interface IAuthorizationRepository
     {
         /// <summary>
         /// Creates a new users group.
@@ -156,5 +156,12 @@ namespace Rhino.Security
         /// </summary>
         /// <param name="user">The user.</param>
         void RemoveUser(IUser user);
+
+
+        /// <summary>
+        /// Removes the specified permission.
+        /// </summary>
+        /// <param name="permission">The permission.</param>
+        void RemovePermission(Permission permission);
     }
 }

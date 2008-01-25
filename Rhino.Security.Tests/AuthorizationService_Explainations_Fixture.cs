@@ -342,8 +342,8 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
         [Test]
         public void ExplainWhyDeniedOnAccountWhenHaveNoGroupsOnUserOrEntity()
         {
-            authorizationEditingService.DetachUserFromGroup(user, "Administrators");
-            authorizationEditingService.DetachEntityFromGroup(account, "Important Accounts");
+            authorizationRepository.DetachUserFromGroup(user, "Administrators");
+            authorizationRepository.DetachEntityFromGroup(account, "Important Accounts");
             UnitOfWork.Current.TransactionalFlush();
 
             AuthorizationInformation information =
@@ -395,7 +395,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
         [Test]
         public void ExplainWhyDeniedIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
             permissionsBuilderService
@@ -417,11 +417,11 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
         [Test]
         public void ExplainWhyAllowedIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.DetachUserFromGroup(user, "Administrators");
-            authorizationEditingService.AssociateUserWith(user, "Helpdesk");
+            authorizationRepository.DetachUserFromGroup(user, "Administrators");
+            authorizationRepository.AssociateUserWith(user, "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
             permissionsBuilderService

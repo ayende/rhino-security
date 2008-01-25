@@ -11,7 +11,7 @@ namespace Rhino.Security.Tests
 	public class DatabaseFixture : TestFixtureBase
 	{
 		protected Account account;
-		protected IAuthorizationEditingService authorizationEditingService;
+		protected IAuthorizationRepository authorizationRepository;
 		protected IAuthorizationService authorizationService;
 		protected IPermissionsBuilderService permissionsBuilderService;
 		protected IPermissionsService permissionService;
@@ -20,16 +20,20 @@ namespace Rhino.Security.Tests
 		[SetUp]
 		public virtual void SetUp()
 		{
-			Security.UseSecuritySchema = false;
-			Security.PrepareForActiveRecordInitialization<User>();
+			Security.PrepareForActiveRecordInitialization<User>(SecurityTableStructure.Prefix);
 			MappingInfo from = MappingInfo.From(typeof (IUser).Assembly, typeof (User).Assembly);
-			FixtureInitialize(PersistenceFramework.ActiveRecord, "windsor.boo", DatabaseEngine.SQLite, from);
+			FixtureInitialize(PersistenceFramework.ActiveRecord, "windsor.boo", GetDatabaseEngine(), from);
 			CurrentContext.CreateUnitOfWork();
 
 			SetupEntities();
 		}
 
-		[TearDown]
+	    protected virtual DatabaseEngine GetDatabaseEngine()
+	    {
+	        return DatabaseEngine.SQLite;
+	    }
+
+	    [TearDown]
 		public void TearDown()
 		{
 			CurrentContext.DisposeUnitOfWork();
@@ -48,15 +52,15 @@ namespace Rhino.Security.Tests
             authorizationService = IoC.Resolve<IAuthorizationService>();
             permissionService = IoC.Resolve<IPermissionsService>();
             permissionsBuilderService = IoC.Resolve<IPermissionsBuilderService>();
-            authorizationEditingService = IoC.Resolve<IAuthorizationEditingService>();
-            authorizationEditingService.CreateUsersGroup("Administrators");
-            authorizationEditingService.CreateEntitiesGroup("Important Accounts");
-            authorizationEditingService.CreateOperation("/Account/Edit");
+            authorizationRepository = IoC.Resolve<IAuthorizationRepository>();
+            authorizationRepository.CreateUsersGroup("Administrators");
+            authorizationRepository.CreateEntitiesGroup("Important Accounts");
+            authorizationRepository.CreateOperation("/Account/Edit");
 
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.AssociateUserWith(user, "Administrators");
-            authorizationEditingService.AssociateEntityWith(account, "Important Accounts");
+            authorizationRepository.AssociateUserWith(user, "Administrators");
+            authorizationRepository.AssociateEntityWith(account, "Important Accounts");
 
             UnitOfWork.Current.TransactionalFlush();
         }

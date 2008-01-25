@@ -91,8 +91,9 @@
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="AccountInfromationExtractor.cs" />
-    <Compile Include="AuthorizationEditing_DAO_Fixture.cs" />
+    <Compile Include="AuthorizationRepositoryFixture.cs" />
     <Compile Include="AuthorizationServiceFixture.cs" />
+    <Compile Include="AuthorizationServiceWithSecondLevelCacheFixture.cs" />
     <Compile Include="AuthorizationService_Explainations_Fixture.cs" />
     <Compile Include="AuthorizationService_Queries_Fixture.cs" />
     <Compile Include="EnvironmentSetupFixture.cs" />

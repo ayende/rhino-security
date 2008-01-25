@@ -206,11 +206,11 @@ namespace Rhino.Security.Tests
         [Test]
         public void CanGetPermissionsSetOnarentGroupUserIsAssociatedWith()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.DetachUserFromGroup(user, "Administrators");
-            authorizationEditingService.AssociateUserWith(user, "Helpdesk");
+            authorizationRepository.DetachUserFromGroup(user, "Administrators");
+            authorizationRepository.AssociateUserWith(user, "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
             permissionsBuilderService
@@ -239,7 +239,7 @@ namespace Rhino.Security.Tests
             Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
             Assert.AreEqual(1, permissions.Length);
 
-            permissionService.RemovePermission(permission);
+            authorizationRepository.RemovePermission(permission);
             UnitOfWork.Current.TransactionalFlush();
 
             permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");

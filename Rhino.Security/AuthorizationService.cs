@@ -11,7 +11,7 @@ namespace Rhino.Security
     /// </summary>
     public class AuthorizationService : IAuthorizationService
     {
-        private readonly IAuthorizationEditingService authorizationEditingService;
+        private readonly IAuthorizationRepository authorizationRepository;
 
         private readonly IPermissionsService permissionsService;
 
@@ -19,12 +19,12 @@ namespace Rhino.Security
         /// Initializes a new instance of the <see cref="AuthorizationService"/> class.
         /// </summary>
         /// <param name="permissionsService">The permissions service.</param>
-        /// <param name="authorizationEditingService">The authorization editing service.</param>
+        /// <param name="authorizationRepository">The authorization editing service.</param>
         public AuthorizationService(IPermissionsService permissionsService,
-                                    IAuthorizationEditingService authorizationEditingService)
+                                    IAuthorizationRepository authorizationRepository)
         {
             this.permissionsService = permissionsService;
-            this.authorizationEditingService = authorizationEditingService;
+            this.authorizationRepository = authorizationRepository;
         }
 
         #region IAuthorizationService Members
@@ -132,7 +132,7 @@ namespace Rhino.Security
 
         private ICriterion GetPermissionQueryInternal(IUser user, string operation, string securityKeyProperty)
         {
-            UsersGroup[] groups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+            UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(user);
             string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
             DetachedCriteria criteria = DetachedCriteria.For<Permission>("permission")
                 .CreateAlias("Operation", "op")
@@ -165,13 +165,13 @@ namespace Rhino.Security
             string entitiesGroupsDescription = "";
             if (entity != null)
             {
-                EntitiesGroup[] entitiesGroups = authorizationEditingService.GetAssociatedEntitiesGroupsFor(entity);
+                EntitiesGroup[] entitiesGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
                 entityDescription = Security.GetDescription(entity);
                 entitiesGroupsDescription = Strings.Join(entitiesGroups);
             }
             if (permissions.Length == 0)
             {
-                UsersGroup[] usersGroups = authorizationEditingService.GetAssociatedUsersGroupFor(user);
+                UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 
                 if (entity == null) //not on specific entity
                 {
@@ -204,7 +204,7 @@ namespace Rhino.Security
         private bool InitializeAuthorizationInfo(string operation, out AuthorizationInformation info)
         {
             info = new AuthorizationInformation();
-            Operation op = authorizationEditingService.GetOperationByName(operation);
+            Operation op = authorizationRepository.GetOperationByName(operation);
             if (op == null)
             {
                 info.AddDeny(Resources.OperationNotDefined, operation);
@@ -221,7 +221,7 @@ namespace Rhino.Security
             if (permission.UsersGroup != null)
             {
                 UsersGroup[] ancestryAssociation =
-                    authorizationEditingService.GetAncestryAssociation(user, permission.UsersGroup.Name);
+                    authorizationRepository.GetAncestryAssociation(user, permission.UsersGroup.Name);
                 string groupAncestry = Strings.Join(ancestryAssociation, " -> ");
                 if (permission.Allow)
                 {

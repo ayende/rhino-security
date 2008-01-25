@@ -265,7 +265,7 @@ namespace Rhino.Security.Tests
         [Test]
         public void WillReturnNothingIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
             permissionsBuilderService
@@ -283,11 +283,11 @@ namespace Rhino.Security.Tests
         [Test]
         public void WillReturnResultIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
         {
-            authorizationEditingService.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
-            authorizationEditingService.DetachUserFromGroup(user, "Administrators");
-            authorizationEditingService.AssociateUserWith(user, "Helpdesk");
+            authorizationRepository.DetachUserFromGroup(user, "Administrators");
+            authorizationRepository.AssociateUserWith(user, "Helpdesk");
             UnitOfWork.Current.TransactionalFlush();
 
             permissionsBuilderService
