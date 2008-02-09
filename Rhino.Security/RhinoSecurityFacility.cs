@@ -4,6 +4,7 @@ namespace Rhino.Security
     using Castle.Core;
     using Castle.Core.Interceptor;
     using Castle.MicroKernel.Facilities;
+    using Castle.MicroKernel.Registration;
     using Commons;
 
     /// <summary>
@@ -16,33 +17,35 @@ namespace Rhino.Security
         ///</summary>
         protected override void Init()
         {
-			Kernel
-                .AddComponentEx<AddCachingInterceptor>()
-                .AddComponentEx<IAuthorizationService>()
-                    .WithImplementation<AuthorizationService>()
-                    .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere
-                .AddComponentEx<IAuthorizationRepository>()
-                    .WithImplementation<AuthorizationRepository>()
-                    .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere
-                .AddComponentEx<IPermissionsBuilderService>()
-                    .WithImplementation<PermissionsBuilderService>()
-                    .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere
-                .AddComponentEx<IPermissionsService>()
-                    .WithImplementation<PermissionsService>()
-                    .WithInterceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere
-            .Register();
+			Kernel.Register(
+				Component.ForService<AddCachingInterceptor>(),
+                Component.ForService<IAuthorizationService>()
+                    .ImplementedBy<AuthorizationService>()
+                    .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere,
+                Component.ForService<IAuthorizationRepository>()
+                    .ImplementedBy<AuthorizationRepository>()
+                    .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere,
+                Component.ForService<IPermissionsBuilderService>()
+                    .ImplementedBy<PermissionsBuilderService>()
+                    .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere,
+                Component.ForService<IPermissionsService>()
+                    .ImplementedBy<PermissionsService>()
+                    .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere
+				);
 
             if (Kernel.HasComponent(typeof(IValidatorRegistry)) == false)
             {
-                Kernel
-                    .AddComponentEx<IValidatorRegistry>()
-                    .WithImplementation<CachedValidationRegistry>()
-                    .Register();
+            	Kernel.Register(
+            		Component.ForService<IValidatorRegistry>()
+            			.ImplementedBy<CachedValidationRegistry>()
+            		);
             }
 
             if (Kernel.HasComponent(typeof(ValidatorRunner)) == false)
             {
-                Kernel.AddComponentEx<ValidatorRunner>().Register();
+            	Kernel.Register(
+            		Component.ForService<ValidatorRunner>()
+            		);
             }
         }
     }
