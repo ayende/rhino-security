@@ -18,17 +18,17 @@ namespace Rhino.Security
         protected override void Init()
         {
 			Kernel.Register(
-				Component.ForService<AddCachingInterceptor>(),
-                Component.ForService<IAuthorizationService>()
+				Component.For<AddCachingInterceptor>(),
+                Component.For<IAuthorizationService>()
                     .ImplementedBy<AuthorizationService>()
                     .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere,
-                Component.ForService<IAuthorizationRepository>()
+                Component.For<IAuthorizationRepository>()
                     .ImplementedBy<AuthorizationRepository>()
                     .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere,
-                Component.ForService<IPermissionsBuilderService>()
+                Component.For<IPermissionsBuilderService>()
                     .ImplementedBy<PermissionsBuilderService>()
                     .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere,
-                Component.ForService<IPermissionsService>()
+                Component.For<IPermissionsService>()
                     .ImplementedBy<PermissionsService>()
                     .Interceptors(new InterceptorReference(typeof(AddCachingInterceptor))).Anywhere
 				);
@@ -36,7 +36,7 @@ namespace Rhino.Security
             if (Kernel.HasComponent(typeof(IValidatorRegistry)) == false)
             {
             	Kernel.Register(
-            		Component.ForService<IValidatorRegistry>()
+            		Component.For<IValidatorRegistry>()
             			.ImplementedBy<CachedValidationRegistry>()
             		);
             }
@@ -44,7 +44,7 @@ namespace Rhino.Security
             if (Kernel.HasComponent(typeof(ValidatorRunner)) == false)
             {
             	Kernel.Register(
-            		Component.ForService<ValidatorRunner>()
+            		Component.For<ValidatorRunner>()
             		);
             }
         }
