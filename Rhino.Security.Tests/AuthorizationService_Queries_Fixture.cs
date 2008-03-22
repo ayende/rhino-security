@@ -3,7 +3,7 @@ namespace Rhino.Security.Tests
     using Commons;
     using MbUnit.Framework;
     using NHibernate;
-    using NHibernate.Expressions;
+    using NHibernate.Criterion;
 
     [TestFixture]
     public class AuthorizationService_Queries_Fixture : DatabaseFixture

@@ -1,14 +1,34 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{558B3AE3-C408-4DB0-AC79-386BC12379BE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Rhino.Security.Tests</RootNamespace>
     <AssemblyName>Rhino.Security.Tests</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,7 +70,7 @@
     </Reference>
     <Reference Include="Iesi.Collections, Version=1.0.0.3, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Iesi.Collections.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="MbUnit.framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
       <SpecificVersion>False</SpecificVersion>
@@ -62,29 +82,29 @@
     </Reference>
     <Reference Include="Rhino.Commons, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Rhino.Commons.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Commons.ActiveRecord, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.ActiveRecord.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Rhino.Commons.ActiveRecord.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Commons.Clr, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Clr.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Rhino.Commons.Clr.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Commons.NHibernate, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.NHibernate.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Rhino.Commons.NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Commons.Test, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Test.dll</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\Rhino.Commons.Test.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.35.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\..\build\net-3.5\debug\System.Data.SQLite.DLL</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -98,18 +118,15 @@
     <Compile Include="AuthorizationService_Queries_Fixture.cs" />
     <Compile Include="EnableTestCaching.cs" />
     <Compile Include="EnvironmentSetupFixture.cs" />
-    <Compile Include="ExternalUserIntegrationFixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScenariosFixture.cs" />
     <Compile Include="SecrityInfoFixture.cs" />
     <Compile Include="User.cs" />
-    <Compile Include="WindowsIdentityUserAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="windsor.boo">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -122,6 +139,23 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

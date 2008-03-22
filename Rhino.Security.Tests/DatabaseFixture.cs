@@ -1,12 +1,10 @@
+using System;
+
 namespace Rhino.Security.Tests
 {
-    using System.IO;
-    using Commons;
+	using Commons;
 	using MbUnit.Framework;
-    using NHibernate;
-    using NHibernate.Cache;
-    using NHibernate.Cfg;
-    using Rhino.Commons.ForTesting;
+	using Rhino.Commons.ForTesting;
 
 	public class DatabaseFixture : TestFixtureBase
 	{
@@ -21,62 +19,48 @@ namespace Rhino.Security.Tests
 		public virtual void SetUp()
 		{
 			Security.PrepareForActiveRecordInitialization<User>(SecurityTableStructure.Prefix);
-			MappingInfo from = MappingInfo.From(typeof (IUser).Assembly, typeof (User).Assembly);
+			MappingInfo from = MappingInfo.From(typeof(IUser).Assembly, typeof(User).Assembly);
 			FixtureInitialize(PersistenceFramework.ActiveRecord, "windsor.boo", GetDatabaseEngine(), from);
 			CurrentContext.CreateUnitOfWork();
 
 			SetupEntities();
 		}
 
-	    protected virtual DatabaseEngine GetDatabaseEngine()
-	    {
-	        return DatabaseEngine.SQLite;
-	    }
+		protected virtual DatabaseEngine GetDatabaseEngine()
+		{
+			return DatabaseEngine.SQLite;
+		}
 
-	    [TearDown]
+		[TearDown]
 		public void TearDown()
 		{
 			CurrentContext.DisposeUnitOfWork();
 		}
 
-        private void SetupEntities()
-        {
-            user = new User();
-            user.Name = "Ayende";
-            account = new Account();
-            account.Name = "south sand";
-
-            UnitOfWork.CurrentSession.Save(user);
-            UnitOfWork.CurrentSession.Save(account);
-
-            authorizationService = IoC.Resolve<IAuthorizationService>();
-            permissionService = IoC.Resolve<IPermissionsService>();
-            permissionsBuilderService = IoC.Resolve<IPermissionsBuilderService>();
-            authorizationRepository = IoC.Resolve<IAuthorizationRepository>();
-            authorizationRepository.CreateUsersGroup("Administrators");
-            authorizationRepository.CreateEntitiesGroup("Important Accounts");
-            authorizationRepository.CreateOperation("/Account/Edit");
-
-            UnitOfWork.Current.TransactionalFlush();
-
-            authorizationRepository.AssociateUserWith(user, "Administrators");
-            authorizationRepository.AssociateEntityWith(account, "Important Accounts");
-
-            UnitOfWork.Current.TransactionalFlush();
-        }
-	}
-
-	public class EnableTestCaching : INHibernateInitializationAware
-	{
-		public void Configured(Configuration cfg)
+		private void SetupEntities()
 		{
-			cfg.Properties[Environment.UseQueryCache] = "true";
-			cfg.Properties[Environment.UseSecondLevelCache] = "true";
-			cfg.Properties[Environment.CacheProvider] = typeof (HashtableCacheProvider).AssemblyQualifiedName;
-		}
+			user = new User();
+			user.Name = "Ayende";
+			account = new Account();
+			account.Name = "south sand";
 
-		public void Initialized(Configuration cfg, ISessionFactory sessionFactory)
-		{
+			UnitOfWork.CurrentSession.Save(user);
+			UnitOfWork.CurrentSession.Save(account);
+
+			authorizationService = IoC.Resolve<IAuthorizationService>();
+			permissionService = IoC.Resolve<IPermissionsService>();
+			permissionsBuilderService = IoC.Resolve<IPermissionsBuilderService>();
+			authorizationRepository = IoC.Resolve<IAuthorizationRepository>();
+			authorizationRepository.CreateUsersGroup("Administrators");
+			authorizationRepository.CreateEntitiesGroup("Important Accounts");
+			authorizationRepository.CreateOperation("/Account/Edit");
+
+			UnitOfWork.Current.TransactionalFlush();
+
+			authorizationRepository.AssociateUserWith(user, "Administrators");
+			authorizationRepository.AssociateEntityWith(account, "Important Accounts");
+
+			UnitOfWork.Current.TransactionalFlush();
 		}
 	}
 }

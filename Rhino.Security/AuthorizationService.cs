@@ -1,7 +1,7 @@
 namespace Rhino.Security
 {
     using NHibernate;
-    using NHibernate.Expressions;
+    using NHibernate.Criterion;
     using NHibernate.SqlCommand;
     using Properties;
 

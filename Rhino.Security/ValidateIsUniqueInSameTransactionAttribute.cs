@@ -4,7 +4,7 @@ namespace Rhino.Security
     using System.Collections;
     using Castle.Components.Validator;
     using Commons;
-    using NHibernate.Expressions;
+    using NHibernate.Criterion;
     using Properties;
 
     /// <summary>

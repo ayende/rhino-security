@@ -2,7 +2,7 @@ namespace Rhino.Security.Tests
 {
     using System;
     using Commons;
-    using NHibernate.Expressions;
+    using NHibernate.Criterion;
 
     public class AccountInfromationExtractor : IEntityInformationExtractor<Account>
     {

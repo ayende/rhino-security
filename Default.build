@@ -1,31 +1,21 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<Project
-	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding='iso-8859-1' ?>
+<project
+	name="rhino-security"
+	default="build"
+	xmlns="http://nant.sf.net/release/0.85/nant.xsd"
+	>
 
-	<PropertyGroup>
-		<ProjectName>Rhino.Security</ProjectName>
-		<ShortName>rhino-security</ShortName>
-		<SolutionFile>Rhino.Security.sln</SolutionFile>
-		<FlattenZipFile>True</FlattenZipFile>
-		<SectionId>-1</SectionId>
-		<Version>0.9</Version>
-		<ClsCompliant>false</ClsCompliant>
-	</PropertyGroup>
-	
-	<ItemGroup>
-		<AssemblyInfo Include="Item">
-			<File>$(MSBuildProjectDirectory)\Rhino.Security\Properties\AssemblyInfo.cs</File>
-		</AssemblyInfo>
-		<AssemblyInfo Include="Item">
-			<File>$(MSBuildProjectDirectory)\Rhino.Security.Tests\Properties\AssemblyInfo.cs</File>
-		</AssemblyInfo>
-	</ItemGroup>
+	<property name="root.dir" value=".." />
+	<include buildfile="${root.dir}/common-project.xml" />
 
-	<ItemGroup>
-		<TestAssembly Include="$(OutDir)\Rhino.Security.Tests.dll"/>
-	</ItemGroup>
+	<fileset id="buildfiles.all">
+		<!-- Files have to be in dependency order -->
+		<include name="Rhino.Security/default.build" />
+		<include name="Rhino.Security.Tests/default.build" if="${common.testrunner.enabled}"/>
+	</fileset>
 
+	<target name="build" depends="common.build" />
 	
-	<Import Project="$(MSBuildProjectDirectory)\..\Common.build.xml"/>
-	
-</Project>
+	<target name="generate-assemblyinfo" depends="common.assemblyinfo" />
+
+</project>
