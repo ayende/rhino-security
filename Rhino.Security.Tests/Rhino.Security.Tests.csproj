@@ -50,7 +50,7 @@
     </Reference>
     <Reference Include="Iesi.Collections, Version=1.0.0.3, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Iesi.Collections.dll</HintPath>
+      <HintPath>..\..\SharedLibs\NHibernate\Iesi.Collections.dll</HintPath>
     </Reference>
     <Reference Include="MbUnit.framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
       <SpecificVersion>False</SpecificVersion>
@@ -60,31 +60,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SharedLibs\NHibernate\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Commons, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.ActiveRecord, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.ActiveRecord.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.Clr, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Clr.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.NHibernate, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.NHibernate.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.Test, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Test.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.35.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\..\SharedLibs\SqLite.Net\System.Data.SQLite.DLL</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -98,23 +78,44 @@
     <Compile Include="AuthorizationService_Queries_Fixture.cs" />
     <Compile Include="EnableTestCaching.cs" />
     <Compile Include="EnvironmentSetupFixture.cs" />
-    <Compile Include="ExternalUserIntegrationFixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScenariosFixture.cs" />
     <Compile Include="SecrityInfoFixture.cs" />
     <Compile Include="User.cs" />
-    <Compile Include="WindowsIdentityUserAdapter.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ClassDiagram1.cd" />
     <None Include="windsor.boo">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.ActiveRecord\Rhino.Commons.ActiveRecord.csproj">
+      <Project>{2B796A66-19FC-4E72-BB02-DC16D878725A}</Project>
+      <Name>Rhino.Commons.ActiveRecord</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.Clr\Rhino.Commons.Clr.csproj">
+      <Project>{77693BCD-4C8A-4523-AEE7-8AB46C1034E7}</Project>
+      <Name>Rhino.Commons.Clr</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate\Rhino.Commons.NHibernate.csproj">
+      <Project>{BF4E220E-5AF8-4448-ABA9-981D69AB8775}</Project>
+      <Name>Rhino.Commons.NHibernate</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.Test\Rhino.Commons.Test.csproj">
+      <Project>{EE98519D-104D-4A31-ADD8-82C5F836018C}</Project>
+      <Name>Rhino.Commons.Test</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons\Rhino.Commons.csproj">
+      <Project>{F6321543-E1EC-4999-A562-D9F060C8E3DF}</Project>
+      <Name>Rhino.Commons</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-dsl\Rhino.DSL\Rhino.DSL.csproj">
+      <Project>{B788F27C-E00A-434A-81AA-1D592E030934}</Project>
+      <Name>Rhino.DSL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.Security\Rhino.Security.csproj">
       <Project>{DBA372FE-3D52-45B3-AF82-B37696328764}</Project>
       <Name>Rhino.Security</Name>

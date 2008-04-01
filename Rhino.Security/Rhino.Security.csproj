@@ -44,7 +44,7 @@
     </Reference>
     <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Castle.MicroKernel.dll</HintPath>
+      <HintPath>..\..\SharedLibs\Castle\Castle.MicroKernel.dll</HintPath>
     </Reference>
     <Reference Include="Iesi.Collections, Version=1.0.0.3, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -53,22 +53,6 @@
     <Reference Include="NHibernate, Version=2.0.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SharedLibs\NHibernate\NHibernate.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.ActiveRecord, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.ActiveRecord.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.Clr, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.Clr.dll</HintPath>
-    </Reference>
-    <Reference Include="Rhino.Commons.NHibernate, Version=1.5.1091.0, Culture=neutral, PublicKeyToken=0b3305902db7183f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Build\Rhino.Commons\Rhino.Commons.NHibernate.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -83,11 +67,9 @@
     <Compile Include="ChangeSchemaVisitor.cs" />
     <Compile Include="EntitiesGroup.cs" />
     <Compile Include="EntityReference.cs" />
-    <Compile Include="ExternalUserType.cs" />
     <Compile Include="IAuthorizationRepository.cs" />
     <Compile Include="IAuthorizationService.cs" />
     <Compile Include="IEntityInformationExtractor.cs" />
-    <Compile Include="IExternalUser.cs" />
     <Compile Include="IForPermissionBuilder.cs" />
     <Compile Include="IIDentifiable.cs" />
     <Compile Include="ILevelPermissionBuilder.cs" />
@@ -104,7 +86,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ReplaceUserVisitor.cs" />
-    <Compile Include="ReplaceUserWithExternalVisitor.cs" />
     <Compile Include="RhinoSecurityFacility.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="EntityType.cs" />
@@ -134,6 +115,28 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.ActiveRecord\Rhino.Commons.ActiveRecord.csproj">
+      <Project>{2B796A66-19FC-4E72-BB02-DC16D878725A}</Project>
+      <Name>Rhino.Commons.ActiveRecord-vs2008</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.Clr\Rhino.Commons.Clr.csproj">
+      <Project>{77693BCD-4C8A-4523-AEE7-8AB46C1034E7}</Project>
+      <Name>Rhino.Commons.Clr</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate\Rhino.Commons.NHibernate.csproj">
+      <Project>{BF4E220E-5AF8-4448-ABA9-981D69AB8775}</Project>
+      <Name>Rhino.Commons.NHibernate</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons\Rhino.Commons.csproj">
+      <Project>{F6321543-E1EC-4999-A562-D9F060C8E3DF}</Project>
+      <Name>Rhino.Commons</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-dsl\Rhino.DSL\Rhino.DSL.csproj">
+      <Project>{B788F27C-E00A-434A-81AA-1D592E030934}</Project>
+      <Name>Rhino.DSL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
