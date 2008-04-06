@@ -20,7 +20,7 @@ namespace Rhino.Security.Tests
 		{
 			Security.PrepareForActiveRecordInitialization<User>(SecurityTableStructure.Prefix);
 			MappingInfo from = MappingInfo.From(typeof(IUser).Assembly, typeof(User).Assembly);
-			FixtureInitialize(PersistenceFramework.ActiveRecord, "windsor.boo", GetDatabaseEngine(), from);
+			IntializeNHibernateAndIoC(PersistenceFramework.ActiveRecord, "windsor.boo", GetDatabaseEngine(), from);
 			CurrentContext.CreateUnitOfWork();
 
 			SetupEntities();
