@@ -6,7 +6,7 @@ namespace Rhino.Security.Tests
 	using MbUnit.Framework;
 	using Rhino.Commons.ForTesting;
 
-	public class DatabaseFixture : TestFixtureBase
+	public class DatabaseFixture : DatabaseTestFixtureBase
 	{
 		protected Account account;
 		protected IAuthorizationRepository authorizationRepository;
