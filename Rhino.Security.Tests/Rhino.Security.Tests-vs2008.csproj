@@ -100,7 +100,6 @@
     <Compile Include="EnvironmentSetupFixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScenariosFixture.cs" />
     <Compile Include="SecrityInfoFixture.cs" />
     <Compile Include="User.cs" />
@@ -160,6 +159,9 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
