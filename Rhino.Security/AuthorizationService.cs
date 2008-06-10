@@ -1,3 +1,6 @@
+using System;
+using Rhino.Commons;
+
 namespace Rhino.Security
 {
     using NHibernate;
@@ -37,7 +40,8 @@ namespace Rhino.Security
         /// <param name="operation">The operation.</param>
         public void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria)
         {
-            string securityKeyProperty = criteria.RootAlias+"." + Security.GetSecurityKeyProperty(criteria.CriteriaClass);
+        	Type rootType = Rhino.Commons.NHibernate.CriteriaUtil.GetRootType(criteria);
+        	string securityKeyProperty = criteria.Alias+"." + Security.GetSecurityKeyProperty(rootType);
             ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
             criteria.Add(allowed);
         }
@@ -50,7 +54,8 @@ namespace Rhino.Security
         /// <param name="operation">The operation.</param>
         public void AddPermissionsToQuery(IUser user, string operation, DetachedCriteria criteria)
         {
-            string securityKeyProperty = criteria.RootAlias + "." + Security.GetSecurityKeyProperty(criteria.CriteriaClass);
+        	Type rootType = Commons.NHibernate.CriteriaUtil.GetRootType(criteria, UnitOfWork.CurrentSession);
+        	string securityKeyProperty = criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
             ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
             criteria.Add(allowed);
         }
