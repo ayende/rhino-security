@@ -1,11 +1,41 @@
+using Rhino.Commons.ForTesting;
+using Rhino.Security.Model;
+
 namespace Rhino.Security.Tests
 {
     using System.Collections.Generic;
     using Commons;
     using MbUnit.Framework;
 
-    [TestFixture]
-    public class PermissionsServiceFixture : DatabaseFixture
+	[TestFixture]
+	public class ActiveRecord_PermissionsServiceFixture : PermissionsServiceFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_PermissionsServiceFixture : PermissionsServiceFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+	}
+
+    public abstract class PermissionsServiceFixture : DatabaseFixture
     {
         [Test]
         public void CanCreatePermission()

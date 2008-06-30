@@ -1,10 +1,38 @@
+using Rhino.Commons.ForTesting;
+
 namespace Rhino.Security.Tests
 {
     using Commons;
     using MbUnit.Framework;
 
-    [TestFixture]
-    public class AuthorizationService_Explainations_Fixture : DatabaseFixture
+	[TestFixture]
+	public class ActiveRecord_AuthorizationService_Explainations_Fixture : AuthorizationService_Explainations_Fixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_AuthorizationService_Explainations_Fixture : AuthorizationService_Explainations_Fixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+	}
+
+    public abstract class AuthorizationService_Explainations_Fixture : DatabaseFixture
     {
         [Test]
         public void ExplainWhyAllowedWhenAllowedPermissionWasDefinedWithDenyPermissionWithLowerLevel()

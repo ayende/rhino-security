@@ -6,7 +6,6 @@ namespace Rhino.Security.Tests
     [TestFixture]
     public class SecrityInfoFixture
     {
-     
         [Test]
         [ExpectedException(typeof(ArgumentException),"Name must have a value")]
         public void WillNotAcceptNullName()

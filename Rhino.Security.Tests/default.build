@@ -31,11 +31,12 @@
 			<include name="log4net.dll" />
 			<include name="Rhino.Mocks.dll" />
 			<include name="Rhino.Security.dll" />
-			
+			<include name="Rhino.Security.ActiveRecord.dll" />
 		</assemblyfileset>
 
-		<resourcefileset id="project.resources" prefix="Rhino.Security" dynamicprefix="true" basedir="${src.dir}">
+		<resourcefileset id="project.resources" prefix="Rhino.Security.Tests" dynamicprefix="true" basedir="${src.dir}">
 			<include name="**/*.txt" />
+			<include name="**/*.hbm.xml" />
 			<include name="**/*.resx" />
 			<exclude name="obj/**" />
 		</resourcefileset>

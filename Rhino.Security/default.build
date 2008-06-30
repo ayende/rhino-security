@@ -21,7 +21,6 @@
 			<include name="Castle.Core.dll"/>
 			<include name="Castle.Components.Validator.dll"/>
 			<include name="Iesi.Collections.dll"/>
-			<include name="Castle.ActiveRecord.dll"/>
 			<include name="log4net.dll"/>
 			<include name="NHibernate.dll"/>
 			<include name="Rhino.Dsl.dll"/>
@@ -35,6 +34,7 @@
 		
 		<resourcefileset id="project.resources" prefix="Rhino.Security" dynamicprefix="true" basedir="${src.dir}">
 			<include name="**/*.txt" />
+			<include name="**/*.hbm.xml" />
 			<include name="**/*.resx" />
 			<exclude name="obj/**" />
 		</resourcefileset>

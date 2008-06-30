@@ -1,3 +1,6 @@
+using Rhino.Commons.ForTesting;
+using Rhino.Security.Model;
+
 namespace Rhino.Security.Tests
 {
 	using System.Data;
@@ -5,7 +8,34 @@ namespace Rhino.Security.Tests
 	using MbUnit.Framework;
 
 	[TestFixture]
-	public class AuthorizationServiceFixture : DatabaseFixture
+	public class ActiveRecord_AuthorizationServiceFixture : AuthorizationServiceFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_AuthorizationServiceFixture : AuthorizationServiceFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+	}
+
+	public abstract class AuthorizationServiceFixture : DatabaseFixture
 	{
 		[Test]
 		public void WillReturnFalseIfNoPermissionHasBeenDefined()

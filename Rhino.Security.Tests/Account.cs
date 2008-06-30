@@ -3,7 +3,7 @@ namespace Rhino.Security.Tests
     using System;
     using Castle.ActiveRecord;
 
-    [ActiveRecord]
+    [ActiveRecord(Cache = CacheEnum.ReadWrite)]
     public class Account
     {
         private long id;

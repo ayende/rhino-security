@@ -1,0 +1,34 @@
+<?xml version="1.0" ?>
+<hibernate-mapping  auto-import="true"
+										default-lazy="true"
+										xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+										namespace="Rhino.Security.Model"
+										assembly="Rhino.Security"
+										xmlns="urn:nhibernate-mapping-2.2">
+	<class name="EntityReference"
+				 table="EntityReferences">
+		<cache usage="read-write"
+					 region="rhino-security"/>
+		<id name="Id"
+				access="property"
+				column="Id"
+				type="System.Guid"
+				unsaved-value="00000000-0000-0000-0000-000000000000">
+			<generator class="guid.comb">
+			</generator>
+		</id>
+		<property name="EntitySecurityKey"
+							access="property"
+							type="System.Guid">
+			<column name="EntitySecurityKey"
+							not-null="true"
+							unique="true"/>
+		</property>
+		<many-to-one name="Type"
+								 access="property"
+								 class="EntityType"
+								 column="Type"
+								 not-null="true" />
+	</class>
+</hibernate-mapping>

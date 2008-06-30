@@ -5,8 +5,35 @@ namespace Rhino.Security.Tests
     using MbUnit.Framework;
     using Rhino.Commons.ForTesting;
 
-    [TestFixture]
-    public class AuthorizationServiceWithSecondLevelCacheFixture : DatabaseFixture
+	[TestFixture]
+	public class ActiveRecord_AuthorizationServiceWithSecondLevelCacheFixture : AuthorizationServiceWithSecondLevelCacheFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_AuthorizationServiceWithSecondLevelCacheFixture : AuthorizationServiceWithSecondLevelCacheFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+	}
+
+    public abstract class AuthorizationServiceWithSecondLevelCacheFixture : DatabaseFixture
     {
         // we need those to ensure that we aren't leaving the 2nd level
         // cache in an inconsistent state after deletion

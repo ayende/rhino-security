@@ -1,10 +1,40 @@
+using Rhino.Commons.ForTesting;
+using Rhino.Security.Model;
+
 namespace Rhino.Security.Tests
 {
 	using Commons;
 	using MbUnit.Framework;
 
 	[TestFixture]
-	public class EnvironmentSetupFixture : DatabaseFixture
+	public class ActiveRecord_EnvironmentSetupFixture : EnvironmentSetupFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_EnvironmentSetupFixture : EnvironmentSetupFixture
+	{
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+	}
+
+	public abstract class EnvironmentSetupFixture : DatabaseFixture
 	{
 		[Test]
 		public void RepositoryIsNotProxied()

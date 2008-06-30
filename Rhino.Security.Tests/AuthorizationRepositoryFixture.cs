@@ -1,11 +1,42 @@
+using Rhino.Commons.ForTesting;
+using Rhino.Security.Exceptions;
+using Rhino.Security.Model;
+
 namespace Rhino.Security.Tests
 {
     using System;
     using Commons;
     using MbUnit.Framework;
 
-    [TestFixture]
-    public class AuthorizationRepositoryFixture : DatabaseFixture
+	[TestFixture]
+	public class ActiveRecord_AuthorizationRepositoryFixture : AuthorizationRepositoryFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_AuthorizationRepositoryFixture : AuthorizationRepositoryFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+	}
+
+    public abstract class AuthorizationRepositoryFixture : DatabaseFixture
     {
         [Test]
         public void CanSaveUser()

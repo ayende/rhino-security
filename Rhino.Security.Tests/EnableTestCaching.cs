@@ -7,7 +7,12 @@ namespace Rhino.Security.Tests
 
     public class EnableTestCaching : INHibernateInitializationAware
     {
-        public void Configured(Configuration cfg)
+    	public void BeforeInitialization()
+    	{
+    		
+    	}
+
+    	public void Configured(Configuration cfg)
         {
             cfg.Properties[Environment.UseQueryCache] = "true";
             cfg.Properties[Environment.UseSecondLevelCache] = "true";

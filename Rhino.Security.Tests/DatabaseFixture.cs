@@ -1,4 +1,7 @@
 using System;
+using System.Diagnostics;
+using Rhino.Security.ActiveRecord;
+using Rhino.Security.Interfaces;
 
 namespace Rhino.Security.Tests
 {
@@ -6,7 +9,7 @@ namespace Rhino.Security.Tests
 	using MbUnit.Framework;
 	using Rhino.Commons.ForTesting;
 
-	public class DatabaseFixture : DatabaseTestFixtureBase
+	public abstract class DatabaseFixture : DatabaseTestFixtureBase
 	{
 		protected Account account;
 		protected IAuthorizationRepository authorizationRepository;
@@ -18,13 +21,22 @@ namespace Rhino.Security.Tests
 		[SetUp]
 		public virtual void SetUp()
 		{
-			Security.PrepareForActiveRecordInitialization<User>(SecurityTableStructure.Prefix);
-			MappingInfo from = MappingInfo.From(typeof(IUser).Assembly, typeof(User).Assembly);
-			IntializeNHibernateAndIoC(PersistenceFramework.ActiveRecord, "windsor.boo", GetDatabaseEngine(), from);
+			MappingInfo from = MappingInfo.From(
+				typeof(IUser).Assembly,
+				typeof(User).Assembly,
+				typeof(RegisterRhinoSecurityMappingAttribute).Assembly);
+			IntializeNHibernateAndIoC(PersistenceFramwork, RhinoContainerConfig, GetDatabaseEngine(), from);
 			CurrentContext.CreateUnitOfWork();
 
 			SetupEntities();
 		}
+
+		public abstract PersistenceFramework PersistenceFramwork
+		{
+			get;
+		}
+
+		public abstract string RhinoContainerConfig { get; }
 
 		protected virtual DatabaseEngine GetDatabaseEngine()
 		{

@@ -1,3 +1,5 @@
+using Rhino.Security.Interfaces;
+
 namespace Rhino.Security.Tests
 {
     using System;

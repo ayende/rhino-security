@@ -1,0 +1,51 @@
+<?xml version="1.0" ?>
+<hibernate-mapping  auto-import="true"
+										default-lazy="true"
+										xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+										namespace="Rhino.Security.Model"
+										assembly="Rhino.Security"
+										xmlns="urn:nhibernate-mapping-2.2">
+	<class name="Operation"
+				 table="Operations">
+		<cache usage="read-write"
+					 region="rhino-security"/>
+		<id name="Id"
+				access="property"
+				column="Id"
+				type="System.Guid"
+				unsaved-value="00000000-0000-0000-0000-000000000000">
+			<generator class="guid.comb">
+			</generator>
+		</id>
+		<property name="Name"
+							access="property"
+							type="String"
+							update="false">
+			<column name="Name"
+							length="255"
+							not-null="true"
+							unique="true"/>
+		</property>
+		<property name="Comment"
+							access="property"
+							type="String">
+			<column name="Comment"
+							length="255"/>
+		</property>
+		<many-to-one name="Parent"
+								 access="property"
+								 class="Operation"
+								 column="Parent" />
+		<set name="Children"
+				 access="property"
+				 table="Operations"
+				 lazy="true"
+				 inverse="true">
+			<cache usage="read-write"
+						 region="rhino-security"/>
+			<key column="Parent" />
+			<one-to-many class="Operation" />
+		</set>
+	</class>
+</hibernate-mapping>

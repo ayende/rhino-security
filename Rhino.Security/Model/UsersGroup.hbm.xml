@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<hibernate-mapping  auto-import="true"
+										default-lazy="true"
+										xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+										namespace="Rhino.Security.Model"
+										assembly="Rhino.Security"
+										xmlns="urn:nhibernate-mapping-2.2">
+	<class name="UsersGroup"
+				 table="UsersGroups">
+		<cache usage="read-write"
+					 region="rhino-security"/>
+		<id name="Id"
+				access="property"
+				column="Id"
+				type="System.Guid"
+				unsaved-value="00000000-0000-0000-0000-000000000000">
+			<generator class="guid.comb">
+			</generator>
+		</id>
+		<property name="Name"
+							access="property"
+							type="String"
+							update="false">
+			<column name="Name"
+							length="255"
+							not-null="true"
+							unique="true"/>
+		</property>
+		<many-to-one name="Parent"
+								 access="property"
+								 class="UsersGroup"
+								 column="Parent" />
+		<set name="DirectChildren"
+				 access="property"
+				 table="UsersGroups"
+				 lazy="true"
+				 inverse="true">
+			<cache usage="read-write"
+						 region="rhino-security"/>
+			<key column="Parent" />
+			<one-to-many class="UsersGroup" />
+		</set>
+		<set name="Users"
+				 access="property"
+				 table="UsersToUsersGroups"
+				 lazy="true">
+			<cache usage="read-write"
+						 region="rhino-security"/>
+			<key column="GroupId" />
+			<many-to-many class="Rhino.Security.IUser"
+										column="UserId"/>
+		</set>
+		<set name="AllChildren"
+				 access="property"
+				 table="UsersGroupsHierarchy"
+				 lazy="true"
+				 inverse="true">
+			<cache usage="read-write"
+						 region="rhino-security"/>
+			<key column="ParentGroup" />
+			<many-to-many class="UsersGroup"
+										column="ChildGroup"/>
+		</set>
+		<set name="AllParents"
+				 access="property"
+				 table="UsersGroupsHierarchy"
+				 lazy="true">
+			<cache usage="read-write"
+						 region="rhino-security"/>
+			<key column="ChildGroup" />
+			<many-to-many class="UsersGroup"
+										column="ParentGroup"/>
+		</set>
+	</class>
+</hibernate-mapping>

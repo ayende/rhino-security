@@ -106,7 +106,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="windsor.boo">
+    <None Include="ar-windsor.boo">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="nh-windsor.boo">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -135,6 +138,10 @@
       <Project>{B788F27C-E00A-434A-81AA-1D592E030934}</Project>
       <Name>Rhino.DSL</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Rhino.Security.ActiveRecord\Rhino.Security.ActiveRecord.csproj">
+      <Project>{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}</Project>
+      <Name>Rhino.Security.ActiveRecord</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Rhino.Security\Rhino.Security-vs2008.csproj">
       <Project>{DBA372FE-3D52-45B3-AF82-B37696328764}</Project>
       <Name>Rhino.Security</Name>
@@ -159,6 +166,15 @@
       <ProductName>.NET Framework 3.5</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Account.hbm.xml" />
+    <EmbeddedResource Include="User.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="hibernate.cfg.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

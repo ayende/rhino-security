@@ -1,11 +1,41 @@
+using Rhino.Commons.ForTesting;
+using Rhino.Security.Model;
+
 namespace Rhino.Security.Tests
 {
     using System;
     using Commons;
     using MbUnit.Framework;
 
-    [TestFixture]
-    public class ScenariosFixture : DatabaseFixture
+	[TestFixture]
+	public class ActiveRecord_ScenariosFixture : ScenariosFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "ar-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.ActiveRecord; }
+		}
+	}
+
+	[TestFixture]
+	public class NHibernate_ScenariosFixture : ScenariosFixture
+	{
+		public override string RhinoContainerConfig
+		{
+			get { return "nh-windsor.boo"; }
+		}
+
+		public override PersistenceFramework PersistenceFramwork
+		{
+			get { return PersistenceFramework.NHibernate; }
+		}
+	}
+
+    public abstract class ScenariosFixture : DatabaseFixture
     {
         [Test]
         public void DeeplyNestedUsersGroup()

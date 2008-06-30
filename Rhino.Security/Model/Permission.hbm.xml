@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<hibernate-mapping  auto-import="true"
+										default-lazy="true"
+										xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+										namespace="Rhino.Security.Model"
+										assembly="Rhino.Security"
+										xmlns="urn:nhibernate-mapping-2.2">
+	<class name="Permission"
+				 table="Permissions">
+		<cache usage="read-write"
+					 region="rhino-security"/>
+		<id name="Id"
+				access="property"
+				column="Id"
+				type="System.Guid"
+				unsaved-value="00000000-0000-0000-0000-000000000000">
+			<generator class="guid.comb">
+			</generator>
+		</id>
+		<property name="EntitySecurityKey"
+							access="property"
+							type="System.Guid, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+			<column name="EntitySecurityKey"/>
+		</property>
+		<property name="Allow"
+							access="property"
+							type="Boolean">
+			<column name="Allow"
+							not-null="true"/>
+		</property>
+		<property name="Level"
+							access="property"
+							type="Int32">
+			<column name="Level"
+							not-null="true"/>
+		</property>
+		<property name="EntityTypeName"
+							access="property"
+							type="String">
+			<column name="EntityTypeName"/>
+		</property>
+		<many-to-one name="Operation"
+								 access="property"
+								 class="Operation"
+								 column="Operation"
+								 not-null="true" />
+		<many-to-one name="User"
+								 access="property"
+								 class="Rhino.Security.IUser"
+								 column="`User`" />
+		<many-to-one name="UsersGroup"
+								 access="property"
+								 class="UsersGroup"
+								 column="UsersGroup" />
+		<many-to-one name="EntitiesGroup"
+								 access="property"
+								 class="EntitiesGroup"
+								 column="EntitiesGroup" />
+	</class>
+</hibernate-mapping>
