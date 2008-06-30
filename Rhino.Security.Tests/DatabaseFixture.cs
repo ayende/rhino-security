@@ -1,5 +1,3 @@
-using System;
-using System.Diagnostics;
 using Rhino.Security.ActiveRecord;
 using Rhino.Security.Interfaces;
 
