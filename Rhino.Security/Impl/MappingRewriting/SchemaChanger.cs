@@ -44,9 +44,9 @@ namespace Rhino.Security.Impl.MappingRewriting
 					Collection collection = property.Value as Collection;
 					if (collection == null) 
 						continue;
-					if (tableStructure == SecurityTableStructure.Schema)
+					if (tableStructure == SecurityTableStructure.Schema && collection.CollectionTable != null)
 						collection.CollectionTable.Schema = "security";
-					else if (collection.Table.Name.StartsWith("security_") == false)
+					else if (tableStructure == SecurityTableStructure.Prefix && collection.Table.Name.StartsWith("security_") == false)
 						collection.CollectionTable.Name = "security_" + collection.Table.Name;
 				}
 			}
