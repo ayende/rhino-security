@@ -59,49 +59,49 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddCachingInterceptor.cs" />
-    <Compile Include="AddCachingVisitor.cs" />
-    <Compile Include="AuthorizationRepository.cs" />
+    <Compile Include="Impl\AddCachingInterceptor.cs" />
+    <Compile Include="Impl\MappingRewriting\SchemaChanger.cs" />
+    <Compile Include="Impl\MappingRewriting\UserMapper.cs" />
+    <Compile Include="NHibernateMappingModifier.cs" />
+    <Compile Include="Services\AuthorizationRepository.cs" />
     <Compile Include="AuthorizationInformation.cs" />
-    <Compile Include="AuthorizationService.cs" />
-    <Compile Include="ChangeSchemaVisitor.cs" />
-    <Compile Include="EntitiesGroup.cs" />
-    <Compile Include="EntityReference.cs" />
-    <Compile Include="IAuthorizationRepository.cs" />
-    <Compile Include="IAuthorizationService.cs" />
-    <Compile Include="IEntityInformationExtractor.cs" />
-    <Compile Include="IForPermissionBuilder.cs" />
-    <Compile Include="IIDentifiable.cs" />
-    <Compile Include="ILevelPermissionBuilder.cs" />
-    <Compile Include="InvalidEntityException.cs" />
-    <Compile Include="IOnPermissionBuilder.cs" />
-    <Compile Include="IPermissionBuilder.cs" />
-    <Compile Include="IPermissionsBuilderService.cs" />
-    <Compile Include="IPermissionsService.cs" />
-    <Compile Include="PermissionsBuilderService.cs" />
-    <Compile Include="PermissionsService.cs" />
+    <Compile Include="Services\AuthorizationService.cs" />
+    <Compile Include="Model\EntitiesGroup.cs" />
+    <Compile Include="Model\EntityReference.cs" />
+    <Compile Include="Interfaces\IAuthorizationRepository.cs" />
+    <Compile Include="Interfaces\IAuthorizationService.cs" />
+    <Compile Include="Interfaces\IEntityInformationExtractor.cs" />
+    <Compile Include="Interfaces\IForPermissionBuilder.cs" />
+    <Compile Include="Interfaces\IIDentifiable.cs" />
+    <Compile Include="Interfaces\ILevelPermissionBuilder.cs" />
+    <Compile Include="Exceptions\InvalidEntityException.cs" />
+    <Compile Include="Interfaces\IOnPermissionBuilder.cs" />
+    <Compile Include="Interfaces\IPermissionBuilder.cs" />
+    <Compile Include="Interfaces\IPermissionsBuilderService.cs" />
+    <Compile Include="Interfaces\IPermissionsService.cs" />
+    <Compile Include="Services\PermissionsBuilderService.cs" />
+    <Compile Include="Services\PermissionsService.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ReplaceUserVisitor.cs" />
     <Compile Include="RhinoSecurityFacility.cs" />
     <Compile Include="Security.cs" />
-    <Compile Include="EntityType.cs" />
-    <Compile Include="EqualityAndHashCodeProvider.cs" />
-    <Compile Include="NamedEntity.cs" />
+    <Compile Include="Model\EntityType.cs" />
+    <Compile Include="Model\EqualityAndHashCodeProvider.cs" />
+    <Compile Include="Model\NamedEntity.cs" />
     <Compile Include="SecurityInfo.cs" />
     <Compile Include="SecurityKeyType.cs" />
     <Compile Include="SecurityTableStructure.cs" />
-    <Compile Include="Strings.cs" />
-    <Compile Include="UsersGroup.cs" />
+    <Compile Include="Impl\Util\Strings.cs" />
+    <Compile Include="Model\UsersGroup.cs" />
     <Compile Include="IUser.cs" />
-    <Compile Include="Operation.cs" />
-    <Compile Include="Permission.cs" />
+    <Compile Include="Model\Operation.cs" />
+    <Compile Include="Model\Permission.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ValidateIsUniqueInSameTransactionAttribute.cs" />
-    <Compile Include="ValidationException.cs" />
+    <Compile Include="Impl\Validatiors\ValidateIsUniqueInSameTransactionAttribute.cs" />
+    <Compile Include="Exceptions\ValidationException.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -109,9 +109,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
