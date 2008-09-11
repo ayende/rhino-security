@@ -38,7 +38,9 @@ namespace Rhino.Security
 		/// </summary>
 		public void Configured(Configuration cfg)
 		{
-			new SchemaChanger(cfg,securityTableStructure).Change();
+			if (cfg.Properties.ContainsKey("rhino.security.skipregistration")) return;
+
+			new SchemaChanger(cfg, securityTableStructure).Change();
 			new UserMapper(cfg, userType).Map();
 		}
 
