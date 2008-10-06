@@ -11,7 +11,6 @@ facility RhinoSecurityFacility:
 	userType = User
 
 component INHibernateInitializationAware, EnableTestCaching
-component INHibernateInitializationAware, NHibernateMappingModifier
 
 component IEntityInformationExtractor of Account, AccountInfromationExtractor
 
