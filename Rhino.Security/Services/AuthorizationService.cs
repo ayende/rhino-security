@@ -139,7 +139,6 @@ namespace Rhino.Security.Services
 
 		private ICriterion GetPermissionQueryInternal(IUser user, string operation, string securityKeyProperty)
 		{
-			UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>("permission")
 				.CreateAlias("Operation", "op")
@@ -147,7 +146,9 @@ namespace Rhino.Security.Services
 				.CreateAlias("entityGroup.Entities", "entityKey", JoinType.LeftOuterJoin)
 				.SetProjection(Projections.Property("Allow"))
 				.Add(Expression.In("op.Name", operationNames))
-				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups))
+				.Add(Expression.Eq("User", user) 
+				|| Subqueries.PropertyIn("UsersGroup.Id", 
+										 SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.Add(
 				Property.ForName(securityKeyProperty).EqProperty("permission.EntitySecurityKey") ||
 				Property.ForName(securityKeyProperty).EqProperty("entityKey.EntitySecurityKey") ||

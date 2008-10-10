@@ -184,7 +184,7 @@ namespace Rhino.Security.Services
 		{
 			UsersGroup desiredGroup = GetUsersGroupByName(usersGroupName);
 			ICollection<UsersGroup> directGroups =
-				usersGroupRepository.FindAll(GetDirectUserGroupsCriteria(user));
+				usersGroupRepository.FindAll(SecurityCriterions.DirectUsersGroups((user)));
 			if (directGroups.Contains(desiredGroup))
 			{
 				return new UsersGroup[] {desiredGroup};
@@ -244,19 +244,9 @@ namespace Rhino.Security.Services
 		/// </summary>
 		/// <param name="user">The user.</param>
 		public virtual UsersGroup[] GetAssociatedUsersGroupFor(IUser user)
-		{
-			DetachedCriteria directGroupsCriteria = GetDirectUserGroupsCriteria(user)
-				.SetProjection(Projections.Id());
-
-			DetachedCriteria allGroupsCriteria = DetachedCriteria.For<UsersGroup>()
-				.CreateAlias("Users", "user", JoinType.LeftOuterJoin)
-				.CreateAlias("AllChildren", "child", JoinType.LeftOuterJoin)
-				.Add(
-				Subqueries.PropertyIn("child.id", directGroupsCriteria) ||
-				Expression.Eq("user.id", user.SecurityInfo.Identifier));
-
+		{			
 			ICollection<UsersGroup> usersGroups =
-				usersGroupRepository.FindAll(allGroupsCriteria, Order.Asc("Name"));
+				usersGroupRepository.FindAll(SecurityCriterions.AllGroups(user), Order.Asc("Name"));
 			return Collection.ToArray<UsersGroup>(usersGroups);
 		}
 
@@ -430,7 +420,7 @@ namespace Rhino.Security.Services
 		/// <param name="user">The user.</param>
 		public void RemoveUser(IUser user)
 		{
-			ICollection<UsersGroup> groups = usersGroupRepository.FindAll(GetDirectUserGroupsCriteria(user));
+			ICollection<UsersGroup> groups = usersGroupRepository.FindAll(SecurityCriterions.DirectUsersGroups((user)));
 			foreach (UsersGroup group in groups)
 			{
 				group.Users.Remove(user);
@@ -460,13 +450,6 @@ namespace Rhino.Security.Services
 			if (first.Count <= second.Count)
 				return first;
 			return second;
-		}
-
-		private DetachedCriteria GetDirectUserGroupsCriteria(IUser user)
-		{
-			return DetachedCriteria.For<UsersGroup>()
-				.CreateAlias("Users", "user")
-				.Add(Expression.Eq("user.id", user.SecurityInfo.Identifier));
 		}
 
 		private EntityReference GetOrCreateEntityReference<TEntity>(Guid key)

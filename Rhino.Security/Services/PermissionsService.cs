@@ -8,6 +8,8 @@ using Rhino.Security.Model;
 
 namespace Rhino.Security.Services
 {
+	using NHibernate.SqlCommand;
+
 	/// <summary>
 	/// Allow to retrieve and remove permissions
 	/// on users, user groups, entities groups and entities.
@@ -38,10 +40,10 @@ namespace Rhino.Security.Services
 		/// <returns></returns>
 		public Permission[] GetPermissionsFor(IUser user)
 		{
-			UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(user);
-
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups));
+				.Add(Expression.Eq("User", user)
+				     || Subqueries.PropertyIn("UsersGroup.Id",
+				                              SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())));
 
 			return FindResults(criteria);
 		}
@@ -55,10 +57,11 @@ namespace Rhino.Security.Services
 		/// <returns></returns>
 		public Permission[] GetPermissionsFor(IUser user, string operationName)
 		{
-			UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", groups))
+				.Add(Expression.Eq("User", user)
+				     || Subqueries.PropertyIn("UsersGroup.Id",
+				                              SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.CreateAlias("Operation", "op")
 				.Add(Expression.In("op.Name", operationNames));
 
@@ -76,15 +79,15 @@ namespace Rhino.Security.Services
 		{
 			Guid key = Security.ExtractKey(entity);
 			EntitiesGroup[] entitiesGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
-			UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
 
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", usersGroups))
+				.Add(Expression.Eq("User", user)
+				     || Subqueries.PropertyIn("UsersGroup.Id",
+				                              SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.Add(Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups));
 
 			return FindResults(criteria);
 		}
-
 
 		/// <summary>
 		/// Gets the permissions for the specified etntity
@@ -99,13 +102,16 @@ namespace Rhino.Security.Services
 			Guid key = Security.ExtractKey(entity);
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
 			EntitiesGroup[] entitiesGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
-			UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
+
+			//UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);					
 
 			AbstractCriterion onCriteria =
 				(Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups)) ||
 				(Expression.IsNull("EntitiesGroup") && Expression.IsNull("EntitySecurityKey"));
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("User", user) || Expression.In("UsersGroup", usersGroups))
+				.Add(Expression.Eq("User", user)
+				     || Subqueries.PropertyIn("UsersGroup.Id",
+				                              SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.Add(onCriteria)
 				.CreateAlias("Operation", "op")
 				.Add(Expression.In("op.Name", operationNames));
@@ -121,8 +127,8 @@ namespace Rhino.Security.Services
 		/// <returns></returns>
 		public Permission[] GetPermissionsFor<TEntity>(TEntity entity) where TEntity : class
 		{
-			if (entity is IUser)// the combpiler will direct IUser instance to here, annoying
-				return GetPermissionsFor((IUser)entity);
+			if (entity is IUser) // the combpiler will direct IUser instance to here, annoying
+				return GetPermissionsFor((IUser) entity);
 
 			Guid key = Security.ExtractKey(entity);
 			EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(entity);
@@ -131,7 +137,6 @@ namespace Rhino.Security.Services
 
 			return FindResults(criteria);
 		}
-
 
 		#endregion
 
