@@ -46,8 +46,8 @@ namespace Rhino.Security.Impl.MappingRewriting
 						continue;
 					if (tableStructure == SecurityTableStructure.Schema && collection.CollectionTable != null)
 						collection.CollectionTable.Schema = "security";
-					else if (tableStructure == SecurityTableStructure.Prefix && collection.Table.Name.StartsWith("security_") == false)
-						collection.CollectionTable.Name = "security_" + collection.Table.Name;
+					else if (tableStructure == SecurityTableStructure.Prefix && collection.CollectionTable != null && collection.CollectionTable.Name.StartsWith("security_") == false)
+						collection.CollectionTable.Name = "security_" + collection.CollectionTable.Name;
 				}
 			}
 		}
