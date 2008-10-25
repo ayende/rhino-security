@@ -27,7 +27,7 @@ namespace Rhino.Security.Tests
         /// Gets or sets the security info for this user
         /// </summary>
         /// <value>The security info.</value>
-        public SecurityInfo SecurityInfo
+        public virtual SecurityInfo SecurityInfo
         {
             get { return new SecurityInfo(name, id); }
         }
