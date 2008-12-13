@@ -92,7 +92,7 @@ namespace Rhino.Security.Services
 		/// </returns>
 		public bool IsAllowed(IUser user, string operation)
 		{
-			Permission[] permissions = permissionsService.GetPermissionsFor(user, operation);
+			Permission[] permissions = permissionsService.GetGlobalPermissionsFor(user, operation);
 			if (permissions.Length == 0)
 				return false;
 			return permissions[0].Allow;
@@ -110,7 +110,7 @@ namespace Rhino.Security.Services
 			AuthorizationInformation info;
 			if (InitializeAuthorizationInfo(operation, out info))
 				return info;
-			Permission[] permissions = permissionsService.GetPermissionsFor(user, operation);
+			Permission[] permissions = permissionsService.GetGlobalPermissionsFor(user, operation);
 			AddPermissionDescriptionToAuthorizationInformation<object>(operation, info, user, permissions, null);
 			return info;
 		}

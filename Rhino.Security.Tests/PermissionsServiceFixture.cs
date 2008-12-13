@@ -139,7 +139,7 @@ namespace Rhino.Security.Tests
                 .Save();
             UnitOfWork.Current.TransactionalFlush();
 
-            Permission[] permissions = permissionService.GetPermissionsFor(user, "/Account/Edit");
+            Permission[] permissions = permissionService.GetPermissionsFor(user, account);
             Assert.AreEqual(1, permissions.Length);
         }
 
@@ -154,9 +154,24 @@ namespace Rhino.Security.Tests
                 .Save();
             UnitOfWork.Current.TransactionalFlush();
 
-            Permission[] permissions = permissionService.GetPermissionsFor(user, "/Account/Edit");
+            Permission[] permissions = permissionService.GetPermissionsFor(user, account);
             Assert.AreEqual(1, permissions.Length);
         }
+
+        [Test]
+        public void CanGetPermissionsByUserAndOpernationName_WhenPermissionOnEverything()
+        {
+            permissionsBuilderService
+                .Allow("/Account")
+                .For(user)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            Permission[] permissions = permissionService.GetGlobalPermissionsFor(user, "/Account/Edit");
+            Assert.AreEqual(1, permissions.Length);
+        }        
 
         [Test]
         public void CanGetPermissionByUserEntityAndOperation()

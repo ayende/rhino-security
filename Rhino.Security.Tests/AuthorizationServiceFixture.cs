@@ -272,6 +272,52 @@ namespace Rhino.Security.Tests
 			Assert.IsTrue(isAllowed);
 		}
 
+        [Test]
+        public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnEntitiesGroup()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(user)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            bool IsAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
+            Assert.IsTrue(IsAllowed);
+        }
+
+        [Test]
+        public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnSpecificEntity()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(user)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            bool IsAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
+            Assert.IsTrue(IsAllowed);
+        }
+
 		[Test]
 		public void UseSecondLevelCacheForSecurityQuestions_WillBeUpdatedWhenGoingThroughNHiberante()
 		{

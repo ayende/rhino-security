@@ -30,7 +30,7 @@ namespace Rhino.Security.Interfaces
 		/// <param name="user">The user.</param>
 		/// <param name="operationName">Name of the operation.</param>
 		/// <returns></returns>
-		Permission[] GetPermissionsFor(IUser user, string operationName) ;
+		Permission[] GetGlobalPermissionsFor(IUser user, string operationName) ;
 
 		/// <summary>
 		/// Gets the permissions for the specified etntity

@@ -10,6 +10,8 @@
 		<property name="use_outer_join">false</property>
 		<property name="query.substitutions">true 1, false 0, yes 'Y', no 'N'</property>
 
+    <property name='proxyfactory.factory_class'>NHibernate.ByteCode.Castle.ProxyFactoryFactory, NHibernate.ByteCode.Castle</property>
+    
 		<mapping assembly="Rhino.Security"/>
 		<mapping assembly="Rhino.Security.Tests"/>
 		

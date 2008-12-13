@@ -339,7 +339,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
         }
 
         [Test]
-        public void ExplainWhyAllowedIfPermissionWasGrantedToUsersGroupAssociatedWithUser()
+        public void ExplainWhyDeniedIfPermissionWasGrantedToEntitiesGroupButNotToGlobal()
         {
             permissionsBuilderService
                 .Allow("/Account/Edit")
@@ -351,7 +351,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             string expected =
-                @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'Important Accounts' ('Ayende' is a member of 'Administrators')
+                @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators')
 ";
             Assert.AreEqual(expected, information.ToString());
         }

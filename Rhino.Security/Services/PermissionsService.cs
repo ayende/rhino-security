@@ -55,14 +55,16 @@ namespace Rhino.Security.Services
 		/// <param name="user">The user.</param>
 		/// <param name="operationName">Name of the operation.</param>
 		/// <returns></returns>
-		public Permission[] GetPermissionsFor(IUser user, string operationName)
+		public Permission[] GetGlobalPermissionsFor(IUser user, string operationName)
 		{
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
 				.Add(Expression.Eq("User", user)
 				     || Subqueries.PropertyIn("UsersGroup.Id",
 				                              SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
-				.CreateAlias("Operation", "op")
+                .Add(Expression.IsNull("EntitiesGroup"))
+                .Add(Expression.IsNull("EntitySecurityKey"))
+                .CreateAlias("Operation", "op")
 				.Add(Expression.In("op.Name", operationNames));
 
 			return FindResults(criteria);

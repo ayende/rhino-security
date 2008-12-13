@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{558B3AE3-C408-4DB0-AC79-386BC12379BE}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -80,6 +80,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\SharedLibs\NHibernate\NHibernate.dll</HintPath>
     </Reference>
+    <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\SharedLibs\NHibernate\NHibernate.ByteCode.Castle.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.35.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
@@ -114,6 +118,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.ActiveRecord.Repositories\Rhino.Commons.ActiveRecord.Repositories.csproj">
+      <Project>{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}</Project>
+      <Name>Rhino.Commons.ActiveRecord.Repositories</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.ActiveRecord\Rhino.Commons.ActiveRecord-vs2008.csproj">
       <Project>{2B796A66-19FC-4E72-BB02-DC16D878725A}</Project>
       <Name>Rhino.Commons.ActiveRecord</Name>
@@ -121,6 +129,10 @@
     <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.Clr\Rhino.Commons.Clr-vs2008.csproj">
       <Project>{77693BCD-4C8A-4523-AEE7-8AB46C1034E7}</Project>
       <Name>Rhino.Commons.Clr</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate.Repositories\Rhino.Commons.NHibernate.Repositories.csproj">
+      <Project>{E50A9705-8545-4EC2-9A47-50C844A27D83}</Project>
+      <Name>Rhino.Commons.NHibernate.Repositories</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate\Rhino.Commons.NHibernate-v2008.csproj">
       <Project>{BF4E220E-5AF8-4448-ABA9-981D69AB8775}</Project>
