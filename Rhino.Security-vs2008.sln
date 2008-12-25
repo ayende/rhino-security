@@ -23,10 +23,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Commons.Binsor", "..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security.ActiveRecord", "Rhino.Security.ActiveRecord\Rhino.Security.ActiveRecord.csproj", "{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Commons.ActiveRecord.Repositories", "..\rhino-commons\Rhino.Commons.ActiveRecord.Repositories\Rhino.Commons.ActiveRecord.Repositories.csproj", "{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Commons.NHibernate.Repositories", "..\rhino-commons\Rhino.Commons.NHibernate.Repositories\Rhino.Commons.NHibernate.Repositories.csproj", "{E50A9705-8545-4EC2-9A47-50C844A27D83}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -94,18 +90,6 @@ Global
 		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Start|Any CPU.ActiveCfg = Release|Any CPU
 		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Start|Any CPU.Build.0 = Release|Any CPU
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}.Start|Any CPU.ActiveCfg = Release|Any CPU
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868}.Start|Any CPU.Build.0 = Release|Any CPU
-		{E50A9705-8545-4EC2-9A47-50C844A27D83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E50A9705-8545-4EC2-9A47-50C844A27D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E50A9705-8545-4EC2-9A47-50C844A27D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E50A9705-8545-4EC2-9A47-50C844A27D83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E50A9705-8545-4EC2-9A47-50C844A27D83}.Start|Any CPU.ActiveCfg = Release|Any CPU
-		{E50A9705-8545-4EC2-9A47-50C844A27D83}.Start|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,7 +102,5 @@ Global
 		{BF4E220E-5AF8-4448-ABA9-981D69AB8775} = {FC06D4B7-409C-4444-982D-AE998D0090E7}
 		{EE98519D-104D-4A31-ADD8-82C5F836018C} = {FC06D4B7-409C-4444-982D-AE998D0090E7}
 		{CCB0BEBF-146A-4C42-B22A-1EB338E4EA8B} = {FC06D4B7-409C-4444-982D-AE998D0090E7}
-		{2FC4AAE0-5CA6-485D-A8A5-2CC6EA693868} = {FC06D4B7-409C-4444-982D-AE998D0090E7}
-		{E50A9705-8545-4EC2-9A47-50C844A27D83} = {FC06D4B7-409C-4444-982D-AE998D0090E7}
 	EndGlobalSection
 EndGlobal

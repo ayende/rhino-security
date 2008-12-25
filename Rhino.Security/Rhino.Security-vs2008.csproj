@@ -156,10 +156,6 @@
       <Project>{77693BCD-4C8A-4523-AEE7-8AB46C1034E7}</Project>
       <Name>Rhino.Commons.Clr</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate.Repositories\Rhino.Commons.NHibernate.Repositories.csproj">
-      <Project>{E50A9705-8545-4EC2-9A47-50C844A27D83}</Project>
-      <Name>Rhino.Commons.NHibernate.Repositories</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate\Rhino.Commons.NHibernate-v2008.csproj">
       <Project>{BF4E220E-5AF8-4448-ABA9-981D69AB8775}</Project>
       <Name>Rhino.Commons.NHibernate</Name>
