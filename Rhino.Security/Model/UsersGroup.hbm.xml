@@ -18,15 +18,14 @@
 			<generator class="guid.comb">
 			</generator>
 		</id>
-		<property name="Name"
+    <property name="Name"
 							access="property"
-							type="String"
-							update="false">
-			<column name="Name"
+							type="String">
+      <column name="Name"
 							length="255"
 							not-null="true"
 							unique="true"/>
-		</property>
+    </property>
 		<many-to-one name="Parent"
 								 access="property"
 								 class="UsersGroup"

@@ -138,7 +138,7 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
-        public void CannotChangeUsersGroupName()
+        public void CanChangeUsersGroupName()
         {
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
             UnitOfWork.Current.TransactionalFlush();
@@ -152,13 +152,13 @@ namespace Rhino.Security.Tests
             UnitOfWork.CurrentSession.Evict(group);
 
             group = authorizationRepository.GetUsersGroupByName("2");
-            Assert.IsNull(group);
-            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
             Assert.IsNotNull(group);
+            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
+            Assert.IsNull(group);
         }
 
         [Test]
-        public void CannotChangeEntitiesGroupName()
+        public void CanChangeEntitiesGroupName()
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             UnitOfWork.Current.TransactionalFlush();
@@ -172,9 +172,9 @@ namespace Rhino.Security.Tests
             UnitOfWork.CurrentSession.Evict(group);
 
             group = authorizationRepository.GetEntitiesGroupByName("2");
-            Assert.IsNull(group);
-            group = authorizationRepository.GetEntitiesGroupByName("Accounts");
             Assert.IsNotNull(group);
+            group = authorizationRepository.GetEntitiesGroupByName("Accounts");
+            Assert.IsNull(group);
         }
 
         [Test]

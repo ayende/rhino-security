@@ -20,8 +20,7 @@
 		</id>
 		<property name="Name"
 							access="property"
-							type="String"
-							update="false">
+							type="String">
 			<column name="Name"
 							length="255"
 							not-null="true"
