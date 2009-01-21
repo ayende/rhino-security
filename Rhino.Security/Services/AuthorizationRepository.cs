@@ -122,6 +122,26 @@ namespace Rhino.Security.Services
 			usersGroupRepository.Delete(group);
 		}
 
+        ///<summary>
+        /// Renames an existing users group
+        ///</summary>
+        ///<param name="usersGroupName">The name of the usersgroup to rename</param>
+        ///<param name="newName">The new name of the usersgroup</param>
+        ///<returns>The renamed group</returns>       
+        public virtual UsersGroup RenameUsersGroup(string usersGroupName, string newName)
+        {
+            UsersGroup group = GetUsersGroupByName(usersGroupName);
+            Guard.Against(group == null, "There is no users group named: " + usersGroupName);
+            group.Name = newName;
+            if (validator.IsValid(group) == false)
+            {
+                ErrorSummary summary = validator.GetErrorSummary(group);
+                throw new Exceptions.ValidationException(summary);
+            }
+            usersGroupRepository.Save(group);
+            return group;
+        }
+
 
 		/// <summary>
 		/// Removes the specified entities group.
@@ -238,6 +258,26 @@ namespace Rhino.Security.Services
 			entitiesGroupRepository.Save(eg);
 			return eg;
 		}
+
+        ///<summary>
+        /// Renames an existing entities group
+        ///</summary>
+        ///<param name="entitiesGroupName">The name of the entities group to rename</param>
+        ///<param name="newName">The new name of the entities group</param>
+        ///<returns>The renamed group</returns>       
+        public virtual EntitiesGroup RenameEntitiesGroup(string entitiesGroupName, string newName)
+        {
+            EntitiesGroup group = GetEntitiesGroupByName(entitiesGroupName);
+            Guard.Against(group == null, "There is no entities group named: " + entitiesGroupName);
+            group.Name = newName;
+            if (validator.IsValid(group) == false)
+            {
+                ErrorSummary summary = validator.GetErrorSummary(group);
+                throw new Exceptions.ValidationException(summary);
+            }
+            entitiesGroupRepository.Save(group);
+            return group;
+        }
 
 		/// <summary>
 		/// Gets the associated users group for the specified user.

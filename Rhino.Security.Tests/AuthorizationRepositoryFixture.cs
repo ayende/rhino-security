@@ -145,8 +145,7 @@ namespace Rhino.Security.Tests
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
-            group.Name = "2";
+            authorizationRepository.RenameUsersGroup("Admininstrators", "2");
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
@@ -158,6 +157,21 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        [ExpectedException(typeof(ValidationException))]
+        public void CannotRenameUsersGroupToAnAlreadyExistingUsersGroup()
+        {
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
+            UsersGroup group2 = authorizationRepository.CreateUsersGroup("ExistingGroup");
+
+            UnitOfWork.Current.TransactionalFlush();
+
+            UnitOfWork.CurrentSession.Evict(group);
+            UnitOfWork.CurrentSession.Evict(group2);
+
+            authorizationRepository.RenameUsersGroup("Admininstrators", "ExistingGroup");
+        }
+
+        [Test]
         public void CanChangeEntitiesGroupName()
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
@@ -165,8 +179,7 @@ namespace Rhino.Security.Tests
 
             UnitOfWork.CurrentSession.Evict(group);
 
-            group = authorizationRepository.GetEntitiesGroupByName("Accounts");
-            group.Name = "2";
+            authorizationRepository.RenameEntitiesGroup("Accounts", "2");            
             UnitOfWork.Current.TransactionalFlush();
 
             UnitOfWork.CurrentSession.Evict(group);
@@ -176,6 +189,36 @@ namespace Rhino.Security.Tests
             group = authorizationRepository.GetEntitiesGroupByName("Accounts");
             Assert.IsNull(group);
         }
+
+        [Test]
+        [ExpectedException(typeof(ValidationException))]
+        public void CannotRenameEntitiesGroupToAnAlreadyExistingEntitiesGroup()
+        {
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
+            EntitiesGroup group2 = authorizationRepository.CreateEntitiesGroup("ExistingGroup");
+
+            UnitOfWork.Current.TransactionalFlush();
+
+            UnitOfWork.CurrentSession.Evict(group);
+            UnitOfWork.CurrentSession.Evict(group2);
+
+            authorizationRepository.RenameEntitiesGroup("Accounts", "ExistingGroup");        
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), "There is no users group named: NonExistingGroup")]
+        public void CannotRenameUsersGroupThatDoesNotExist()
+        {
+            authorizationRepository.RenameUsersGroup("NonExistingGroup", "Administrators");    
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidOperationException), "There is no entities group named: NonExistingGroup")]
+        public void CannotRenameEntitiesGroupThatDoesNotExist()
+        {
+            authorizationRepository.RenameEntitiesGroup("NonExistingGroup", "Accounts");
+        }
+
 
         [Test]
         public void CanAssociateUserWithGroup()

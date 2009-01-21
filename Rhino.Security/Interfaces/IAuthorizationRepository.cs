@@ -165,5 +165,21 @@ namespace Rhino.Security.Interfaces
 		/// </summary>
 		/// <param name="permission">The permission.</param>
 		void RemovePermission(Permission permission);
+
+        ///<summary>
+        /// Renames an existing users group
+        ///</summary>
+        ///<param name="usersGroupName">The name of the usersgroup to rename</param>
+        ///<param name="newName">The new name of the usersgroup</param>
+        ///<returns>The renamed group</returns> 
+        UsersGroup RenameUsersGroup(string usersGroupName, string newName);
+
+        ///<summary>
+        /// Renames an existing entities group
+        ///</summary>
+        ///<param name="entitiesGroupName">The name of the entities group to rename</param>
+        ///<param name="newName">The new name of the entities group</param>
+        ///<returns>The renamed group</returns> 
+        EntitiesGroup RenameEntitiesGroup(string entitiesGroupName, string newName);
 	}
 }
