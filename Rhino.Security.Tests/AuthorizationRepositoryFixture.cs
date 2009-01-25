@@ -242,6 +242,33 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void CanAssociateAccountWithMultipleGroups()
+        {
+            Account ayende = new Account();
+            ayende.Name = "ayende";
+
+            UnitOfWork.CurrentSession.Save(ayende);
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
+            EntitiesGroup group2 = authorizationRepository.CreateEntitiesGroup("Accounts of second group");
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationRepository.AssociateEntityWith(ayende, "Accounts");
+            UnitOfWork.Current.TransactionalFlush();
+            authorizationRepository.AssociateEntityWith(ayende, "Accounts of second group");
+
+            UnitOfWork.Current.TransactionalFlush();
+
+            UnitOfWork.CurrentSession.Evict(ayende);
+            UnitOfWork.CurrentSession.Evict(group);
+            UnitOfWork.CurrentSession.Evict(group2);
+
+            EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(ayende);
+            Assert.AreEqual(2, groups.Length);
+            Assert.AreEqual("Accounts", groups[0].Name);
+            Assert.AreEqual("Accounts of second group", groups[1].Name);
+        }
+
+        [Test]
         public void CanAssociateUserWithNestedGroup()
         {
             User ayende = new User();
