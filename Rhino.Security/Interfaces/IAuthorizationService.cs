@@ -1,5 +1,6 @@
 using NHibernate;
 using NHibernate.Criterion;
+using Rhino.Security.Model;
 
 namespace Rhino.Security.Interfaces
 {
@@ -18,6 +19,16 @@ namespace Rhino.Security.Interfaces
 		/// <param name="operation">The operation.</param>
 		void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria);
 
+
+        ///<summary>
+        /// Adds the permissions to the criteria query for the given usersgroup
+        ///</summary>
+        ///<param name="usersgroup">The usersgroup. Only permissions directly related to this usergroup 
+        /// are taken into account</param>
+        ///<param name="operation">The operation</param>
+        ///<param name="criteria">The criteria</param>
+        void AddPermissionsToQuery(UsersGroup usersgroup, string operation, ICriteria criteria);
+
 		/// <summary>
 		/// Adds the permissions to the criteria query.
 		/// </summary>
@@ -25,6 +36,14 @@ namespace Rhino.Security.Interfaces
 		/// <param name="criteria">The criteria.</param>
 		/// <param name="operation">The operation.</param>
 		void AddPermissionsToQuery(IUser user, string operation, DetachedCriteria criteria);
+
+        ///<summary>Adds the permissions to the criteria query for the given usersgroup
+        ///</summary>
+        ///<param name="usersgroup">The usersgroup. Only permissions directly related to this usergroup
+        /// are taken into account</param>
+        ///<param name="operation">The operation</param>
+        ///<param name="criteria">The criteria</param>        
+        void AddPermissionsToQuery(UsersGroup usersgroup, string operation, DetachedCriteria criteria);
 
 		/// <summary>
 		/// Determines whether the specified user is allowed to perform the specified 

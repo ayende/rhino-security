@@ -41,12 +41,23 @@ namespace Rhino.Security.Services
 		/// <param name="criteria">The criteria.</param>
 		/// <param name="operation">The operation.</param>
 		public void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria)
-		{
-			Type rootType = Rhino.Commons.NHibernate.CriteriaUtil.GetRootType(criteria);
-			string securityKeyProperty = criteria.Alias+"." + Security.GetSecurityKeyProperty(rootType);
-			ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
+		{			
+            ICriterion allowed = GetPermissionQueryInternal(user, operation, GetSecurityKeyProperty(criteria));
 			criteria.Add(allowed);
 		}
+
+        ///<summary>
+        /// Adds the permissions to the criteria query for the given usersgroup
+        ///</summary>
+        ///<param name="usersgroup">The usersgroup. Only permissions directly related to this usergroup
+        /// are taken into account</param>
+        ///<param name="operation">The operation</param>
+        ///<param name="criteria">The criteria</param>
+        public void AddPermissionsToQuery(UsersGroup usersgroup,string operation, ICriteria criteria)
+        {            
+            ICriterion allowed = GetPermissionQueryInternal(usersgroup, operation, GetSecurityKeyProperty(criteria));
+            criteria.Add(allowed);
+        }
 
 		/// <summary>
 		/// Adds the permissions to query.
@@ -55,14 +66,24 @@ namespace Rhino.Security.Services
 		/// <param name="criteria">The criteria.</param>
 		/// <param name="operation">The operation.</param>
 		public void AddPermissionsToQuery(IUser user, string operation, DetachedCriteria criteria)
-		{
-			Type rootType = Commons.NHibernate.CriteriaUtil.GetRootType(criteria, UnitOfWork.CurrentSession);
-			string securityKeyProperty = criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
-			ICriterion allowed = GetPermissionQueryInternal(user, operation, securityKeyProperty);
+		{			
+            ICriterion allowed = GetPermissionQueryInternal(user, operation, GetSecurityKeyProperty(criteria));
 			criteria.Add(allowed);
 		}
 
-		/// <summary>
+        ///<summary>Adds the permissions to the criteria query for the given usersgroup
+        ///</summary>
+        ///<param name="usersgroup">The usersgroup. Only permissions directly related to this usergroup
+        /// are taken into account</param>
+        ///<param name="operation">The operation</param>
+        ///<param name="criteria">The criteria</param>
+        public void AddPermissionsToQuery(UsersGroup usersgroup, string operation, DetachedCriteria criteria)
+        {            
+            ICriterion allowed = GetPermissionQueryInternal(usersgroup, operation, GetSecurityKeyProperty(criteria));
+            criteria.Add(allowed);
+        }	    
+
+	    /// <summary>
 		/// Determines whether the specified user is allowed to perform the specified
 		/// operation on the entity
 		/// </summary>
@@ -162,6 +183,43 @@ namespace Rhino.Security.Services
 				.AddOrder(Order.Asc("Allow"));
 			return Subqueries.Eq(true, criteria);
 		}
+
+        private ICriterion GetPermissionQueryInternal(UsersGroup usersgroup, string operation, string securityKeyProperty)
+        {
+            string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
+            DetachedCriteria criteria = DetachedCriteria.For<Permission>("permission")
+                .CreateAlias("Operation", "op")
+                .CreateAlias("EntitiesGroup", "entityGroup", JoinType.LeftOuterJoin)
+                .CreateAlias("entityGroup.Entities", "entityKey", JoinType.LeftOuterJoin)
+                .SetProjection(Projections.Property("Allow"))
+                .Add(Expression.In("op.Name", operationNames))
+                .Add(Expression.Eq("UsersGroup", usersgroup))
+                .Add(
+                Property.ForName(securityKeyProperty).EqProperty("permission.EntitySecurityKey") ||
+                Property.ForName(securityKeyProperty).EqProperty("entityKey.EntitySecurityKey") ||
+                (
+                    Expression.IsNull("permission.EntitySecurityKey") &&
+                    Expression.IsNull("permission.EntitiesGroup")
+                )
+                )
+                .SetMaxResults(1)
+                .AddOrder(Order.Desc("Level"))
+                .AddOrder(Order.Asc("Allow"));
+            return Subqueries.Eq(true, criteria);
+        }
+
+        private string GetSecurityKeyProperty(DetachedCriteria criteria)
+        {
+            Type rootType = Commons.NHibernate.CriteriaUtil.GetRootType(criteria, UnitOfWork.CurrentSession);
+            return criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
+        }
+
+        private string GetSecurityKeyProperty(ICriteria criteria)
+        {
+            Type rootType = Commons.NHibernate.CriteriaUtil.GetRootType(criteria);
+            return criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
+        }
+
 
 		private void AddPermissionDescriptionToAuthorizationInformation<TEntity>(string operation,
 		                                                                         AuthorizationInformation info,

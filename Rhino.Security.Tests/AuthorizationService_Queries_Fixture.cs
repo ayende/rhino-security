@@ -1,4 +1,5 @@
 using Rhino.Commons.ForTesting;
+using Rhino.Security.Model;
 
 namespace Rhino.Security.Tests
 {
@@ -53,9 +54,25 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void WillReturnNothingForUsersGroupIfNoPermissionHasBeenDefined()
+        {
+            UsersGroup[] usersgroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
+            authorizationService.AddPermissionsToQuery(usersgroups[0], "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
         public void WillReturnNothingIfOperationNotDefined()
         {
             authorizationService.AddPermissionsToQuery(user, "/Account/Delete", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturnNothingForUsersGroupIfOperationNotDefined()
+        {
+            UsersGroup[] usersgroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
+            authorizationService.AddPermissionsToQuery(usersgroups[0], "/Account/Delete", criteria);
             Assert.IsEmpty(criteria.List());
         }
 
@@ -75,6 +92,22 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void WillReturnResultForUsersGroupIfAllowPermissionWasDefined()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
+        [Test]
         public void WillReturnResultIfAllowPermissionWasDefinedOnEverything()
         {
             permissionsBuilderService
@@ -86,6 +119,22 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturnResultForUsersGroupIfAllowPermissionWasDefinedOnEverything()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
             Assert.IsNotEmpty(criteria.List());
         }
 
@@ -111,10 +160,33 @@ namespace Rhino.Security.Tests
 
         }
 
+        [Test]
+        public void WillReturnResultForUsersGroupIfAllowPermissionWasDefinedOnGroupAndDenyPermissionOnUser()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For("Administrators")
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(user)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+
+        }
+
 
         [Test]
         public void WillReturnNothingIfAllowedPermissionWasDefinedWithDenyPermissionWithHigherLevel()
-        {
+        {            
             permissionsBuilderService
                 .Allow("/Account/Edit")
                 .For(user)
@@ -130,6 +202,28 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturnNothingForUsersGroupIfAllowedPermissionWasDefinedWithDenyPermissionWithHigherLevel()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .Level(5)
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
             Assert.IsEmpty(criteria.List());
         }
 
@@ -155,6 +249,28 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void WillReturnResultForUsersGroupIfAllowedPermissionWasDefinedWithDenyPermissionWithLowerLevel()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .Level(10)
+                .Save();
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .Level(5)
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
+        [Test]
         public void WillReturnResultOnAccountIfPermissionWasGrantedOnAnything()
         {
             permissionsBuilderService
@@ -171,7 +287,24 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
-        public void WillReturnothingOnAccountIfPermissionWasDeniedOnAnything()
+        public void WillReturnResultForUsersGroupOnAccountIfPermissionWasGrantedOnAnything()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturNothingOnAccountIfPermissionWasDeniedOnAnything()
         {
             permissionsBuilderService
                 .Deny("/Account/Edit")
@@ -182,6 +315,22 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturNothingForUsersGroupOnAccountIfPermissionWasDeniedOnAnything()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(usersgroup)
+                .OnEverything()
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
             Assert.IsEmpty(criteria.List());
         }
 
@@ -200,6 +349,22 @@ namespace Rhino.Security.Tests
             Assert.IsNotEmpty(criteria.List());
         }
 
+        [Test]
+        public void WillReturnResultForUsersGroupOnAccountIfPermissionWasGrantedOnGroup()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
 
         [Test]
         public void WillReturnNothingOnAccountIfPermissionWasDeniedOnGroupAssociatedWithUser()
@@ -213,6 +378,22 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturnNothingForUsersGroupoOnAccountIfPermissionWasDeniedOnGroup()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(usersgroup)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
             Assert.IsEmpty(criteria.List());
         }
 
@@ -262,6 +443,22 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void WillReturnResultForUsersGroupOnEntityGroupIfPermissionWasGrantedToUsersGroup()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
+        [Test]
         public void WillReturnNothingOnAccountIfPermissionWasDeniedToUserOnTheGroupTheEntityIsAssociatedWith()
         {
             permissionsBuilderService
@@ -273,6 +470,22 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturnNothingForUsersGroupOnAccountIfPermissionWasDeniedToUserOnTheGroupTheEntityIsAssociatedWith()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Deny("/Account/Edit")
+                .For(usersgroup)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
             Assert.IsEmpty(criteria.List());
         }
 
@@ -292,6 +505,22 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void WillReturnResultForUsersGroupOnAccountIfPermissionWasAllowedToUserOnTheGroupTheEntityIsAssociatedWith()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsNotEmpty(criteria.List());
+        }
+
+        [Test]
         public void WillReturnNothingIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
@@ -306,6 +535,25 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
+        public void WillReturnNothingForUsersGroupIfPermissionWasAllowedToChildGroupOfVerifiedUsersGroup()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            UnitOfWork.Current.TransactionalFlush();
+
+            permissionsBuilderService
+               .Allow("/Account/Edit")
+               .For("Helpdesk")
+               .On("Important Accounts")
+               .DefaultLevel()
+               .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
             Assert.IsEmpty(criteria.List());
         }
 
@@ -332,10 +580,40 @@ namespace Rhino.Security.Tests
         }
 
         [Test]
+        public void WillReturnNothingForUsersGroupIfPermissionWasAllowedToParentGroupOfVerifiedUsersGroup()
+        {            
+            authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Helpdesk");
+            UnitOfWork.Current.TransactionalFlush();
+            
+            UnitOfWork.Current.TransactionalFlush();
+
+            permissionsBuilderService
+               .Allow("/Account/Edit")
+               .For("Administrators")
+               .On("Important Accounts")
+               .DefaultLevel()
+               .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", criteria);
+            Assert.IsEmpty(criteria.List());
+        }
+
+        [Test]
         public void WillReturnNothingIfOperationNotDefined_WithDetachedCriteria()
         {
             DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>();
             authorizationService.AddPermissionsToQuery(user, "/Account/Delete", detachedCriteria);
+            Assert.IsEmpty(detachedCriteria.GetExecutableCriteria(UnitOfWork.CurrentSession).List());
+        }
+
+        [Test]
+        public void WillReturnNothingForUsersGroupIfOperationNotDefined_WithDetachedCriteria()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>();
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Delete", detachedCriteria);
             Assert.IsEmpty(detachedCriteria.GetExecutableCriteria(UnitOfWork.CurrentSession).List());
         }
 
@@ -354,6 +632,25 @@ namespace Rhino.Security.Tests
             UnitOfWork.Current.TransactionalFlush();
 
             authorizationService.AddPermissionsToQuery(user, "/Account/Edit", detachedCriteria);
+            Assert.IsNotEmpty(detachedCriteria.GetExecutableCriteria(UnitOfWork.CurrentSession).List());
+        }
+
+        [Test]
+        public void WillReturnResultForUsersGroupIfAllowPermissionWasDefined_WithDetachedCriteria_AndConditions()
+        {
+            UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>()
+                .Add(Expression.Like("Name", "South", MatchMode.Start))
+                ;
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(usersgroup)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            UnitOfWork.Current.TransactionalFlush();
+
+            authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", detachedCriteria);
             Assert.IsNotEmpty(detachedCriteria.GetExecutableCriteria(UnitOfWork.CurrentSession).List());
         }
     }
