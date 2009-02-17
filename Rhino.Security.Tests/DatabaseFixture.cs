@@ -23,7 +23,7 @@ namespace Rhino.Security.Tests
 				typeof(IUser).Assembly,
 				typeof(User).Assembly,
 				typeof(RegisterRhinoSecurityMappingAttribute).Assembly);
-			IntializeNHibernateAndIoC(PersistenceFramwork, RhinoContainerConfig, GetDatabaseEngine(), from);
+			InitializeNHibernateAndIoC(PersistenceFramwork, RhinoContainerConfig, GetDatabaseEngine(), from);
 			CurrentContext.CreateUnitOfWork();
 
 			SetupEntities();
