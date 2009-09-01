@@ -8,6 +8,9 @@ namespace Rhino.Security.Model
 	/// </summary>
 	public class UsersGroup : NamedEntity<UsersGroup>
 	{
+	    ///<summary>
+        /// Create a new instance of <c>UsersGroup</c>
+	    ///</summary>
 	    public UsersGroup()
 	    {
 	        Users = new HashSet<IUser>();

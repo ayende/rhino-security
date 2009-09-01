@@ -80,7 +80,6 @@
     <Compile Include="Impl\MappingRewriting\SchemaChanger.cs" />
     <Compile Include="Impl\MappingRewriting\UserMapper.cs" />
     <Compile Include="Services\SecurityCriterions.cs" />
-    <Compile Include="NHibernateMappingModifier.cs" />
     <Compile Include="Services\AuthorizationRepository.cs" />
     <Compile Include="AuthorizationInformation.cs" />
     <Compile Include="Services\AuthorizationService.cs" />
@@ -104,7 +103,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RhinoSecurityFacility.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="Model\EntityType.cs" />
     <Compile Include="Model\EqualityAndHashCodeProvider.cs" />

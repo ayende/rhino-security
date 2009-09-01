@@ -8,6 +8,9 @@ namespace Rhino.Security.Model
 	/// </summary>
 	public class Operation : NamedEntity<Operation>
 	{
+	    ///<summary>
+	    /// Create instance of <c>Operation</c>
+	    ///</summary>
 	    public Operation()
 	    {
 	        Children = new HashSet<Operation>();

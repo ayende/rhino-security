@@ -7,6 +7,9 @@ namespace Rhino.Security.Model
 	/// </summary>
 	public class EntitiesGroup : NamedEntity<EntitiesGroup>
 	{
+	    ///<summary>
+        /// Create a new instance of <c>EntitiesGroup</c>
+	    ///</summary>
 	    public EntitiesGroup()
 	    {
 	        Entities = new HashSet<EntityReference>();

@@ -1,34 +1,33 @@
 using System;
 using System.Collections.Generic;
+using NHibernate;
 using NHibernate.Criterion;
-using Rhino.Commons;
 using Rhino.Security.Impl.Util;
 using Rhino.Security.Interfaces;
 using Rhino.Security.Model;
+using System.Linq;
 
 namespace Rhino.Security.Services
 {
-	using NHibernate.SqlCommand;
-
-	/// <summary>
+    /// <summary>
 	/// Allow to retrieve and remove permissions
 	/// on users, user groups, entities groups and entities.
 	/// </summary>
 	public class PermissionsService : IPermissionsService
 	{
 		private readonly IAuthorizationRepository authorizationRepository;
-		private readonly IRepository<Permission> permissionRepository;
+        private readonly ISession session;
 
-		/// <summary>
+        /// <summary>
 		/// Initializes a new instance of the <see cref="PermissionsService"/> class.
 		/// </summary>
 		/// <param name="authorizationRepository">The authorization editing service.</param>
-		/// <param name="permissionRepository">The permission repository.</param>
+		/// <param name="session">The NHibernate session</param>
 		public PermissionsService(IAuthorizationRepository authorizationRepository,
-		                          IRepository<Permission> permissionRepository)
+		                          ISession session)
 		{
 			this.authorizationRepository = authorizationRepository;
-			this.permissionRepository = permissionRepository;
+		    this.session = session;
 		}
 
 		#region IPermissionsService Members
@@ -144,9 +143,12 @@ namespace Rhino.Security.Services
 
 		private Permission[] FindResults(DetachedCriteria criteria)
 		{
-			ICollection<Permission> permissions = permissionRepository.FindAll(criteria,
-			                                                                   Order.Desc("Level"), Order.Asc("Allow"));
-			return Collection.ToArray<Permission>(permissions);
+		    ICollection<Permission> permissions = criteria.GetExecutableCriteria(session)
+		        .AddOrder(Order.Desc("Level"))
+		        .AddOrder(Order.Asc("Allow"))
+                .SetCacheable(true)
+                .List<Permission>();
+		    return permissions.ToArray();
 		}
 	}
 }

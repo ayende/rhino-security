@@ -1,0 +1,19 @@
+Service Locator
+Initialization
+
+// windsor
+Kernel.Register(
+    Component.For<IAuthorizationService>()
+        .ImplementedBy<AuthorizationService>(),
+    Component.For<IAuthorizationRepository>()
+        .ImplementedBy<AuthorizationRepository>(),
+    Component.For<IPermissionsBuilderService>()
+        .ImplementedBy<PermissionsBuilderService>(),
+    Component.For<IPermissionsService>()
+        .ImplementedBy<PermissionsService>()
+	);
+
+
+init 
+new SchemaChanger(cfg, securityTableStructure).Change();
+new UserMapper(cfg, userType).Map();
