@@ -1,0 +1,1 @@
+Rhino Security wouldn't have been possible without the excellent NHibernate OR/M (http://nhforge.org)
