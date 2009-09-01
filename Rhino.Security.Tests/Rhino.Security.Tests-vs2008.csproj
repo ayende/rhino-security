@@ -118,34 +118,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.ActiveRecord\Rhino.Commons.ActiveRecord-vs2008.csproj">
-      <Project>{2B796A66-19FC-4E72-BB02-DC16D878725A}</Project>
-      <Name>Rhino.Commons.ActiveRecord</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.Clr\Rhino.Commons.Clr-vs2008.csproj">
-      <Project>{77693BCD-4C8A-4523-AEE7-8AB46C1034E7}</Project>
-      <Name>Rhino.Commons.Clr</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.NHibernate\Rhino.Commons.NHibernate-v2008.csproj">
-      <Project>{BF4E220E-5AF8-4448-ABA9-981D69AB8775}</Project>
-      <Name>Rhino.Commons.NHibernate</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons.Test\Rhino.Commons.Test-vs2008.csproj">
-      <Project>{EE98519D-104D-4A31-ADD8-82C5F836018C}</Project>
-      <Name>Rhino.Commons.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\rhino-commons\Rhino.Commons\Rhino.Commons-vs2008.csproj">
-      <Project>{F6321543-E1EC-4999-A562-D9F060C8E3DF}</Project>
-      <Name>Rhino.Commons</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\rhino-dsl\Rhino.DSL\Rhino.DSL.csproj">
-      <Project>{B788F27C-E00A-434A-81AA-1D592E030934}</Project>
-      <Name>Rhino.DSL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Rhino.Security.ActiveRecord\Rhino.Security.ActiveRecord.csproj">
-      <Project>{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}</Project>
-      <Name>Rhino.Security.ActiveRecord</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Rhino.Security\Rhino.Security-vs2008.csproj">
       <Project>{DBA372FE-3D52-45B3-AF82-B37696328764}</Project>
       <Name>Rhino.Security</Name>

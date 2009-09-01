@@ -1,16 +1,9 @@
 using System;
-using Rhino.Security.Impl;
 using Rhino.Security.Interfaces;
 using Rhino.Security.Services;
 
 namespace Rhino.Security
 {
-    using Castle.Components.Validator;
-    using Castle.Core;
-    using Castle.MicroKernel.Facilities;
-    using Castle.MicroKernel.Registration;
-    using Commons;
-
     /// <summary>
     /// Setup everything necessary for Rhino Security to function
     /// </summary>

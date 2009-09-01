@@ -1,4 +1,4 @@
-using Iesi.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Rhino.Security.Model
 {
@@ -7,16 +7,15 @@ namespace Rhino.Security.Model
 	/// </summary>
 	public class EntitiesGroup : NamedEntity<EntitiesGroup>
 	{
-		private ISet<EntityReference> entities = new HashedSet<EntityReference>();
+	    public EntitiesGroup()
+	    {
+	        Entities = new HashSet<EntityReference>();
+	    }
 
-		/// <summary>
-		/// Gets or sets the entities security keys beloging to this entities group
-		/// </summary>
-		/// <value>The entities security keys.</value>
-		public virtual ISet<EntityReference> Entities
-		{
-			get { return entities; }
-			set { entities = value; }
-		}
+	    /// <summary>
+	    /// Gets or sets the entities security keys beloging to this entities group
+	    /// </summary>
+	    /// <value>The entities security keys.</value>
+	    public virtual ICollection<EntityReference> Entities { get; set; }
 	}
 }

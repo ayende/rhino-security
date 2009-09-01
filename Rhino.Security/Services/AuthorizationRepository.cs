@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using Castle.Components.Validator;
+using NHibernate;
 using NHibernate.Criterion;
-using NHibernate.SqlCommand;
-using Rhino.Commons;
+using NHibernate.Validator.Engine;
+using Rhino.Security.Impl;
 using Rhino.Security.Impl.Util;
 using Rhino.Security.Interfaces;
 using Rhino.Security.Model;
+using System.Linq;
 
 namespace Rhino.Security.Services
 {
@@ -16,41 +17,17 @@ namespace Rhino.Security.Services
 	/// </summary>
 	public class AuthorizationRepository : IAuthorizationRepository
 	{
-		private readonly IRepository<EntitiesGroup> entitiesGroupRepository;
-		private readonly IRepository<EntityReference> entityReferenceRepository;
-		private readonly IRepository<EntityType> entityTypesRepository;
-		private readonly IRepository<Operation> operationsRepository;
-		private readonly IRepository<Permission> permissionsRepository;
-		private readonly IRepository<UsersGroup> usersGroupRepository;
-		private readonly ValidatorRunner validator;
+	    private readonly ISession session;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorizationRepository"/> class.
 		/// </summary>
-		/// <param name="usersGroupRepository">The users group repository.</param>
-		/// <param name="entitiesGroupRepository">The entities group repository.</param>
-		/// <param name="validator">The validator.</param>
-		/// <param name="entityReferenceRepository">The entity reference repository.</param>
-		/// <param name="entityTypesRepository">The entity types repository.</param>
-		/// <param name="operationsRepository">The operations repository.</param>
-		/// <param name="permissionsRepository">The permissionss repository.</param>
-		public AuthorizationRepository(IRepository<UsersGroup> usersGroupRepository,
-		                               IRepository<EntitiesGroup> entitiesGroupRepository, ValidatorRunner validator,
-		                               IRepository<EntityReference> entityReferenceRepository,
-		                               IRepository<EntityType> entityTypesRepository,
-		                               IRepository<Operation> operationsRepository,
-		                               IRepository<Permission> permissionsRepository)
+		public AuthorizationRepository(ISession session)
 		{
-			this.usersGroupRepository = usersGroupRepository;
-			this.permissionsRepository = permissionsRepository;
-			this.operationsRepository = operationsRepository;
-			this.entityTypesRepository = entityTypesRepository;
-			this.entityReferenceRepository = entityReferenceRepository;
-			this.entitiesGroupRepository = entitiesGroupRepository;
-			this.validator = validator;
+		    this.session = session;
 		}
 
-		#region IAuthorizationRepository Members
+	    #region IAuthorizationRepository Members
 
 		/// <summary>
 		/// Creates a new users group.
@@ -58,14 +35,8 @@ namespace Rhino.Security.Services
 		/// <param name="name">The name of the new group.</param>
 		public virtual UsersGroup CreateUsersGroup(string name)
 		{
-			UsersGroup ug = new UsersGroup();
-			ug.Name = name;
-			if (validator.IsValid(ug) == false)
-			{
-				ErrorSummary summary = validator.GetErrorSummary(ug);
-				throw new Exceptions.ValidationException(summary);
-			}
-			usersGroupRepository.Save(ug);
+			var ug = new UsersGroup {Name = name};
+		    session.Save(ug);
 			return ug;
 		}
 
@@ -102,10 +73,10 @@ namespace Rhino.Security.Services
 
 			Guard.Against(group.DirectChildren.Count != 0, "Cannot remove users group '"+usersGroupName+"' because is has child groups. Remove those groups and try again.");
 
-			DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("UsersGroup", group));
+		    session.CreateQuery("delete Permission p where p.UsersGroup = :group")
+		        .SetEntity("group", group)
+		        .ExecuteUpdate();
 
-			permissionsRepository.DeleteAll(permissionsToRemove);
 			// we have to do this in order to ensure that we play
 			// nicely with the second level cache and collection removals
 			if (group.Parent!=null)
@@ -119,7 +90,7 @@ namespace Rhino.Security.Services
 			group.AllParents.Clear();
 			group.Users.Clear();
 
-			usersGroupRepository.Delete(group);
+			session.Delete(group);
 		}
 
         ///<summary>
@@ -133,12 +104,8 @@ namespace Rhino.Security.Services
             UsersGroup group = GetUsersGroupByName(usersGroupName);
             Guard.Against(group == null, "There is no users group named: " + usersGroupName);
             group.Name = newName;
-            if (validator.IsValid(group) == false)
-            {
-                ErrorSummary summary = validator.GetErrorSummary(group);
-                throw new Exceptions.ValidationException(summary);
-            }
-            usersGroupRepository.Save(group);
+            
+            session.Save(group);
             return group;
         }
 
@@ -154,14 +121,13 @@ namespace Rhino.Security.Services
 			if(group==null)
 				return;
 
-			DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("EntitiesGroup", group));
-
-			permissionsRepository.DeleteAll(permissionsToRemove);
+		    session.CreateQuery("delete Permission p where p.EntitiesGroup = :group")
+		        .SetEntity("group", group)
+		        .ExecuteUpdate();
 
 			group.Entities.Clear();
 
-			entitiesGroupRepository.Delete(group);
+			session.Delete(group);
 		}
 
 
@@ -178,18 +144,17 @@ namespace Rhino.Security.Services
 
 			Guard.Against(operation.Children.Count != 0, "Cannot remove operation '"+operationName+"' because it has child operations. Remove those operations and try again.");
 
-			DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("Operation", operation));
+            session.CreateQuery("delete Permission p where p.Operation = :operation")
+                .SetEntity("operation", operation)
+                .ExecuteUpdate();
 
-			permissionsRepository.DeleteAll(permissionsToRemove);
-            
 			// so we can play safely with the 2nd level cache & collections
 			if(operation.Parent!=null)
 			{
 				operation.Parent.Children.Remove(operation);
 			}
 
-			operationsRepository.Delete(operation);
+			session.Delete(operation);
 		}
 
 		/// <summary>
@@ -203,11 +168,15 @@ namespace Rhino.Security.Services
 		public virtual UsersGroup[] GetAncestryAssociation(IUser user, string usersGroupName)
 		{
 			UsersGroup desiredGroup = GetUsersGroupByName(usersGroupName);
-			ICollection<UsersGroup> directGroups =
-				usersGroupRepository.FindAll(SecurityCriterions.DirectUsersGroups((user)));
+		    ICollection<UsersGroup> directGroups =
+		        SecurityCriterions.DirectUsersGroups((user))
+		            .GetExecutableCriteria(session)
+                    .SetCacheable(true)
+		            .List<UsersGroup>();
+
 			if (directGroups.Contains(desiredGroup))
 			{
-				return new UsersGroup[] {desiredGroup};
+				return new[] {desiredGroup};
 			}
 			// as a nice benefit, this does an eager load of all the groups in the hierarchy
 			// in an efficient way, so we don't have SELECT N + 1 here, nor do we need
@@ -248,14 +217,8 @@ namespace Rhino.Security.Services
 		/// <param name="name">The name of the new group.</param>
 		public virtual EntitiesGroup CreateEntitiesGroup(string name)
 		{
-			EntitiesGroup eg = new EntitiesGroup();
-			eg.Name = name;
-			if (validator.IsValid(eg) == false)
-			{
-				ErrorSummary summary = validator.GetErrorSummary(eg);
-				throw new Exceptions.ValidationException(summary);
-			}
-			entitiesGroupRepository.Save(eg);
+			EntitiesGroup eg = new EntitiesGroup {Name = name};
+		    session.Save(eg);
 			return eg;
 		}
 
@@ -270,12 +233,7 @@ namespace Rhino.Security.Services
             EntitiesGroup group = GetEntitiesGroupByName(entitiesGroupName);
             Guard.Against(group == null, "There is no entities group named: " + entitiesGroupName);
             group.Name = newName;
-            if (validator.IsValid(group) == false)
-            {
-                ErrorSummary summary = validator.GetErrorSummary(group);
-                throw new Exceptions.ValidationException(summary);
-            }
-            entitiesGroupRepository.Save(group);
+            session.Save(group);
             return group;
         }
 
@@ -284,10 +242,14 @@ namespace Rhino.Security.Services
 		/// </summary>
 		/// <param name="user">The user.</param>
 		public virtual UsersGroup[] GetAssociatedUsersGroupFor(IUser user)
-		{			
-			ICollection<UsersGroup> usersGroups =
-				usersGroupRepository.FindAll(SecurityCriterions.AllGroups(user), Order.Asc("Name"));
-			return Collection.ToArray<UsersGroup>(usersGroups);
+		{
+		    ICollection<UsersGroup> usersGroups =
+		        SecurityCriterions.AllGroups(user)
+		            .GetExecutableCriteria(session)
+		            .AddOrder(Order.Asc("Name"))
+                    .SetCacheable(true)
+                    .List<UsersGroup>();
+		    return usersGroups.ToArray();
 		}
 
 
@@ -297,7 +259,10 @@ namespace Rhino.Security.Services
 		/// <param name="groupName">Name of the group.</param>
 		public virtual UsersGroup GetUsersGroupByName(string groupName)
 		{
-			return usersGroupRepository.FindOne(Expression.Eq("Name", groupName));
+			return session.CreateCriteria<UsersGroup>()
+                .Add(Restrictions.Eq("Name", groupName))
+                .SetCacheable(true)
+                .UniqueResult<UsersGroup>();
 		}
 
 		/// <summary>
@@ -306,7 +271,10 @@ namespace Rhino.Security.Services
 		/// <param name="groupName">The name of the group.</param>
 		public virtual EntitiesGroup GetEntitiesGroupByName(string groupName)
 		{
-			return entitiesGroupRepository.FindOne(Expression.Eq("Name", groupName));
+            return session.CreateCriteria<EntitiesGroup>()
+                .Add(Restrictions.Eq("Name", groupName))
+                .SetCacheable(true)
+                .UniqueResult<EntitiesGroup>();
 		}
 
 
@@ -319,11 +287,13 @@ namespace Rhino.Security.Services
 		public virtual EntitiesGroup[] GetAssociatedEntitiesGroupsFor<TEntity>(TEntity entity) where TEntity : class
 		{
 			Guid key = Security.ExtractKey(entity);
-			DetachedCriteria criteria = DetachedCriteria.For<EntitiesGroup>()
-				.CreateAlias("Entities", "e")
-				.Add(Expression.Eq("e.EntitySecurityKey", key));
-			ICollection<EntitiesGroup> entitiesGroups = entitiesGroupRepository.FindAll(criteria);
-			return Collection.ToArray<EntitiesGroup>(entitiesGroups);
+		    ICollection<EntitiesGroup> entitiesGroups =
+		        session.CreateCriteria<EntitiesGroup>()
+		            .CreateAlias("Entities", "e")
+		            .Add(Restrictions.Eq("e.EntitySecurityKey", key))
+                    .SetCacheable(true)
+                    .List<EntitiesGroup>();
+            return entitiesGroups.ToArray();
 		}
 
 		/// <summary>
@@ -388,11 +358,7 @@ namespace Rhino.Security.Services
 			Guard.Against<ArgumentException>(string.IsNullOrEmpty(operationName), "operationName must have a value");
 			Guard.Against<ArgumentException>(operationName[0] != '/', "Operation names must start with '/'");
 
-			Operation op = new Operation();
-			op.Name = operationName;
-
-			if (validator.IsValid(op) == false)
-				throw new Exceptions.ValidationException(validator.GetErrorSummary(op));
+			Operation op = new Operation {Name = operationName};
 
 			string parentOperationName = Strings.GetParentOperationName(operationName);
 			if (parentOperationName != string.Empty) //we haven't got to the root
@@ -405,7 +371,7 @@ namespace Rhino.Security.Services
 				parentOperation.Children.Add(op);
 			}
 
-			operationsRepository.Save(op);
+			session.Save(op);
 			return op;
 		}
 
@@ -416,7 +382,10 @@ namespace Rhino.Security.Services
 		/// <returns></returns>
 		public virtual Operation GetOperationByName(string operationName)
 		{
-			return operationsRepository.FindOne(Expression.Eq("Name", operationName));
+            return session.CreateCriteria<Operation>()
+             .Add(Restrictions.Eq("Name", operationName))
+             .SetCacheable(true)
+             .UniqueResult<Operation>();
 		}
 
 		/// <summary>
@@ -460,15 +429,19 @@ namespace Rhino.Security.Services
 		/// <param name="user">The user.</param>
 		public void RemoveUser(IUser user)
 		{
-			ICollection<UsersGroup> groups = usersGroupRepository.FindAll(SecurityCriterions.DirectUsersGroups((user)));
+		    ICollection<UsersGroup> groups =
+		        SecurityCriterions.DirectUsersGroups((user))
+		            .GetExecutableCriteria(session)
+                    .SetCacheable(true)
+                    .List<UsersGroup>();
 			foreach (UsersGroup group in groups)
 			{
 				group.Users.Remove(user);
 			}
 
-			DetachedCriteria permissionsToRemove = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("User", user));
-			permissionsRepository.DeleteAll(permissionsToRemove);
+		    session.CreateQuery("delete Permission p where p.User = :user")
+		        .SetEntity("user", user)
+		        .ExecuteUpdate();
 		}
 
 
@@ -478,7 +451,7 @@ namespace Rhino.Security.Services
 		/// <param name="permission">The permission.</param>
 		public void RemovePermission(Permission permission)
 		{
-			permissionsRepository.Delete(permission);
+			session.Delete(permission);
 		}
 
 		#endregion
@@ -494,27 +467,30 @@ namespace Rhino.Security.Services
 
 		private EntityReference GetOrCreateEntityReference<TEntity>(Guid key)
 		{
-			EntityReference reference = entityReferenceRepository.FindOne(Expression.Eq("EntitySecurityKey", key));
+			EntityReference reference = session.CreateCriteria<EntityReference>()
+                .Add(Restrictions.Eq("EntitySecurityKey", key))
+                .SetCacheable(true)
+                .UniqueResult<EntityReference>();
 			if (reference == null)
 			{
 				reference = new EntityReference();
 				reference.EntitySecurityKey = key;
 				reference.Type = GetOrCreateEntityType<TEntity>();
-				entityReferenceRepository.Save(reference);
+				session.Save(reference);
 			}
 			return reference;
 		}
 
 		private EntityType GetOrCreateEntityType<TEntity>()
 		{
-			EntityType entityType = entityTypesRepository.FindOne(
-				Expression.Eq("Name", typeof (TEntity).FullName)
-				);
+			EntityType entityType = session.CreateCriteria<EntityType>()
+                .Add(Restrictions.Eq("Name", typeof (TEntity).FullName))
+                .SetCacheable(true)
+                .UniqueResult<EntityType>();
 			if (entityType == null)
 			{
-				entityType = new EntityType();
-				entityType.Name = typeof (TEntity).FullName;
-				entityTypesRepository.Save(entityType);
+				entityType = new EntityType {Name = typeof (TEntity).FullName};
+			    session.Save(entityType);
 			}
 			return entityType;
 		}

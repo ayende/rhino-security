@@ -1,7 +1,8 @@
+using Rhino.Security.Impl;
+
 namespace Rhino.Security
 {
     using System;
-    using Commons;
 
     /// <summary>
     /// Contains the information about the user that

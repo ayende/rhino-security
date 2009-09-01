@@ -1,4 +1,5 @@
 using System;
+using Rhino.Security.Impl;
 using Rhino.Security.Interfaces;
 
 namespace Rhino.Security.Model

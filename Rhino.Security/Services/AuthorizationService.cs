@@ -2,7 +2,6 @@ using System;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
-using Rhino.Commons;
 using Rhino.Security.Impl.Util;
 using Rhino.Security.Interfaces;
 using Rhino.Security.Model;
@@ -158,7 +157,7 @@ namespace Rhino.Security.Services
 
 		#endregion
 
-		private ICriterion GetPermissionQueryInternal(IUser user, string operation, string securityKeyProperty)
+		private static ICriterion GetPermissionQueryInternal(IUser user, string operation, string securityKeyProperty)
 		{
 			string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>("permission")
@@ -166,16 +165,16 @@ namespace Rhino.Security.Services
 				.CreateAlias("EntitiesGroup", "entityGroup", JoinType.LeftOuterJoin)
 				.CreateAlias("entityGroup.Entities", "entityKey", JoinType.LeftOuterJoin)
 				.SetProjection(Projections.Property("Allow"))
-				.Add(Expression.In("op.Name", operationNames))
-				.Add(Expression.Eq("User", user) 
+				.Add(Restrictions.In("op.Name", operationNames))
+				.Add(Restrictions.Eq("User", user) 
 				|| Subqueries.PropertyIn("UsersGroup.Id", 
 										 SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.Add(
 				Property.ForName(securityKeyProperty).EqProperty("permission.EntitySecurityKey") ||
 				Property.ForName(securityKeyProperty).EqProperty("entityKey.EntitySecurityKey") ||
 				(
-					Expression.IsNull("permission.EntitySecurityKey") &&
-					Expression.IsNull("permission.EntitiesGroup")
+					Restrictions.IsNull("permission.EntitySecurityKey") &&
+					Restrictions.IsNull("permission.EntitiesGroup")
 				)
 				)
 				.SetMaxResults(1)
@@ -210,13 +209,13 @@ namespace Rhino.Security.Services
 
         private string GetSecurityKeyProperty(DetachedCriteria criteria)
         {
-            Type rootType = Commons.NHibernate.CriteriaUtil.GetRootType(criteria, UnitOfWork.CurrentSession);
+            Type rootType = criteria.GetRootEntityTypeIfAvailable();
             return criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
         }
 
         private string GetSecurityKeyProperty(ICriteria criteria)
         {
-            Type rootType = Commons.NHibernate.CriteriaUtil.GetRootType(criteria);
+            Type rootType = criteria.GetRootEntityTypeIfAvailable();
             return criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
         }
 

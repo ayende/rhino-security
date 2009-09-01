@@ -1,6 +1,5 @@
-using Castle.Components.Validator;
-using Iesi.Collections.Generic;
-using Rhino.Security.Model;
+using System.Collections.Generic;
+using NHibernate.Validator.Constraints;
 
 namespace Rhino.Security.Model
 {
@@ -9,39 +8,28 @@ namespace Rhino.Security.Model
 	/// </summary>
 	public class Operation : NamedEntity<Operation>
 	{
-		private string comment;
-		private Operation parent;
-		private ISet<Operation> children = new HashedSet<Operation>();
+	    public Operation()
+	    {
+	        Children = new HashSet<Operation>();
+	    }
 
-		/// <summary>
-		/// Gets or sets the comment for this operation
-		/// </summary>
-		/// <value>The comment.</value>
-		[ValidateLength(0, 255)]
-		public virtual string Comment
-		{
-			get { return comment; }
-			set { comment = value; }
-		}
+	    /// <summary>
+	    /// Gets or sets the comment for this operation
+	    /// </summary>
+	    /// <value>The comment.</value>
+	    [Length(255), NotEmpty]
+	    public virtual string Comment { get; set; }
 
-		/// <summary>
-		/// Gets or sets the parent of this operation
-		/// </summary>
-		/// <value>The parent.</value>
-		public virtual Operation Parent
-		{
-			get { return parent; }
-			set { parent = value; }
-		}
+	    /// <summary>
+	    /// Gets or sets the parent of this operation
+	    /// </summary>
+	    /// <value>The parent.</value>
+	    public virtual Operation Parent { get; set; }
 
-		/// <summary>
-		/// Gets or sets the children of this operation
-		/// </summary>
-		/// <value>The children.</value>
-		public virtual ISet<Operation> Children
-		{
-			get { return children; }
-			set { children = value; }
-		}
+	    /// <summary>
+	    /// Gets or sets the children of this operation
+	    /// </summary>
+	    /// <value>The children.</value>
+	    public virtual ICollection<Operation> Children { get; set; }
 	}
 }

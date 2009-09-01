@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Castle.Core.Logging;
-using Rhino.Commons;
+using log4net;
+using Microsoft.Practices.ServiceLocation;
+using Rhino.Security.Impl;
 using Rhino.Security.Interfaces;
 
 namespace Rhino.Security
@@ -15,17 +16,10 @@ namespace Rhino.Security
 		private static readonly MethodInfo getSecurityKeyMethod = typeof (Security).GetMethod(
 			"GetSecurityKeyPropertyInternal", BindingFlags.NonPublic | BindingFlags.Static);
 
-		private static readonly Dictionary<Type, Rhino.Commons.Func<string>> GetSecurityKeyPropertyCache =
-			new Dictionary<Type, Rhino.Commons.Func<string>>();
+		private static readonly Dictionary<Type, Func<string>> GetSecurityKeyPropertyCache =
+			new Dictionary<Type, Func<string>>();
 
-		/// <summary>
-		/// Gets the logger for the security system.
-		/// </summary>
-		/// <value>The logger.</value>
-		public static ILogger Logger
-		{
-			get { return IoC.TryResolve<ILogger>(new NullLogger()); }
-		}
+	    private ILog logger = LogManager.GetLogger(typeof (Security));
 
 		/// <summary>
 		/// Extracts the key from the specified entity.
@@ -37,7 +31,7 @@ namespace Rhino.Security
 			where TEntity : class
 		{
 			Guard.Against<ArgumentNullException>(entity == null, "Entity cannot be null");
-			IEntityInformationExtractor<TEntity> extractor = IoC.Resolve<IEntityInformationExtractor<TEntity>>();
+			var extractor = ServiceLocator.Current.GetInstance<IEntityInformationExtractor<TEntity>>();
 			return extractor.GetSecurityKeyFor(entity);
 		}
 
@@ -49,7 +43,7 @@ namespace Rhino.Security
 		/// <returns></returns>
 		public static string GetDescription<TEntity>(TEntity entity) where TEntity : class
 		{
-			IEntityInformationExtractor<TEntity> extractor = IoC.Resolve<IEntityInformationExtractor<TEntity>>();
+            IEntityInformationExtractor<TEntity> extractor = ServiceLocator.Current.GetInstance<IEntityInformationExtractor<TEntity>>();
 			return extractor.GetDescription(ExtractKey(entity));
 		}
 
@@ -62,12 +56,11 @@ namespace Rhino.Security
 		{
 			lock (GetSecurityKeyPropertyCache)
 			{
-				Rhino.Commons.Func<string> func;
+				Func<string> func;
 				if (GetSecurityKeyPropertyCache.TryGetValue(entityType, out func))
 					return func();
-				func = (Rhino.Commons.Func<string>)
-				       Delegate.CreateDelegate(typeof (Rhino.Commons.Func<string>),
-				                               getSecurityKeyMethod.MakeGenericMethod(entityType));
+				func = (Func<string>)
+				       Delegate.CreateDelegate(typeof (Func<string>),getSecurityKeyMethod.MakeGenericMethod(entityType));
 				GetSecurityKeyPropertyCache[entityType] = func;
 				return func();
 			}
@@ -75,7 +68,7 @@ namespace Rhino.Security
 
 		internal static string GetSecurityKeyPropertyInternal<TEntity>()
 		{
-			return IoC.Resolve<IEntityInformationExtractor<TEntity>>().SecurityKeyPropertyName;
+            return ServiceLocator.Current.GetInstance<IEntityInformationExtractor<TEntity>>().SecurityKeyPropertyName;
 		}
 	}
 }

@@ -1,5 +1,5 @@
 using System.Text;
-using Castle.Components.Validator;
+using NHibernate.Validator.Engine;
 
 namespace Rhino.Security.Exceptions
 {
@@ -9,38 +9,36 @@ namespace Rhino.Security.Exceptions
 	[global::System.Serializable]
 	public class ValidationException : System.Exception
 	{
-		private readonly ErrorSummary errorSummary;
+        private readonly IConstraintValidatorContext errorSummary;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ValidationException"/> class.
 		/// </summary>
 		/// <param name="errorSummary">The error summary.</param>
-		public ValidationException(ErrorSummary errorSummary) : base(GenerateMessage(errorSummary))
+        public ValidationException(ConstraintValidatorContext errorSummary)
+            : base(GenerateMessage(errorSummary))
 		{
 			this.errorSummary = errorSummary;
 		}
 
-		private static string GenerateMessage(ErrorSummary summary)
+        private static string GenerateMessage(ConstraintValidatorContext summary)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.AppendLine("Validation errors");
-			foreach (string invalidProperty in summary.InvalidProperties)
+			var sb = new StringBuilder();
+			sb.AppendLine("Validation errors:");
+			foreach (var invalidProperty in summary.InvalidMessages)
 			{
-				sb.Append(invalidProperty).AppendLine(":");
-				foreach (string error in summary.GetErrorsForProperty(invalidProperty))
-				{
-					sb.Append("\t").AppendLine(error);
-				}
-				sb.AppendLine();
+			    sb.Append(invalidProperty.PropertyName)
+                    .Append(" ")
+                    .AppendLine(invalidProperty.Message);
 			}
-			return sb.ToString();
+            return sb.ToString();
 		}
 
 		/// <summary>
 		/// Gets the error summary with details about the validation error
 		/// </summary>
 		/// <value>The error summary.</value>
-		public ErrorSummary ErrorSummary
+        public IConstraintValidatorContext ErrorSummary
 		{
 			get { return errorSummary; }
 		}

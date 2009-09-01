@@ -1,7 +1,6 @@
 using System;
 using NHibernate;
 using NHibernate.Cfg;
-using Rhino.Commons;
 using Rhino.Security.Impl.MappingRewriting;
 
 namespace Rhino.Security

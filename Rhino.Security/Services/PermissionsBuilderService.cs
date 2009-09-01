@@ -1,5 +1,6 @@
 using System;
-using Rhino.Commons;
+using NHibernate;
+using Rhino.Security.Impl;
 using Rhino.Security.Interfaces;
 using Rhino.Security.Model;
 
@@ -10,17 +11,17 @@ namespace Rhino.Security.Services
 	/// </summary>
 	public class PermissionsBuilderService : IPermissionsBuilderService
 	{
-		private readonly IRepository<Permission> permissionRepository;
-		private readonly IAuthorizationRepository authorizationRepository;
+	    private readonly ISession session;
+	    private readonly IAuthorizationRepository authorizationRepository;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="PermissionsBuilderService"/> class.
 		/// </summary>
-		/// <param name="permissionRepository">The permission repository.</param>
+		/// <param name="session">The nhibernate session</param>
 		/// <param name="authorizationRepository">The authorization editing service.</param>
-		public PermissionsBuilderService(IRepository<Permission> permissionRepository, IAuthorizationRepository authorizationRepository)
+		public PermissionsBuilderService(ISession session, IAuthorizationRepository authorizationRepository)
 		{
-			this.permissionRepository = permissionRepository;
-			this.authorizationRepository = authorizationRepository;
+		    this.session = session;
+		    this.authorizationRepository = authorizationRepository;
 		}
 
 		/// <summary>
@@ -173,7 +174,7 @@ namespace Rhino.Security.Services
 		/// <param name="permission">The permission.</param>
 		public void Save(Permission permission)
 		{
-			permissionRepository.Save(permission);
+			session.Save(permission);
 		}
 
 		/// <summary>
