@@ -59,6 +59,7 @@ task Release -depends Test {
 		$build_dir\Rhino.Security.dll `
 		$build_dir\Rhino.Security.xml `
 		license.txt `
+		"How to use.txt" `
 		acknowledgements.txt
 	if ($lastExitCode -ne 0) {
         throw "Error: Failed to execute ZIP command"

@@ -1,23 +1,32 @@
-Service Locator
-Initialization
+Registering into NHibernate
+===========================
+BEFORE creating the session factory, call the following:
 
-// windsor
-Kernel.Register(
-    Component.For<IAuthorizationService>()
-        .ImplementedBy<AuthorizationService>()
-        .Lifestyle.Is(Lifestyle.Transient),
-    Component.For<IAuthorizationRepository>()
-        .ImplementedBy<AuthorizationRepository>()
-        .Lifestyle.Is(Lifestyle.Transient),
-    Component.For<IPermissionsBuilderService>()
-        .ImplementedBy<PermissionsBuilderService>()
-        .Lifestyle.Is(Lifestyle.Transient),
-    Component.For<IPermissionsService>()
-        .ImplementedBy<PermissionsService>()
-        .Lifestyle.Is(Lifestyle.Transient)
-	);
+	Security.Configure(cfg, SecurityTableStructure.Schema);
 
+Container Configuration
+=======================
 
-init 
-new SchemaChanger(cfg, securityTableStructure).Change();
-new UserMapper(cfg, userType).Map();
+Rhino Sercurity make use of Common Service Locator (http://www.codeplex.com/CommonServiceLocator), you need to set the ServiceLocator.SetLocatorProvider() to provide the following services:
+ * IAuthorizationService
+ * IAuthorizationRepository
+ * IPermissionsBuilderService
+ * IPermissionsService
+
+ALL services must be TRASIENT, and the container needs to provide access to the current ISession. 
+The following is an example of configuring Rhino Security using Windsor:
+	
+	Kernel.Register(
+		Component.For<IAuthorizationService>()
+			.ImplementedBy<AuthorizationService>()
+			.Lifestyle.Is(Lifestyle.Transient),
+		Component.For<IAuthorizationRepository>()
+			.ImplementedBy<AuthorizationRepository>()
+			.Lifestyle.Is(Lifestyle.Transient),
+		Component.For<IPermissionsBuilderService>()
+			.ImplementedBy<PermissionsBuilderService>()
+			.Lifestyle.Is(Lifestyle.Transient),
+		Component.For<IPermissionsService>()
+			.ImplementedBy<PermissionsService>()
+			.Lifestyle.Is(Lifestyle.Transient)
+		);
