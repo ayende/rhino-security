@@ -4,7 +4,7 @@ properties {
   $build_dir = "$base_dir\build" 
   $buildartifacts_dir = "$build_dir\" 
   $sln_file = "$base_dir\Rhino.Security-vs2008.sln" 
-  $version = "3.6.0.0"
+  $version = "1.3.0.0"
   $tools_dir = "$base_dir\Tools"
   $release_dir = "$base_dir\Release"
 } 
@@ -49,35 +49,15 @@ task Compile -depends Init {
 task Test -depends Compile {
   $old = pwd
   cd $build_dir
-  exec ".\MbUnit.Cons.exe" "$build_dir\Rhino.Security.Tests.dll"
+  exec "$tools_dir\xunit\xunit.console.exe" "$build_dir\Rhino.Security.Tests.dll"
   cd $old		
 }
 
-task Merge {
-	$old = pwd
-	cd $build_dir
-	
-	Remove-Item Rhino.Mocks.Partial.dll -ErrorAction SilentlyContinue 
-	Rename-Item $build_dir\Rhino.Mocks.dll Rhino.Mocks.Partial.dll
-	
-	& $tools_dir\ILMerge.exe Rhino.Mocks.Partial.dll `
-		Castle.DynamicProxy2.dll `
-		Castle.Core.dll `
-		/out:Rhino.Mocks.dll `
-		/t:library `
-		"/keyfile:$base_dir\ayende-open-source.snk" `
-		"/internalize:$base_dir\ilmerge.exclude"
-	if ($lastExitCode -ne 0) {
-        throw "Error: Failed to merge assemblies!"
-    }
-	cd $old
-}
-
-task Release -depends Test, Merge {
+task Release -depends Test {
 	& $tools_dir\zip.exe -9 -A -j `
-		$release_dir\Rhino.Mocks.zip `
-		$build_dir\Rhino.Mocks.dll `
-		$build_dir\Rhino.Mocks.xml `
+		$release_dir\Rhino.Security.zip `
+		$build_dir\Rhino.Security.dll `
+		$build_dir\Rhino.Security.xml `
 		license.txt `
 		acknowledgements.txt
 	if ($lastExitCode -ne 0) {
