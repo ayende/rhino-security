@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using NHibernate;
 using NHibernate.Criterion;
-using NHibernate.Validator.Engine;
 using Rhino.Security.Impl;
 using Rhino.Security.Impl.Util;
 using Rhino.Security.Interfaces;

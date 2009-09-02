@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NHibernate.Validator.Constraints;
 
 namespace Rhino.Security.Model
 {
@@ -20,7 +19,6 @@ namespace Rhino.Security.Model
 	    /// Gets or sets the comment for this operation
 	    /// </summary>
 	    /// <value>The comment.</value>
-	    [Length(255), NotEmpty]
 	    public virtual string Comment { get; set; }
 
 	    /// <summary>

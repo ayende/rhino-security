@@ -1,4 +1,3 @@
-using NHibernate.Validator.Constraints;
 
 namespace Rhino.Security.Model
 {
@@ -16,7 +15,6 @@ namespace Rhino.Security.Model
 	    /// The name can be set only on creation, and is not changed
 	    /// afterward.
 	    /// </remarks>
-	    [NotNullNotEmpty, Length(255)]
 	    public virtual string Name { get; set; }
 
 	    /// <summary>

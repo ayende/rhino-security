@@ -1,5 +1,4 @@
 using NHibernate.Exceptions;
-using Rhino.Security.Exceptions;
 using Rhino.Security.Model;
 using Xunit;
 
