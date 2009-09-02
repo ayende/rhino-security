@@ -1,40 +1,10 @@
-using Rhino.Commons.ForTesting;
+using Xunit;
 
 namespace Rhino.Security.Tests
 {
-    using Commons;
-    using MbUnit.Framework;
-
-	[TestFixture]
-	public class ActiveRecord_AuthorizationService_Explainations_Fixture : AuthorizationService_Explainations_Fixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "ar-windsor.boo"; }
-		}
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.ActiveRecord; }
-		}
-	}
-
-	[TestFixture]
-	public class NHibernate_AuthorizationService_Explainations_Fixture : AuthorizationService_Explainations_Fixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "nh-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.NHibernate; }
-		}
-	}
-
-    public abstract class AuthorizationService_Explainations_Fixture : DatabaseFixture
+    public class AuthorizationService_Explainations_Fixture : DatabaseFixture
     {
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedWhenAllowedPermissionWasDefinedWithDenyPermissionWithLowerLevel()
         {
             permissionsBuilderService
@@ -49,7 +19,7 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .Level(5)
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
@@ -57,28 +27,28 @@ namespace Rhino.Security.Tests
                 @"Permission (level 10) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 Permission (level 5) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyNotAllowedIfOperationNotDefined()
         {
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Delete");
-            Assert.AreEqual("Operation '/Account/Delete' was not defined\r\n", information.ToString());
+            Assert.Equal("Operation '/Account/Delete' was not defined\r\n", information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyNotAllowedIfNoPermissionGranted()
         {
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
-            Assert.AreEqual(
+            Assert.Equal(
                 "Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators')\r\n",
                 information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyNotAllowedIfDenyPermissionWasDefined()
         {
             permissionsBuilderService
@@ -87,16 +57,16 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
-            Assert.AreEqual(
+            Assert.Equal(
                 "Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'everything'\r\n",
                 information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedIfAllowPermissionWasDefined()
         {
             permissionsBuilderService
@@ -105,16 +75,16 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
-            Assert.AreEqual(
+            Assert.Equal(
                 "Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'\r\n",
                 information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedIfAllowPermissionWasDefinedOnGroup()
         {
             permissionsBuilderService
@@ -123,17 +93,17 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
-            Assert.AreEqual(
+            Assert.Equal(
                 "Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')\r\n",
                 information.ToString());
         }
 
 
-        [Test]
+        [Fact]
         public void ExplainWhyNotAllowedIfbDenyPermissionWasDefinedOnGroup()
         {
             permissionsBuilderService
@@ -142,17 +112,17 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
-            Assert.AreEqual(
+            Assert.Equal(
                 "Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')\r\n",
                 information.ToString());
         }
 
 
-        [Test]
+        [Fact]
         public void ExplainWhyNotAllowedIfAllowPermissionWasDefinedOnGroupAndDenyPermissionOnUser()
         {
             permissionsBuilderService
@@ -167,7 +137,7 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
@@ -175,10 +145,10 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 @"Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')
 Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyNotAllowedWhenAllowedPermissionWasDefinedWithDenyPermissionWithHigherLevel()
         {
             permissionsBuilderService
@@ -193,7 +163,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .OnEverything()
                 .Level(5)
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
@@ -201,10 +171,10 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 @"Permission (level 5) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')
 Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedOnAccountIfPermissionWasGrantedOnAnything()
         {
             permissionsBuilderService
@@ -213,18 +183,18 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountIfPermissionWasDeniedOnAnything()
         {
             permissionsBuilderService
@@ -233,17 +203,17 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'everything'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedOnAccountIfPermissionWasGrantedOnGroupAssociatedWithUser()
         {
             permissionsBuilderService
@@ -252,17 +222,17 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'Account: south sand' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountIfPermissionWasDeniedOnGroupAssociatedWithUser()
         {
             permissionsBuilderService
@@ -271,17 +241,17 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'Account: south sand' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedOnAccountIfPermissionWasGrantedToUser()
         {
             permissionsBuilderService
@@ -290,18 +260,18 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'Account: south sand'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountIfPermissionWasDeniedToUser()
         {
             permissionsBuilderService
@@ -310,17 +280,17 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'Account: south sand'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedOnEntityGroupIfPermissionWasGrantedToUsersGroupAssociatedWithUser()
         {
             permissionsBuilderService
@@ -329,16 +299,16 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedIfPermissionWasGrantedToEntitiesGroupButNotToGlobal()
         {
             permissionsBuilderService
@@ -347,16 +317,16 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountIfNoPermissionIsDefined()
         {
             AuthorizationInformation information =
@@ -364,25 +334,25 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators') on 'Account: south sand' or any of the groups 'Account: south sand' is associated with ('Important Accounts')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountWhenHaveNoGroupsOnUserOrEntity()
         {
             authorizationRepository.DetachUserFromGroup(user, "Administrators");
             authorizationRepository.DetachEntityFromGroup(account, "Important Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('not assoicated with any group') on 'Account: south sand' or any of the groups 'Account: south sand' is associated with ('not assoicated with any group')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountIfPermissionWasDeniedToUserOnTheGroupTheEntityIsAssociatedWith()
         {
             permissionsBuilderService
@@ -391,17 +361,17 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedOnAccountIfPermissionWasAllowedToUserOnTheGroupTheEntityIsAssociatedWith()
         {
             permissionsBuilderService
@@ -410,21 +380,21 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')'
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyDeniedIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             permissionsBuilderService
                 .Allow("/Account/Edit")
@@ -432,25 +402,25 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators') on 'Account: south sand' or any of the groups 'Account: south sand' is associated with ('Important Accounts')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
 
-        [Test]
+        [Fact]
         public void ExplainWhyAllowedIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             authorizationRepository.DetachUserFromGroup(user, "Administrators");
             authorizationRepository.AssociateUserWith(user, "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             permissionsBuilderService
                 .Allow("/Account/Edit")
@@ -458,14 +428,14 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')' ('Ayende' is a member of 'Helpdesk -> Administrators')
 ";
-            Assert.AreEqual(expected, information.ToString());
+            Assert.Equal(expected, information.ToString());
         }
     }
 }

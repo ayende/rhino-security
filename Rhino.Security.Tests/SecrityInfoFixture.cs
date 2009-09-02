@@ -1,30 +1,27 @@
+using Xunit;
+
 namespace Rhino.Security.Tests
 {
     using System;
-    using MbUnit.Framework;
 
-    [TestFixture]
     public class SecrityInfoFixture
     {
-        [Test]
-        [ExpectedException(typeof(ArgumentException),"Name must have a value")]
+        [Fact]
         public void WillNotAcceptNullName()
         {
-            new SecurityInfo(null, "1");
+            Assert.Throws<ArgumentException>("Name must have a value", () => new SecurityInfo(null, "1"));
         }
 
-        [Test]
-        [ExpectedException(typeof(ArgumentException), "Name must have a value")]
+        [Fact]
         public void WillNotAcceptEmptyName()
         {
-            new SecurityInfo("",  "1");
+            Assert.Throws<ArgumentException>("Name must have a value", () => new SecurityInfo("", "1"));
         }
 
-        [Test]
-        [ExpectedException(typeof(ArgumentException), "Identifier must not be null")]
+        [Fact]
         public void WillNotAcceptNullIdentifier()
         {
-            new SecurityInfo("a", null);
+            Assert.Throws<ArgumentException>("Identifier must not be null", () => new SecurityInfo("", null));
         }
     }
 }

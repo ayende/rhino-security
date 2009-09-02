@@ -4,13 +4,17 @@ Initialization
 // windsor
 Kernel.Register(
     Component.For<IAuthorizationService>()
-        .ImplementedBy<AuthorizationService>(),
+        .ImplementedBy<AuthorizationService>()
+        .Lifestyle.Is(Lifestyle.Transient),
     Component.For<IAuthorizationRepository>()
-        .ImplementedBy<AuthorizationRepository>(),
+        .ImplementedBy<AuthorizationRepository>()
+        .Lifestyle.Is(Lifestyle.Transient),
     Component.For<IPermissionsBuilderService>()
-        .ImplementedBy<PermissionsBuilderService>(),
+        .ImplementedBy<PermissionsBuilderService>()
+        .Lifestyle.Is(Lifestyle.Transient),
     Component.For<IPermissionsService>()
         .ImplementedBy<PermissionsService>()
+        .Lifestyle.Is(Lifestyle.Transient)
 	);
 
 

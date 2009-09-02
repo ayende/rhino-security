@@ -1,27 +1,10 @@
 namespace Rhino.Security.Tests
 {
-    using System;
-    using Castle.ActiveRecord;
-
-    [ActiveRecord(Cache = CacheEnum.ReadWrite)]
     public class User : IUser
     {
-        private long id;
-        private string name;
+        public virtual long Id { get; set; }
 
-        [PrimaryKey]
-        public virtual long Id
-        {
-            get { return id; }
-            set { id = value; }
-        }
-
-        [Property(NotNull = true)]
-        public virtual string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
+        public virtual string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the security info for this user
@@ -29,7 +12,7 @@ namespace Rhino.Security.Tests
         /// <value>The security info.</value>
         public virtual SecurityInfo SecurityInfo
         {
-            get { return new SecurityInfo(name, id); }
+            get { return new SecurityInfo(Name, Id); }
         }
     }
 }

@@ -29,6 +29,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -38,6 +39,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,49 +50,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.ActiveRecord, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\Castle\Castle.ActiveRecord.dll</HintPath>
+      <HintPath>..\SharedLibs\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Components.Validator, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="NHibernate, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\Castle\Castle.Components.Validator.dll</HintPath>
+      <HintPath>..\SharedLibs\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+    <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\Castle\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\Castle\Castle.MicroKernel.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\Castle\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="Iesi.Collections, Version=1.0.0.3, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\NHibernate\Iesi.Collections.dll</HintPath>
-    </Reference>
-    <Reference Include="MbUnit.framework, Version=1.0.2700.29885, Culture=neutral, PublicKeyToken=5e72ecd30bc408d5">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\Tools\MbUnit\MbUnit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="NHibernate, Version=2.0.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\NHibernate\NHibernate.dll</HintPath>
-    </Reference>
-    <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\NHibernate\NHibernate.ByteCode.Castle.dll</HintPath>
+      <HintPath>..\SharedLibs\NHibernate.ByteCode.Castle.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.35.1, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\SharedLibs\SqLite.Net\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\SharedLibs\System.Data.SQLite.DLL</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="xunit, Version=1.1.0.1323, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\SharedLibs\xunit.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
@@ -100,22 +85,15 @@
     <Compile Include="AuthorizationServiceWithSecondLevelCacheFixture.cs" />
     <Compile Include="AuthorizationService_Explainations_Fixture.cs" />
     <Compile Include="AuthorizationService_Queries_Fixture.cs" />
-    <Compile Include="EnableTestCaching.cs" />
-    <Compile Include="EnvironmentSetupFixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
     <Compile Include="ScenariosFixture.cs" />
     <Compile Include="SecrityInfoFixture.cs" />
+    <Compile Include="SillyContainer.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="ar-windsor.boo">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="nh-windsor.boo">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Rhino.Security\Rhino.Security-vs2008.csproj">
@@ -146,11 +124,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Account.hbm.xml" />
     <EmbeddedResource Include="User.hbm.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="hibernate.cfg.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

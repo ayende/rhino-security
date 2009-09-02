@@ -107,15 +107,15 @@ namespace Rhino.Security.Services
 			//UsersGroup[] usersGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);					
 
 			AbstractCriterion onCriteria =
-				(Expression.Eq("EntitySecurityKey", key) || Expression.In("EntitiesGroup", entitiesGroups)) ||
-				(Expression.IsNull("EntitiesGroup") && Expression.IsNull("EntitySecurityKey"));
+				(Restrictions.Eq("EntitySecurityKey", key) || Restrictions.In("EntitiesGroup", entitiesGroups)) ||
+				(Restrictions.IsNull("EntitiesGroup") && Restrictions.IsNull("EntitySecurityKey"));
 			DetachedCriteria criteria = DetachedCriteria.For<Permission>()
-				.Add(Expression.Eq("User", user)
+				.Add(Restrictions.Eq("User", user)
 				     || Subqueries.PropertyIn("UsersGroup.Id",
 				                              SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.Add(onCriteria)
 				.CreateAlias("Operation", "op")
-				.Add(Expression.In("op.Name", operationNames));
+				.Add(Restrictions.In("op.Name", operationNames));
 
 			return FindResults(criteria);
 		}

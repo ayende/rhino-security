@@ -1,39 +1,11 @@
+using System.IO;
+using Microsoft.Practices.ServiceLocation;
+using Rhino.Security.Interfaces;
+using Xunit;
+
 namespace Rhino.Security.Tests
 {
-    using System.Data;
-    using Commons;
-    using MbUnit.Framework;
-    using Rhino.Commons.ForTesting;
-
-	[TestFixture]
-	public class ActiveRecord_AuthorizationServiceWithSecondLevelCacheFixture : AuthorizationServiceWithSecondLevelCacheFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "ar-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.ActiveRecord; }
-		}
-	}
-
-	[TestFixture]
-	public class NHibernate_AuthorizationServiceWithSecondLevelCacheFixture : AuthorizationServiceWithSecondLevelCacheFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "nh-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.NHibernate; }
-		}
-	}
-
-    public abstract class AuthorizationServiceWithSecondLevelCacheFixture : DatabaseFixture
+    public class AuthorizationServiceWithSecondLevelCacheFixture : DatabaseFixture
     {
         // we need those to ensure that we aren't leaving the 2nd level
         // cache in an inconsistent state after deletion
@@ -41,7 +13,21 @@ namespace Rhino.Security.Tests
         //TODO: Add user to group, save, remove and query
         //TODO: Add nested users group save, remove and query
 
-        [Test]
+        public override string ConnectionString
+        {
+            get
+            {
+                return "Data Source=test.db";
+            }
+        }
+
+        protected override void BeforeSetup()
+        {
+            if (File.Exists("test.db"))
+                File.Delete("test.db");
+        }
+
+        [Fact]
         public void UseSecondLevelCacheForSecurityQuestions()
         {
             permissionsBuilderService
@@ -50,35 +36,42 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
 
-            using (UnitOfWork.Start(UnitOfWorkNestingOptions.CreateNewOrNestUnitOfWork))
+            session.Flush();
+            session.Transaction.Commit();
+            session.Dispose();
+
+            using (var s2 = factory.OpenSession())// load into the 2nd level cache
+            using (s2.BeginTransaction())
             {
-                bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-                Assert.IsTrue(isAllowed);
+                SillyContainer.SessionProvider = () => s2;
+                var anotherAuthorizationService = ServiceLocator.Current.GetInstance<IAuthorizationService>();
+                Assert.True(anotherAuthorizationService.IsAllowed(user, account, "/Account/Edit"));
+
+                s2.Transaction.Commit();
             }
 
-            using (IDbCommand command = UnitOfWork.CurrentSession.Connection.CreateCommand())
+            using (var s2 = factory.OpenSession())//remove the data from the cache
+            using (s2.BeginTransaction())
             {
-                command.CommandText = "DELETE FROM security_Permissions";
-                command.ExecuteNonQuery();
+                using (var command = s2.Connection.CreateCommand())
+                {
+                    command.CommandText = "DELETE FROM security_Permissions";
+                    command.ExecuteNonQuery();
+                }
+
+                s2.Transaction.Commit();
             }
-            using (UnitOfWork.Start(UnitOfWorkNestingOptions.CreateNewOrNestUnitOfWork))
+            using (var s3 = factory.OpenSession())
+            using (s3.BeginTransaction())
             {
                 // should return true since it loads from cache
-                bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-                Assert.IsTrue(isAllowed);
+                SillyContainer.SessionProvider = () => s3;
+                var anotherAuthorizationService = ServiceLocator.Current.GetInstance<IAuthorizationService>();
+                Assert.True(anotherAuthorizationService.IsAllowed(user, account, "/Account/Edit"));
+
+                s3.Transaction.Commit();
             }
-        }
-
-
-        /// <summary>
-        /// We need this because we need to open several connections
-        /// to the database.
-        /// </summary>
-        protected override DatabaseEngine GetDatabaseEngine()
-        {
-            return DatabaseEngine.MsSql2005;
         }
     }
 }

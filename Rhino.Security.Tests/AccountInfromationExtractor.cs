@@ -1,18 +1,18 @@
+using NHibernate;
+using NHibernate.Criterion;
 using Rhino.Security.Interfaces;
 
 namespace Rhino.Security.Tests
 {
     using System;
-    using Commons;
-    using NHibernate.Criterion;
 
     public class AccountInfromationExtractor : IEntityInformationExtractor<Account>
     {
-        private readonly IRepository<Account> accountsRepository;
+        private readonly ISession session;
 
-        public AccountInfromationExtractor(IRepository<Account> account)
+        public AccountInfromationExtractor(ISession session)
         {
-            this.accountsRepository = account;
+            this.session = session;
         }
 
         public Guid GetSecurityKeyFor(Account entity)
@@ -22,7 +22,9 @@ namespace Rhino.Security.Tests
 
         public string GetDescription(Guid securityKey)
         {
-            Account account = accountsRepository.FindOne(Expression.Eq("SecurityKey", securityKey));
+            Account account = session.CreateCriteria<Account>()
+                .Add(Restrictions.Eq("SecurityKey", securityKey))
+                .UniqueResult<Account>();
             return string.Format("Account: {0}", account.Name);
         }
 

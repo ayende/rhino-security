@@ -1,494 +1,490 @@
-using Rhino.Commons.ForTesting;
+using NHibernate.Exceptions;
 using Rhino.Security.Exceptions;
 using Rhino.Security.Model;
+using Xunit;
 
 namespace Rhino.Security.Tests
 {
     using System;
-    using Commons;
-    using MbUnit.Framework;
 
-	[TestFixture]
-	public class ActiveRecord_AuthorizationRepositoryFixture : AuthorizationRepositoryFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "ar-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.ActiveRecord; }
-		}
-	}
-
-	[TestFixture]
-	public class NHibernate_AuthorizationRepositoryFixture : AuthorizationRepositoryFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "nh-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.NHibernate; }
-		}
-	}
-
-    public abstract class AuthorizationRepositoryFixture : DatabaseFixture
+    public class AuthorizationRepositoryFixture : DatabaseFixture
     {
-        [Test]
+        [Fact]
         public void CanSaveUser()
         {
-            User ayende = new User();
-            ayende.Name = "ayende";
-            UnitOfWork.CurrentSession.Save(ayende);
-            UnitOfWork.CurrentSession.Flush();
-            UnitOfWork.CurrentSession.Evict(ayende);
+            User ayende = new User {Name = "ayende"};
+            session.Save(ayende);
+            session.Flush();
+            session.Evict(ayende);
 
-            User fromDb = UnitOfWork.CurrentSession.Get<User>(ayende.Id);
-            Assert.IsNotNull(fromDb);
-            Assert.AreEqual(ayende.Name, fromDb.Name);
+            User fromDb = session.Get<User>(ayende.Id);
+            Assert.NotNull(fromDb);
+            Assert.Equal(ayende.Name, fromDb.Name);
         }
 
-        [Test]
+        [Fact]
         public void CanSaveAccount()
         {
-            Account ayende = new Account();
-            ayende.Name = "ayende";
-            Assert.AreNotEqual(Guid.Empty, ayende.SecurityKey);
-            UnitOfWork.CurrentSession.Save(ayende);
-            UnitOfWork.CurrentSession.Flush();
-            UnitOfWork.CurrentSession.Evict(ayende);
+            Account ayende = new Account {Name = "ayende"};
+            Assert.NotEqual(Guid.Empty, ayende.SecurityKey);
+            session.Save(ayende);
+            session.Flush();
+            session.Evict(ayende);
 
-            Account fromDb = UnitOfWork.CurrentSession.Get<Account>(ayende.Id);
-            Assert.IsNotNull(fromDb);
-            Assert.AreEqual(ayende.Name, fromDb.Name);
-            Assert.AreEqual(fromDb.SecurityKey, ayende.SecurityKey);
+            Account fromDb = session.Get<Account>(ayende.Id);
+            Assert.NotNull(fromDb);
+            Assert.Equal(ayende.Name, fromDb.Name);
+            Assert.Equal(fromDb.SecurityKey, ayende.SecurityKey);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateUsersGroup()
         {
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
 
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(group);
 
-            UsersGroup groupFromDb = Repository<UsersGroup>.Get(group.Id);
-            Assert.IsNotNull(groupFromDb);
-            Assert.AreEqual(group.Name, groupFromDb.Name);
+            UsersGroup groupFromDb = session.Get<UsersGroup>(group.Id);
+            Assert.NotNull(groupFromDb);
+            Assert.Equal(group.Name, groupFromDb.Name);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateEntitesGroup()
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
 
-            EntitiesGroup groupFromDb = Repository<EntitiesGroup>.Get(group.Id);
-            Assert.IsNotNull(groupFromDb);
-            Assert.AreEqual(group.Name, groupFromDb.Name);
+            session.Flush();
+            session.Evict(group);
+
+            EntitiesGroup groupFromDb = session.Get<EntitiesGroup>(group.Id);
+            Assert.NotNull(groupFromDb);
+            Assert.Equal(group.Name, groupFromDb.Name);
         }
 
-        [Test]
-        [ExpectedException(typeof (ValidationException))]
+        [Fact]
         public void CannotCreateEntitiesGroupWithSameName()
         {
             authorizationRepository.CreateEntitiesGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
-            authorizationRepository.CreateEntitiesGroup("Admininstrators");
+            session.Flush();
+
+            Exception exception = Assert.Throws<GenericADOException>(() =>
+                                                                         {
+                                                                             authorizationRepository.CreateEntitiesGroup("Admininstrators");
+                                                                             session.Flush();
+                                                                         }).InnerException;
+            Assert.Contains("unique", exception.Message);
         }
 
-        [Test]
-        [ExpectedException(typeof (ValidationException))]
+        [Fact]
         public void CannotCreateUsersGroupsWithSameName()
         {
             authorizationRepository.CreateUsersGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
-            authorizationRepository.CreateUsersGroup("Admininstrators");
+            session.Flush();
+
+            Exception exception = Assert.Throws<GenericADOException>(() =>
+                                                                         {
+                                                                             authorizationRepository.CreateUsersGroup("Admininstrators");
+                                                                             session.Flush();
+                                                                         }).InnerException;
+
+            Assert.Contains("unique", exception.Message);
         }
 
-        [Test]
+        [Fact]
         public void CanGetUsersGroupByName()
         {
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(group);
 
             group = authorizationRepository.GetUsersGroupByName("Admininstrators");
-            Assert.IsNotNull(group);
+            Assert.NotNull(group);
         }
 
-        [Test]
+        [Fact]
         public void CanGetEntitiesGroupByName()
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+
+            session.Flush(); 
+            session.Evict(group);
 
             group = authorizationRepository.GetEntitiesGroupByName("Accounts");
-            Assert.IsNotNull(group);
+            Assert.NotNull(group);
         }
 
-        [Test]
+        [Fact]
         public void CanChangeUsersGroupName()
         {
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(group);
 
             authorizationRepository.RenameUsersGroup("Admininstrators", "2");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+
+            session.Flush(); 
+            session.Evict(group);
 
             group = authorizationRepository.GetUsersGroupByName("2");
-            Assert.IsNotNull(group);
+            Assert.NotNull(group);
             group = authorizationRepository.GetUsersGroupByName("Admininstrators");
-            Assert.IsNull(group);
+            Assert.Null(group);
         }
 
-        [Test]
-        [ExpectedException(typeof(ValidationException))]
+        [Fact]
         public void CannotRenameUsersGroupToAnAlreadyExistingUsersGroup()
         {
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
             UsersGroup group2 = authorizationRepository.CreateUsersGroup("ExistingGroup");
 
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
-            UnitOfWork.CurrentSession.Evict(group);
-            UnitOfWork.CurrentSession.Evict(group2);
+            session.Evict(group);
+            session.Evict(group2);
 
-            authorizationRepository.RenameUsersGroup("Admininstrators", "ExistingGroup");
+            Exception exception = Assert.Throws<GenericADOException>(
+                () =>
+                    {
+                        authorizationRepository.RenameUsersGroup("Admininstrators", "ExistingGroup");
+                        session.Flush();
+                    }).InnerException;
+            Assert.Contains("unique", exception.Message);
         }
 
-        [Test]
+        [Fact]
         public void CanChangeEntitiesGroupName()
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(group);
 
-            authorizationRepository.RenameEntitiesGroup("Accounts", "2");            
-            UnitOfWork.Current.TransactionalFlush();
+            authorizationRepository.RenameEntitiesGroup("Accounts", "2");
 
-            UnitOfWork.CurrentSession.Evict(group);
+
+            session.Evict(group);
 
             group = authorizationRepository.GetEntitiesGroupByName("2");
-            Assert.IsNotNull(group);
+            Assert.NotNull(group);
             group = authorizationRepository.GetEntitiesGroupByName("Accounts");
-            Assert.IsNull(group);
+            Assert.Null(group);
         }
 
-        [Test]
-        [ExpectedException(typeof(ValidationException))]
+        [Fact]
         public void CannotRenameEntitiesGroupToAnAlreadyExistingEntitiesGroup()
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             EntitiesGroup group2 = authorizationRepository.CreateEntitiesGroup("ExistingGroup");
 
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(group);
-            UnitOfWork.CurrentSession.Evict(group2);
+            session.Flush();
+            session.Evict(group);
+            session.Evict(group2);
 
-            authorizationRepository.RenameEntitiesGroup("Accounts", "ExistingGroup");        
+            Exception exception = Assert.Throws<GenericADOException>(
+                () =>
+                    {
+                        authorizationRepository.RenameEntitiesGroup("Accounts", "ExistingGroup");
+                        session.Flush();
+                    }).InnerException;
+
+            Assert.Contains("unique", exception.Message);
         }
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException), "There is no users group named: NonExistingGroup")]
+        [Fact]
         public void CannotRenameUsersGroupThatDoesNotExist()
         {
-            authorizationRepository.RenameUsersGroup("NonExistingGroup", "Administrators");    
+            Assert.Throws<InvalidOperationException>("There is no users group named: NonExistingGroup",
+                                                     () =>
+                                                     authorizationRepository.RenameUsersGroup("NonExistingGroup",
+                                                                                              "Administrators"));
         }
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException), "There is no entities group named: NonExistingGroup")]
+        [Fact]
         public void CannotRenameEntitiesGroupThatDoesNotExist()
         {
-            authorizationRepository.RenameEntitiesGroup("NonExistingGroup", "Accounts");
+            Assert.Throws<InvalidOperationException>( "There is no entities group named: NonExistingGroup",
+                                                     () =>
+                                                     authorizationRepository.RenameEntitiesGroup("NonExistingGroup",
+                                                                                                 "Accounts"));
         }
 
 
-        [Test]
+        [Fact]
         public void CanAssociateUserWithGroup()
         {
-            User ayende = new User();
-            ayende.Name = "ayende";
+            User ayende = new User {Name = "ayende"};
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateUserWith(ayende, "Admins");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(ayende);
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(ayende);
+            session.Evict(group);
 
             UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(ayende);
-            Assert.AreEqual(1, groups.Length);
-            Assert.AreEqual("Admins", groups[0].Name);
+            Assert.Equal(1, groups.Length);
+            Assert.Equal("Admins", groups[0].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanAssociateAccountWithMultipleGroups()
         {
             Account ayende = new Account();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
             EntitiesGroup group2 = authorizationRepository.CreateEntitiesGroup("Accounts of second group");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateEntityWith(ayende, "Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.AssociateEntityWith(ayende, "Accounts of second group");
 
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
-            UnitOfWork.CurrentSession.Evict(ayende);
-            UnitOfWork.CurrentSession.Evict(group);
-            UnitOfWork.CurrentSession.Evict(group2);
+            session.Evict(ayende);
+            session.Evict(group);
+            session.Evict(group2);
 
             EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(ayende);
-            Assert.AreEqual(2, groups.Length);
-            Assert.AreEqual("Accounts", groups[0].Name);
-            Assert.AreEqual("Accounts of second group", groups[1].Name);
+            Assert.Equal(2, groups.Length);
+            Assert.Equal("Accounts", groups[0].Name);
+            Assert.Equal("Accounts of second group", groups[1].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanAssociateUserWithNestedGroup()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
+
             UsersGroup group = authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateUserWith(ayende, "DBA");
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(ayende);
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(ayende);
+            session.Evict(group);
 
             UsersGroup[] groups = authorizationRepository.GetAssociatedUsersGroupFor(ayende);
-            Assert.AreEqual(2, groups.Length);
-            Assert.AreEqual("Admins", groups[0].Name);
-            Assert.AreEqual("DBA", groups[1].Name);
+            Assert.Equal(2, groups.Length);
+            Assert.Equal("Admins", groups[0].Name);
+            Assert.Equal("DBA", groups[1].Name);
         }
 
 
-        [Test]
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWithNested()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateUserWith(ayende, "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
-            Assert.AreEqual(2, groups.Length);
-            Assert.AreEqual("DBA", groups[0].Name);
-            Assert.AreEqual("Admins", groups[1].Name);
+            Assert.Equal(2, groups.Length);
+            Assert.Equal("DBA", groups[0].Name);
+            Assert.Equal("Admins", groups[1].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupDirect()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateUserWith(ayende, "Admins");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
-            Assert.AreEqual(1, groups.Length);
-            Assert.AreEqual("Admins", groups[0].Name);
+            Assert.Equal(1, groups.Length);
+            Assert.Equal("Admins", groups[0].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereNonExists()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
+
 
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
-            Assert.AreEqual(0, groups.Length);
+            Assert.Equal(0, groups.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsDirectPathShouldSelectThat()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
-            UnitOfWork.Current.TransactionalFlush();
+
+
             authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.AssociateUserWith(ayende, "Admins");
             authorizationRepository.AssociateUserWith(ayende, "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
-            Assert.AreEqual(1, groups.Length);
-            Assert.AreEqual("Admins", groups[0].Name);
+            Assert.Equal(1, groups.Length);
+            Assert.Equal("Admins", groups[0].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsTwoLevelNesting()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
-            UnitOfWork.Current.TransactionalFlush();
+
+
             authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.CreateChildUserGroupOf("DBA", "SQLite DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.AssociateUserWith(ayende, "SQLite DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
-            Assert.AreEqual(3, groups.Length);
-            Assert.AreEqual("SQLite DBA", groups[0].Name);
-            Assert.AreEqual("DBA", groups[1].Name);
-            Assert.AreEqual("Admins", groups[2].Name);
+            Assert.Equal(3, groups.Length);
+            Assert.Equal("SQLite DBA", groups[0].Name);
+            Assert.Equal("DBA", groups[1].Name);
+            Assert.Equal("Admins", groups[2].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsMoreThanOneIndirectPathShouldSelectShortest()
         {
             User ayende = new User();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             authorizationRepository.CreateUsersGroup("Admins");
-            UnitOfWork.Current.TransactionalFlush();
-            UnitOfWork.Current.TransactionalFlush();
+
+
             authorizationRepository.CreateChildUserGroupOf("Admins", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.CreateChildUserGroupOf("DBA", "SQLite DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.AssociateUserWith(ayende, "DBA");
             authorizationRepository.AssociateUserWith(ayende, "SQLite DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
-            Assert.AreEqual(2, groups.Length);
-            Assert.AreEqual("DBA", groups[0].Name);
-            Assert.AreEqual("Admins", groups[1].Name);
+            Assert.Equal(2, groups.Length);
+            Assert.Equal("DBA", groups[0].Name);
+            Assert.Equal("Admins", groups[1].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanAssociateAccountWithGroup()
         {
             Account ayende = new Account();
             ayende.Name = "ayende";
 
-            UnitOfWork.CurrentSession.Save(ayende);
+            session.Save(ayende);
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateEntityWith(ayende, "Accounts");
 
-            UnitOfWork.Current.TransactionalFlush();
 
-            UnitOfWork.CurrentSession.Evict(ayende);
-            UnitOfWork.CurrentSession.Evict(group);
+            session.Flush();
+            session.Evict(ayende);
+            session.Evict(group);
 
             EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(ayende);
-            Assert.AreEqual(1, groups.Length);
-            Assert.AreEqual("Accounts", groups[0].Name);
+            Assert.Equal(1, groups.Length);
+            Assert.Equal("Accounts", groups[0].Name);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOperation()
         {
             authorizationRepository.CreateOperation("/Account/Delete");
-            UnitOfWork.Current.TransactionalFlush();
+
             Operation operation = authorizationRepository.GetOperationByName("/Account/Delete");
-            Assert.IsNotNull(operation, "Could not create operation");
+            Assert.NotNull(operation);
         }
 
-        [Test]
+        [Fact]
         public void WhenCreatingNestedOperation_WillCreateParentOperation_IfDoesNotExists()
         {
             Operation operation = authorizationRepository.CreateOperation("/Account/Delete");
-            UnitOfWork.Current.TransactionalFlush();
+
             Operation parentOperation = authorizationRepository.GetOperationByName("/Account");
-            Assert.IsNotNull(parentOperation);
-            Assert.AreEqual(operation.Parent, parentOperation);
+            Assert.NotNull(parentOperation);
+            Assert.Equal(operation.Parent, parentOperation);
         }
 
-        [Test]
+        [Fact]
         public void WhenCreatingNestedOperation_WillLinkToParentOperation()
         {
             authorizationRepository.CreateOperation("/Account/Delete");
-            UnitOfWork.Current.TransactionalFlush();
+
             Operation parentOperation = authorizationRepository.GetOperationByName("/Account");
-            Assert.IsNotNull(parentOperation); // was created in setup
-            Assert.AreEqual(2, parentOperation.Children.Count); // /Edit, /Delete
+            Assert.NotNull(parentOperation); // was created in setup
+            Assert.Equal(2, parentOperation.Children.Count); // /Edit, /Delete
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveUserGroup()
         {
             authorizationRepository.RemoveUsersGroup("Administrators");
-            UnitOfWork.Current.TransactionalFlush();
 
-            Assert.IsNull(authorizationRepository.GetUsersGroupByName("Administrators"));
+
+            Assert.Null(authorizationRepository.GetUsersGroupByName("Administrators"));
         }
 
-        [Test]
-        [ExpectedException(typeof (InvalidOperationException),
-            "Cannot remove users group 'Administrators' because is has child groups. Remove those groups and try again."
-            )]
+        [Fact]
         public void RemovingParentUserGroupWillFail()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
-            authorizationRepository.RemoveUsersGroup("Administrators");
+
+            Assert.Throws<InvalidOperationException>(
+                 "Cannot remove users group 'Administrators' because is has child groups. Remove those groups and try again.",
+                 () => authorizationRepository.RemoveUsersGroup("Administrators"));
         }
 
 
-        [Test]
+        [Fact]
         public void WhenRemovingUsersGroupThatHasAssociatedPermissionsThoseShouldBeRemoved()
         {
             permissionsBuilderService
@@ -497,71 +493,71 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+
 
             Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.IsNotEmpty(permissions);
+            Assert.NotEmpty(permissions);
 
             authorizationRepository.RemoveUsersGroup("Administrators");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             permissions = permissionService.GetPermissionsFor(user);
-            Assert.IsEmpty(permissions);
+            Assert.Empty(permissions);
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveNestedUserGroup()
         {
             UsersGroup dbaGroup = authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.RemoveUsersGroup("DBA");
-            UnitOfWork.Current.TransactionalFlush();
 
-            Assert.IsNull(authorizationRepository.GetUsersGroupByName("DBA"));
 
-            UsersGroup administratorsGroup = 
+            Assert.Null(authorizationRepository.GetUsersGroupByName("DBA"));
+
+            UsersGroup administratorsGroup =
                 authorizationRepository.GetUsersGroupByName("Administrators");
-            Assert.AreEqual(0,
+            Assert.Equal(0,
                             administratorsGroup.DirectChildren.Count
                 );
-            Assert.AreEqual(0,
+            Assert.Equal(0,
                             administratorsGroup.AllChildren.Count
                 );
 
-            Assert.AreEqual(0, dbaGroup.AllParents.Count);
+            Assert.Equal(0, dbaGroup.AllParents.Count);
         }
 
-        [Test]
+        [Fact]
         public void UsersAreNotAssociatedWithRemovedGroups()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             authorizationRepository.AssociateUserWith(user, "DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             UsersGroup[] associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
-            Assert.AreEqual(2, associedGroups.Length);
+            Assert.Equal(2, associedGroups.Length);
 
             authorizationRepository.RemoveUsersGroup("DBA");
-            UnitOfWork.Current.TransactionalFlush();
+
 
 
             associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
-            Assert.AreEqual(1, associedGroups.Length);
+            Assert.Equal(1, associedGroups.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveEntitiesGroup()
         {
             authorizationRepository.RemoveEntitiesGroup("Important Accounts");
-            UnitOfWork.Current.TransactionalFlush();
-            Assert.IsNull(authorizationRepository.GetEntitiesGroupByName("Important Accounts")); ;
+
+            Assert.Null(authorizationRepository.GetEntitiesGroupByName("Important Accounts")); ;
         }
 
 
-        [Test]
+        [Fact]
         public void WhenRemovingEntitiesGroupAllPermissionsOnItWillBeDeleted()
         {
             permissionsBuilderService
@@ -570,52 +566,52 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
-       
+
+
             Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.IsNotEmpty(permissions);
+            Assert.NotEmpty(permissions);
 
             authorizationRepository.RemoveEntitiesGroup("Important Accounts");
-            UnitOfWork.Current.TransactionalFlush();
+
 
             permissions = permissionService.GetPermissionsFor(user);
-            Assert.IsEmpty(permissions);
+            Assert.Empty(permissions);
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveOperation()
         {
             authorizationRepository.RemoveOperation("/Account/Edit");
-            UnitOfWork.Current.TransactionalFlush();
-            Assert.IsNull(authorizationRepository.GetOperationByName("/Account/Edit"));
+
+            Assert.Null(authorizationRepository.GetOperationByName("/Account/Edit"));
         }
 
-        [Test]
-        [ExpectedException(typeof(InvalidOperationException), "Cannot remove operation '/Account' because it has child operations. Remove those operations and try again.")]
+        [Fact]
         public void CannotRemoveParentOperatio()
         {
-            authorizationRepository.RemoveOperation("/Account");
+            Assert.Throws<InvalidOperationException>("Cannot remove operation '/Account' because it has child operations. Remove those operations and try again.",
+                () => authorizationRepository.RemoveOperation("/Account"));
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveNestedOperation()
         {
             authorizationRepository.RemoveOperation("/Account/Edit");
-            UnitOfWork.Current.TransactionalFlush();
+
             Operation parent = authorizationRepository.GetOperationByName("/Account");
 
-            Assert.AreEqual(0, parent.Children.Count);
+            Assert.Equal(0, parent.Children.Count);
         }
 
-        [Test]
+        [Fact]
         public void CanRemoveUser()
         {
             authorizationRepository.RemoveUser(user);
-            Repository<User>.Delete(user);
-            UnitOfWork.Current.TransactionalFlush();
+            session.Delete(user);
+
         }
 
-        [Test]
+        [Fact]
         public void RemovingUserWillAlsoRemoveAssociatedPermissions()
         {
             permissionsBuilderService
@@ -624,10 +620,10 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+
             authorizationRepository.RemoveUser(user);
-            Repository<User>.Delete(user);
-            UnitOfWork.Current.TransactionalFlush();
+            session.Delete(user);
+
         }
     }
 }

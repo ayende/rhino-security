@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using log4net;
 using Microsoft.Practices.ServiceLocation;
+using NHibernate.Cfg;
+using NHibernate.UserTypes;
 using Rhino.Security.Impl;
+using Rhino.Security.Impl.MappingRewriting;
 using Rhino.Security.Interfaces;
 
 namespace Rhino.Security
@@ -70,5 +73,16 @@ namespace Rhino.Security
 		{
             return ServiceLocator.Current.GetInstance<IEntityInformationExtractor<TEntity>>().SecurityKeyPropertyName;
 		}
+
+        ///<summary>
+        /// Setup NHibernate to include Rhino Security configuration
+        ///</summary>
+        public static void Configure<TUserType>(Configuration cfg, SecurityTableStructure securityTableStructure)
+             where TUserType : IUser
+        {
+            cfg.AddAssembly(typeof (IUser).Assembly);
+            new SchemaChanger(cfg, securityTableStructure).Change();
+            new UserMapper(cfg, typeof(TUserType)).Map();
+        }
 	}
 }

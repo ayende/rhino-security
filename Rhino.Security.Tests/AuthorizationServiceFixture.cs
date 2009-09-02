@@ -1,57 +1,25 @@
-using Rhino.Commons.ForTesting;
 using Rhino.Security.Model;
+using Xunit;
 
 namespace Rhino.Security.Tests
 {
-	using System.Data;
-	using Commons;
-	using MbUnit.Framework;
-
-	[TestFixture]
-	public class ActiveRecord_AuthorizationServiceFixture : AuthorizationServiceFixture
+	public class AuthorizationServiceFixture : DatabaseFixture
 	{
-		public override string RhinoContainerConfig
-		{
-			get { return "ar-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.ActiveRecord; }
-		}
-	}
-
-	[TestFixture]
-	public class NHibernate_AuthorizationServiceFixture : AuthorizationServiceFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "nh-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.NHibernate; }
-		}
-	}
-
-	public abstract class AuthorizationServiceFixture : DatabaseFixture
-	{
-		[Test]
+		[Fact]
 		public void WillReturnFalseIfNoPermissionHasBeenDefined()
 		{
 			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseIfOperationNotDefined()
 		{
 			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Delete");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueIfAllowPermissionWasDefined()
 		{
 			permissionsBuilderService
@@ -60,13 +28,13 @@ namespace Rhino.Security.Tests
 				.OnEverything()
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseIfAllowPermissionWasDefinedOnGroupAndDenyPermissionOnUser()
 		{
 			permissionsBuilderService
@@ -81,13 +49,13 @@ namespace Rhino.Security.Tests
 				.OnEverything()
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseIfAllowedPermissionWasDefinedWithDenyPermissionWithHigherLevel()
 		{
 			permissionsBuilderService
@@ -102,13 +70,13 @@ namespace Rhino.Security.Tests
 				.OnEverything()
 				.Level(5)
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueIfAllowedPermissionWasDefinedWithDenyPermissionWithLowerLevel()
 		{
 			permissionsBuilderService
@@ -123,14 +91,14 @@ namespace Rhino.Security.Tests
 				.OnEverything()
 				.Level(5)
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueOnAccountIfPermissionWasGrantedOnAnything()
 		{
 			permissionsBuilderService
@@ -139,13 +107,13 @@ namespace Rhino.Security.Tests
 				.OnEverything()
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseOnAccountIfPermissionWasDeniedOnAnything()
 		{
 			permissionsBuilderService
@@ -154,13 +122,13 @@ namespace Rhino.Security.Tests
 				.OnEverything()
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueOnAccountIfPermissionWasGrantedOnGroupAssociatedWithUser()
 		{
 			permissionsBuilderService
@@ -169,13 +137,13 @@ namespace Rhino.Security.Tests
 				.On(account)
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseOnAccountIfPermissionWasDeniedOnGroupAssociatedWithUser()
 		{
 			permissionsBuilderService
@@ -184,13 +152,13 @@ namespace Rhino.Security.Tests
 				.On(account)
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueOnAccountIfPermissionWasGrantedToUser()
 		{
 			permissionsBuilderService
@@ -199,13 +167,13 @@ namespace Rhino.Security.Tests
 				.On(account)
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseOnAccountIfPermissionWasDeniedToUser()
 		{
 			permissionsBuilderService
@@ -214,13 +182,13 @@ namespace Rhino.Security.Tests
 				.On(account)
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueOnEntityGroupIfPermissionWasGrantedToUsersGroupAssociatedWithUser()
 		{
 			permissionsBuilderService
@@ -229,20 +197,20 @@ namespace Rhino.Security.Tests
 				.On("Important Accounts")
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseOnAccountIfNoPermissionIsDefined()
 		{
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseOnAccountIfPermissionWasDeniedToUserOnTheGroupTheEntityIsAssociatedWith()
 		{
 			permissionsBuilderService
@@ -251,13 +219,13 @@ namespace Rhino.Security.Tests
 				.On("Important Accounts")
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueOnAccountIfPermissionWasAllowedToUserOnTheGroupTheEntityIsAssociatedWith()
 		{
 			permissionsBuilderService
@@ -266,13 +234,13 @@ namespace Rhino.Security.Tests
 				.On("Important Accounts")
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 
-        [Test]
+        [Fact]
         public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnEntitiesGroup()
         {
             permissionsBuilderService
@@ -281,7 +249,7 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             permissionsBuilderService
                 .Deny("/Account/Edit")
@@ -289,13 +257,13 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             bool IsAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-            Assert.IsTrue(IsAllowed);
+            Assert.True(IsAllowed);
         }
 
-        [Test]
+        [Fact]
         public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnSpecificEntity()
         {
             permissionsBuilderService
@@ -304,7 +272,7 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             permissionsBuilderService
                 .Deny("/Account/Edit")
@@ -312,13 +280,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             bool IsAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
-            Assert.IsTrue(IsAllowed);
+            Assert.True(IsAllowed);
         }
 
-		[Test]
+		[Fact]
 		public void UseSecondLevelCacheForSecurityQuestions_WillBeUpdatedWhenGoingThroughNHiberante()
 		{
 			permissionsBuilderService
@@ -327,25 +295,25 @@ namespace Rhino.Security.Tests
 				.On("Important Accounts")
 				.DefaultLevel()
 				.Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 
-			Repository<Permission>.DeleteAll();
-			UnitOfWork.Current.TransactionalFlush();
+		    session.Delete("from Permission");
+			
 
 			// should return true since it loads from cache
 			isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
 
-		[Test]
+		[Fact]
 		public void WillReturnFalseIfPermissionWasAllowedToChildGroupUserIsAssociatedWith()
 		{
 			authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			permissionsBuilderService
 			   .Allow("/Account/Edit")
@@ -353,21 +321,21 @@ namespace Rhino.Security.Tests
 			   .On("Important Accounts")
 			   .DefaultLevel()
 			   .Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsFalse(isAllowed);
+			Assert.False(isAllowed);
 		}
 
-		[Test]
+		[Fact]
 		public void WillReturnTrueIfPermissionWasAllowedToParentGroupUserIsAssociatedWith()
 		{
 			authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			authorizationRepository.DetachUserFromGroup(user, "Administrators");
 			authorizationRepository.AssociateUserWith(user, "Helpdesk");
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			permissionsBuilderService
 			   .Allow("/Account/Edit")
@@ -375,10 +343,10 @@ namespace Rhino.Security.Tests
 			   .On("Important Accounts")
 			   .DefaultLevel()
 			   .Save();
-			UnitOfWork.Current.TransactionalFlush();
+			
 
 			bool isAllowed = authorizationService.IsAllowed(user, account, "/Account/Edit");
-			Assert.IsTrue(isAllowed);
+			Assert.True(isAllowed);
 		}
 	}
 }

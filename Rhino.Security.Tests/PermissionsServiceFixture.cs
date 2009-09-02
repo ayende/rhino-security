@@ -1,43 +1,13 @@
-using Rhino.Commons.ForTesting;
 using Rhino.Security.Model;
+using Xunit;
 
 namespace Rhino.Security.Tests
 {
     using System.Collections.Generic;
-    using Commons;
-    using MbUnit.Framework;
 
-	[TestFixture]
-	public class ActiveRecord_PermissionsServiceFixture : PermissionsServiceFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "ar-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.ActiveRecord; }
-		}
-	}
-
-	[TestFixture]
-	public class NHibernate_PermissionsServiceFixture : PermissionsServiceFixture
-	{
-		public override string RhinoContainerConfig
-		{
-			get { return "nh-windsor.boo"; }
-		}
-
-		public override PersistenceFramework PersistenceFramwork
-		{
-			get { return PersistenceFramework.NHibernate; }
-		}
-	}
-
-    public abstract class PermissionsServiceFixture : DatabaseFixture
+    public class PermissionsServiceFixture : DatabaseFixture
     {
-        [Test]
+        [Fact]
         public void CanCreatePermission()
         {
             Permission permission = permissionsBuilderService
@@ -46,14 +16,14 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
-            UnitOfWork.CurrentSession.Evict(permission);
-            ICollection<Permission> all = Repository<Permission>.FindAll();
+            session.Flush();
+            session.Evict(permission);
+            ICollection<Permission> all = session.CreateCriteria<Permission>().List<Permission>();
 
-            Assert.AreEqual(1, all.Count);
+            Assert.Equal(1, all.Count);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionByUser()
         {
             permissionsBuilderService
@@ -62,13 +32,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByUser_WhenDefinedOnGroup()
         {
             permissionsBuilderService
@@ -77,13 +47,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByEntity()
         {
             permissionsBuilderService
@@ -92,13 +62,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(account);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByEntity_WhenDefinedOnEntityGroup()
         {
             permissionsBuilderService
@@ -107,13 +77,13 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(account);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByUserAndEntity()
         {
             permissionsBuilderService
@@ -122,13 +92,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByUserAndOperationName()
         {
             permissionsBuilderService
@@ -137,13 +107,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByUserAndOperationName_WhenParentOperationWasGranted()
         {
             permissionsBuilderService
@@ -152,13 +122,13 @@ namespace Rhino.Security.Tests
                 .On(account)
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account);
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsByUserAndOpernationName_WhenPermissionOnEverything()
         {
             permissionsBuilderService
@@ -167,13 +137,13 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush(); 
 
             Permission[] permissions = permissionService.GetGlobalPermissionsFor(user, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }        
 
-        [Test]
+        [Fact]
         public void CanGetPermissionByUserEntityAndOperation()
         {
             permissionsBuilderService
@@ -182,13 +152,13 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void PermissionsAreOrderedByLevelAndThenByDenyOrAllow()
         {
             permissionsBuilderService
@@ -215,25 +185,25 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .Level(20)
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user);
-            Assert.AreEqual(4, permissions.Length);
+            Assert.Equal(4, permissions.Length);
 
-            Assert.AreEqual(20, permissions[0].Level);
-            Assert.IsFalse(permissions[0].Allow);
+            Assert.Equal(20, permissions[0].Level);
+            Assert.False(permissions[0].Allow);
 
-            Assert.AreEqual(20, permissions[1].Level);
-            Assert.IsTrue(permissions[1].Allow);
+            Assert.Equal(20, permissions[1].Level);
+            Assert.True(permissions[1].Allow);
 
-            Assert.AreEqual(1, permissions[2].Level);
-            Assert.IsFalse(permissions[2].Allow);
+            Assert.Equal(1, permissions[2].Level);
+            Assert.False(permissions[2].Allow);
 
-            Assert.AreEqual(1, permissions[3].Level);
-            Assert.IsTrue(permissions[3].Allow);
+            Assert.Equal(1, permissions[3].Level);
+            Assert.True(permissions[3].Allow);
         }
 
-        [Test]
+        [Fact]
         public void CanSetPermissionOnEverythingAndGetItOnEntity()
         {
             permissionsBuilderService
@@ -242,21 +212,21 @@ namespace Rhino.Security.Tests
                 .OnEverything()
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanGetPermissionsSetOnarentGroupUserIsAssociatedWith()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             authorizationRepository.DetachUserFromGroup(user, "Administrators");
             authorizationRepository.AssociateUserWith(user, "Helpdesk");
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             permissionsBuilderService
                 .Allow("/Account/Edit")
@@ -264,13 +234,13 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
         }
 
-        [Test]
+        [Fact]
         public void CanRemovePermission()
         {
             Permission permission = permissionsBuilderService
@@ -279,16 +249,16 @@ namespace Rhino.Security.Tests
                 .On("Important Accounts")
                 .DefaultLevel()
                 .Save();
-            UnitOfWork.Current.TransactionalFlush();
+            session.Flush();
 
             Permission[] permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
-            Assert.AreEqual(1, permissions.Length);
+            Assert.Equal(1, permissions.Length);
 
             authorizationRepository.RemovePermission(permission);
-            UnitOfWork.Current.TransactionalFlush();
+            
 
             permissions = permissionService.GetPermissionsFor(user, account, "/Account/Edit");
-            Assert.AreEqual(0, permissions.Length);
+            Assert.Equal(0, permissions.Length);
         }
     }
 }
