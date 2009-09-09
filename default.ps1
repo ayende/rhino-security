@@ -10,12 +10,14 @@ properties {
 } 
 
 include .\psake_ext.ps1
+include .\SharedLibs\build-ext\x64detection.ps1
 	
 task default -depends Release
 
 task Clean { 
   remove-item -force -recurse $buildartifacts_dir -ErrorAction SilentlyContinue 
   remove-item -force -recurse $release_dir -ErrorAction SilentlyContinue 
+  Build-SharedLibs-For-Processor 
 } 
 
 task Init -depends Clean { 
