@@ -16,7 +16,7 @@ Rhino Security is a security framework to provide row level security for NHibern
 Getting Started
 ---------------
 
-Read the [How to Use.txt](How to Use.txt) file for more information about getting started.
+Read the [How to Use.txt](http://github.com/ayende/rhino-security/raw/master/How%20to%20Use.txt) file for more information about getting started.
                  
 More Information
 ----------------
