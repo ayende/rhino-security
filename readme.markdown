@@ -23,7 +23,7 @@ More Information
 
 More information about the library can be found [in the Rhino Security category on Ayende's blog](http://ayende.com/Blog/category/548.aspx).
 
-Try [this Google search]("rhino security" nhibernate) to find a ton of other information about it.    
+Try [this Google search](rhino security nhibernate) to find a ton of other information about it.    
 
 
 -----
