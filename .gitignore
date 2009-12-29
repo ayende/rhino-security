@@ -9,3 +9,4 @@ build/
 _ReSharper.*/
 AssemblyInfo.cs
 *.user
+/Rhino.Security/Rhino.Security.xml

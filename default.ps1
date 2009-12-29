@@ -66,7 +66,7 @@ task Release -depends Test {
 	& $tools_dir\zip.exe -9 -A -j `
 		$release_dir\Rhino.Security-$humanReadableversion-Build-$env:ccnetnumericlabel.zip `
 		$build_dir\Rhino.Security.dll `
-		$build_dir\Rhino.Security.xml `
+		Rhino.Security\Rhino.Security.xml `
 		license.txt `
 		"How to use.txt" `
 		acknowledgements.txt
