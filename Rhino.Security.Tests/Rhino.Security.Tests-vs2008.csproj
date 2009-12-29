@@ -39,7 +39,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <NoWarn>1607</NoWarn>
   </PropertyGroup>
@@ -93,6 +93,7 @@
     <Compile Include="SecrityInfoFixture.cs" />
     <Compile Include="SillyContainer.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="UsersGroupsNotReturningAllAssociatedUsers.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

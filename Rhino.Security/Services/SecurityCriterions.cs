@@ -21,12 +21,16 @@ namespace Rhino.Security.Services
 			DetachedCriteria directGroupsCriteria = DirectUsersGroups(user)
 				.SetProjection(Projections.Id());
 
-			return DetachedCriteria.For<UsersGroup>()
-				.CreateAlias("Users", "user", JoinType.LeftOuterJoin)
-				.CreateAlias("AllChildren", "child", JoinType.LeftOuterJoin)
-				.Add(
-				Subqueries.PropertyIn("child.id", directGroupsCriteria) ||
-				Expression.Eq("user.id", user.SecurityInfo.Identifier));
+            DetachedCriteria criteria = DetachedCriteria.For<UsersGroup>()
+                                                        .CreateAlias("Users", "user", JoinType.LeftOuterJoin)
+                                                        .CreateAlias("AllChildren", "child", JoinType.LeftOuterJoin)
+                                                        .Add(
+                                                             Subqueries.PropertyIn("child.id", directGroupsCriteria) ||
+                                                             Expression.Eq("user.id", user.SecurityInfo.Identifier))
+                                        .SetProjection(Projections.Id());
+
+            return DetachedCriteria.For<UsersGroup>()
+                                    .Add(Subqueries.PropertyIn("Id", criteria));
 		}
 		
 	}

@@ -48,7 +48,11 @@ task Init -depends Clean {
 } 
 
 task Compile -depends Init { 
-  exec msbuild "/p:OutDir=""$buildartifacts_dir "" $sln_file"
+  & msbuild "$sln_file" "/p:OutDir=$build_dir\\" /p:Configuration=Release
+  if ($lastExitCode -ne 0) {
+        throw "Error: Failed to execute msbuild"
+  }
+
 } 
 
 task Test -depends Compile {

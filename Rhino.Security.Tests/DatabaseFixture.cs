@@ -8,6 +8,7 @@ using NHibernate.Dialect;
 using NHibernate.Driver;
 using NHibernate.Tool.hbm2ddl;
 using Rhino.Security.Interfaces;
+using Xunit;
 using Environment=NHibernate.Cfg.Environment;
 
 namespace Rhino.Security.Tests
@@ -33,6 +34,8 @@ namespace Rhino.Security.Tests
             var sillyContainer = new SillyContainer();
             ServiceLocator.SetLocatorProvider(() => sillyContainer);
 
+            Assert.NotNull(typeof(System.Data.SQLite.SQLiteConnection));
+
 		    var cfg = new Configuration()
                 .SetProperty(Environment.ConnectionDriver, typeof(SQLite20Driver).AssemblyQualifiedName)
                 .SetProperty(Environment.Dialect, typeof(SQLiteDialect).AssemblyQualifiedName)
@@ -55,6 +58,8 @@ namespace Rhino.Security.Tests
             session.BeginTransaction();
 
             SetupEntities();
+
+            session.Flush();
 		}
 
         protected virtual void BeforeSetup()

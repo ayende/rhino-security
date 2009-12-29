@@ -535,13 +535,14 @@ namespace Rhino.Security.Tests
 
             authorizationRepository.AssociateUserWith(user, "DBA");
 
+            session.Flush();
 
             UsersGroup[] associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
             Assert.Equal(2, associedGroups.Length);
 
             authorizationRepository.RemoveUsersGroup("DBA");
 
-
+            session.Flush();
 
             associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
             Assert.Equal(1, associedGroups.Length);
