@@ -9,7 +9,7 @@ properties {
   $tools_dir = "$base_dir\Tools"
   $release_dir = "$base_dir\Release"
   $uploadCategory = "Rhino-Security"
-  $uploadScript = "C:\Builds\Uploader\PublishBuild.build"
+  $uploader = "..\Uploader\S3Uploader.exe"
 } 
 
 include .\psake_ext.ps1
@@ -76,12 +76,17 @@ task Release -depends Test {
 }
 
 
-task Upload -depend Release {
-	if (Test-Path $uploadScript ) {
-		$log = git log -n 1 --oneline		
-		msbuild $uploadScript /p:Category=$uploadCategory "/p:Comment=$log" "/p:File=$release_dir\Rhino.Security-$humanReadableversion-Build-$env:ccnetnumericlabel.zip"
+task Upload -depends Release {
+	Write-Host "Starting upload"
+	if (Test-Path $uploader) {
+		$log = $env:push_msg 
+    if($log -eq $null -or $log.Length -eq 0) {
+      $log = git log -n 1 --oneline		
+    }
+		&$uploader "$global:uploadCategory" "$release_dir\Rhino.Security-$humanReadableversion-Build-$env:ccnetnumericlabel.zip" "$log"
 		
 		if ($lastExitCode -ne 0) {
+      write-host "Failed to upload to S3: $lastExitCode"
 			throw "Error: Failed to publish build"
 		}
 	}
