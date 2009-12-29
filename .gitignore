@@ -10,3 +10,4 @@ _ReSharper.*/
 AssemblyInfo.cs
 *.user
 /Rhino.Security/Rhino.Security.xml
+/Rhino.Security/Rhino.Security.XML
