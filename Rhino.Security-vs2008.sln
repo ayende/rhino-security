@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security-vs2008", "Rh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security.Tests-vs2008", "Rhino.Security.Tests\Rhino.Security.Tests-vs2008.csproj", "{558B3AE3-C408-4DB0-AC79-386BC12379BE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security.ActiveRecord", "Rhino.Security.ActiveRecord\Rhino.Security.ActiveRecord.csproj", "{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,12 @@ Global
 		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Start|Any CPU.ActiveCfg = Release|Any CPU
 		{558B3AE3-C408-4DB0-AC79-386BC12379BE}.Start|Any CPU.Build.0 = Release|Any CPU
+		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Start|Any CPU.ActiveCfg = Release|Any CPU
+		{5FCDDA8A-B305-474E-AD27-4DEF6CB042B6}.Start|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

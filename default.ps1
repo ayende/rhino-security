@@ -43,6 +43,15 @@ task Init -depends Clean {
 		-clsCompliant "false" `
 		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
 		
+	Generate-Assembly-Info `
+		-file "$base_dir\Rhino.Security.ActiveRecord\Properties\AssemblyInfo.cs" `
+		-title "Rhino Security $version" `
+		-description "Security Library for NHibernate" `
+		-company "Hibernating Rhinos" `
+		-product "Rhino Security $version" `
+		-version $version `
+		-copyright "Hibernating Rhinos & Ayende Rahien 2004 - 2009"
+		
 	new-item $release_dir -itemType directory 
 	new-item $buildartifacts_dir -itemType directory 
 } 
