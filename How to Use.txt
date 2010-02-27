@@ -7,13 +7,13 @@ BEFORE creating the session factory, call the following:
 Container Configuration
 =======================
 
-Rhino Sercurity make use of Common Service Locator (http://www.codeplex.com/CommonServiceLocator), you need to set the ServiceLocator.SetLocatorProvider() to provide the following services:
+Rhino Security make use of Common Service Locator (http://www.codeplex.com/CommonServiceLocator), you need to set the ServiceLocator.SetLocatorProvider() to provide the following services:
  * IAuthorizationService
  * IAuthorizationRepository
  * IPermissionsBuilderService
  * IPermissionsService
 
-ALL services must be TRASIENT, and the container needs to provide access to the current ISession. 
+ALL services must be TRANSIENT, and the container needs to provide access to the current ISession. 
 The following is an example of configuring Rhino Security using Windsor:
 	
 	Kernel.Register(
