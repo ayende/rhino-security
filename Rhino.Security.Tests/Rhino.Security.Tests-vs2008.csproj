@@ -94,6 +94,7 @@
     <Compile Include="SillyContainer.cs" />
     <Compile Include="User.cs" />
     <Compile Include="UsersGroupsNotReturningAllAssociatedUsers.cs" />
+    <Compile Include="VerifyAssociatedUsersOnUsersGroup.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
