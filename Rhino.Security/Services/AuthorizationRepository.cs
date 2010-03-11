@@ -60,6 +60,27 @@ namespace Rhino.Security.Services
 			return group;
 		}
 
+        /// <summary>
+        /// Creates the entity group as a child of <paramref name="parentGroupName"/>.
+        /// </summary>
+        /// <param name="parentGroupName">Name of the parent group.</param>
+        /// <param name="usersGroupName">Name of the users group.</param>
+        /// <returns></returns>
+        public virtual EntitiesGroup CreateChildEntityGroupOf(string parentGroupName, string usersGroupName)
+        {
+            EntitiesGroup parent = GetEntitiesGroupByName(parentGroupName);
+            Guard.Against<ArgumentException>(parent == null, 
+                                            "Parent users group '" + parentGroupName + "' does not exists");
+            EntitiesGroup group = CreateEntitiesGroup(usersGroupName);
+            group.Parent = parent;
+            group.AllParents.AddAll(parent.AllParents);
+            group.AllParents.Add(parent);
+            parent.DirectChildren.Add(group);
+            parent.AllChildren.Add(group);
+
+            return group;
+        }
+
 		/// <summary>
 		/// temporary string
 		/// </summary>
@@ -209,6 +230,59 @@ namespace Rhino.Security.Services
 			}
 			return shortest.ToArray();
 		}
+        /// <summary>
+        /// Gets the ancestry association of an entity with the named entity group.
+        /// This allows to track how an entity is associated to a group through 
+        /// their ancestry.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="entityGroupName">Name of the entity group.</param>
+        /// <returns></returns>
+        public virtual EntitiesGroup[] GetAncestryAssociationOfEntity<TEntity>(TEntity entity, string entityGroupName) where TEntity : class
+        {
+            EntitiesGroup desiredGroup = GetEntitiesGroupByName(entityGroupName);
+            ICollection<EntitiesGroup> directGroups =
+                SecurityCriterions.DirectEntitiesGroups(entity)
+                    .GetExecutableCriteria(session)
+                    .SetCacheable(true)
+                    .List<EntitiesGroup>();
+
+            if (directGroups.Contains(desiredGroup))
+            {
+                return new[] { desiredGroup };
+            }
+            // as a nice benefit, this does an eager load of all the groups in the hierarchy
+            // in an efficient way, so we don't have SELECT N + 1 here, nor do we need
+            // to load the Entities collection (which may be very large) to check if we are associated
+            // directly or not
+            EntitiesGroup[] associatedGroups = GetAssociatedEntitiesGroupsFor(entity);
+            if (Array.IndexOf(associatedGroups, desiredGroup) == -1)
+            {
+                return new EntitiesGroup[0];
+            }
+            // now we need to find out the path to it
+            List<EntitiesGroup> shortest = new List<EntitiesGroup>();
+            foreach (EntitiesGroup entitiesGroup in associatedGroups)
+            {
+                List<EntitiesGroup> path = new List<EntitiesGroup>();
+                EntitiesGroup current = entitiesGroup;
+                while (current != null && current != desiredGroup)
+                {
+                    path.Add(current);
+                    current = current.Parent;
+                }
+                if (current != null)
+                    path.Add(current);
+                // Valid paths are those that are contains the desired group
+                // and start in one of the groups that are directly associated
+                // with the user
+                if (path.Contains(desiredGroup) && directGroups.Contains(path[0]))
+                {
+                    shortest = Min(shortest, path);
+                }
+            }
+            return shortest.ToArray();
+        }
 
 		/// <summary>
 		/// Creates a new entities group.
@@ -285,14 +359,14 @@ namespace Rhino.Security.Services
 		/// <returns></returns>
 		public virtual EntitiesGroup[] GetAssociatedEntitiesGroupsFor<TEntity>(TEntity entity) where TEntity : class
 		{
-			Guid key = Security.ExtractKey(entity);
 		    ICollection<EntitiesGroup> entitiesGroups =
-		        session.CreateCriteria<EntitiesGroup>()
-		            .CreateAlias("Entities", "e")
-		            .Add(Restrictions.Eq("e.EntitySecurityKey", key))
+		        SecurityCriterions.AllGroups(entity)
+		            .GetExecutableCriteria(session)
+                    .AddOrder(Order.Asc("Name"))
                     .SetCacheable(true)
                     .List<EntitiesGroup>();
-            return entitiesGroups.ToArray();
+
+		    return entitiesGroups.ToArray();
 		}
 
 		/// <summary>
@@ -463,6 +537,15 @@ namespace Rhino.Security.Services
 				return first;
 			return second;
 		}
+
+        private static List<EntitiesGroup> Min(List<EntitiesGroup> first, List<EntitiesGroup> second)
+        {
+            if (first.Count == 0)
+                return second;
+            if (first.Count <= second.Count)
+                return first;
+            return second;
+        }
 
 		private EntityReference GetOrCreateEntityReference<TEntity>(Guid key)
 		{
