@@ -236,7 +236,7 @@ namespace Rhino.Security.Tests
             Assert.Equal(1, groups.Length);
             Assert.Equal("Admins", groups[0].Name);
         }
-        //todo: test to be able to associate entity ref with multilple entity groups
+
         [Fact]
         public void CanAssociateAccountWithMultipleGroups()
         {
