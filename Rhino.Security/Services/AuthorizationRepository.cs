@@ -140,12 +140,24 @@ namespace Rhino.Security.Services
 			EntitiesGroup group = GetEntitiesGroupByName(entitesGroupName);
 			if(group==null)
 				return;
+            Guard.Against(group.DirectChildren.Count != 0, "Cannot remove entity group '" + entitesGroupName + "' because is has child groups. Remove those groups and try again.");
 
 		    session.CreateQuery("delete Permission p where p.EntitiesGroup = :group")
 		        .SetEntity("group", group)
 		        .ExecuteUpdate();
 
-			group.Entities.Clear();
+            // we have to do this in order to ensure that we play
+            // nicely with the second level cache and collection removals
+            if (group.Parent != null)
+		    {
+		        group.Parent.DirectChildren.Remove(group);
+		    }
+		    foreach (EntitiesGroup parent in group.AllParents)
+		    {
+		        parent.AllChildren.Remove(group);
+		    }
+            group.AllParents.Clear();
+            group.Entities.Clear();
 
 			session.Delete(group);
 		}
