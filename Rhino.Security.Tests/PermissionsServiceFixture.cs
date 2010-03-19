@@ -159,6 +159,36 @@ namespace Rhino.Security.Tests
         }
 
         [Fact]
+        public void CanGetPermissionByOperation()
+        {
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            session.Flush();
+
+            Permission[] permissions = permissionService.GetPermissionsFor("/Account/Edit");
+            Assert.Equal(1, permissions.Length);
+        }
+
+        [Fact]
+        public void CanGetPermissionByOperation_WhenParentOperationWasGranted()
+        {
+            permissionsBuilderService
+                .Allow("/Account")
+                .For(user)
+                .On(account)
+                .DefaultLevel()
+                .Save();
+            session.Flush();
+
+            Permission[] permissions = permissionService.GetPermissionsFor("/Account/Edit");
+            Assert.Equal(1, permissions.Length);
+        }
+
+        [Fact]
         public void PermissionsAreOrderedByLevelAndThenByDenyOrAllow()
         {
             permissionsBuilderService

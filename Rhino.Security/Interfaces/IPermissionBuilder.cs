@@ -11,5 +11,10 @@ namespace Rhino.Security.Interfaces
 		/// Save the created permission
 		/// </summary>
 		Permission Save();
+        
+        /// <summary>
+		/// Builds a permission without saving
+		/// </summary>
+		Permission Build();
 	}
 }

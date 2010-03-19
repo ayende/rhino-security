@@ -25,7 +25,7 @@ namespace Rhino.Security.Interfaces
 		Permission[] GetPermissionsFor<TEntity>(IUser user, TEntity entity) where TEntity : class;
 
 		/// <summary>
-		/// Gets the permissions for the specified etntity
+		/// Gets the permissions for the specified entity
 		/// </summary>
 		/// <param name="user">The user.</param>
 		/// <param name="operationName">Name of the operation.</param>
@@ -33,7 +33,14 @@ namespace Rhino.Security.Interfaces
 		Permission[] GetGlobalPermissionsFor(IUser user, string operationName) ;
 
 		/// <summary>
-		/// Gets the permissions for the specified etntity
+		/// Gets all permissions for the specified operation
+		/// </summary>
+		/// <param name="operationName">Name of the operation.</param>
+		/// <returns></returns>
+		Permission[] GetPermissionsFor(string operationName) ;
+
+		/// <summary>
+		/// Gets the permissions for the specified entity
 		/// </summary>
 		/// <typeparam name="TEntity">The type of the entity.</typeparam>
 		/// <param name="user">The user.</param>
@@ -43,7 +50,7 @@ namespace Rhino.Security.Interfaces
 		Permission[] GetPermissionsFor<TEntity>(IUser user, TEntity entity, string operationName) where TEntity : class;
 
 		/// <summary>
-		/// Gets the permissions for the specified etntity
+		/// Gets the permissions for the specified entity
 		/// </summary>
 		/// <typeparam name="TEntity">The type of the entity.</typeparam>
 		/// <param name="entity">The entity.</param>

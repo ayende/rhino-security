@@ -55,7 +55,15 @@ namespace Rhino.Security.Services
 				return permission;
 			}
 
-			/// <summary>
+		    /// <summary>
+            /// Builds a permission without saving
+		    /// </summary>
+		    public Permission Build()
+		    {
+                return permission;
+		    }
+
+		    /// <summary>
 			/// Set the user that this permission is built for
 			/// </summary>
 			/// <param name="user">The user.</param>

@@ -49,7 +49,7 @@ namespace Rhino.Security.Services
 
 
 		/// <summary>
-		/// Gets the permissions for the specified etntity
+		/// Gets the permissions for the specified entity
 		/// </summary>
 		/// <param name="user">The user.</param>
 		/// <param name="operationName">Name of the operation.</param>
@@ -69,7 +69,22 @@ namespace Rhino.Security.Services
 			return FindResults(criteria);
 		}
 
-		/// <summary>
+        /// <summary>
+        /// Gets all permissions for the specified operation
+        /// </summary>
+        /// <param name="operationName">Name of the operation.</param>
+        /// <returns></returns>
+        public Permission[] GetPermissionsFor(string operationName)
+        {
+            string[] operationNames = Strings.GetHierarchicalOperationNames(operationName);
+            DetachedCriteria criteria = DetachedCriteria.For<Permission>()
+                .CreateAlias("Operation", "op")
+                .Add(Restrictions.In("op.Name", operationNames));
+
+            return this.FindResults(criteria);
+        }
+
+        /// <summary>
 		/// Gets the permissions for the specified user and entity
 		/// </summary>
 		/// <typeparam name="TEntity"></typeparam>
@@ -91,7 +106,7 @@ namespace Rhino.Security.Services
 		}
 
 		/// <summary>
-		/// Gets the permissions for the specified etntity
+		/// Gets the permissions for the specified entity
 		/// </summary>
 		/// <typeparam name="TEntity">The type of the entity.</typeparam>
 		/// <param name="user">The user.</param>
@@ -121,7 +136,7 @@ namespace Rhino.Security.Services
 		}
 
 		/// <summary>
-		/// Gets the permissions for the specified etntity
+		/// Gets the permissions for the specified entity
 		/// </summary>
 		/// <typeparam name="TEntity">The type of the entity.</typeparam>
 		/// <param name="entity">The entity.</param>
