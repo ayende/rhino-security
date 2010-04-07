@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace Rhino.Security.Tests
@@ -27,7 +28,7 @@ namespace Rhino.Security.Tests
                 @"Permission (level 10) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 Permission (level 5) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -35,7 +36,7 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
         {
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Delete");
-            Assert.Equal("Operation '/Account/Delete' was not defined\r\n", information.ToString());
+			Assert.Equal("Operation '/Account/Delete' was not defined".TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -44,8 +45,8 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             Assert.Equal(
-                "Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators')\r\n",
-                information.ToString());
+				"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators')".TrimAndFixLineEndings(),
+				information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -62,8 +63,8 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             Assert.Equal(
-                "Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'everything'\r\n",
-                information.ToString());
+				"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'everything'".TrimAndFixLineEndings(),
+				information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -80,8 +81,8 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             Assert.Equal(
-                "Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'\r\n",
-                information.ToString());
+				"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'".TrimAndFixLineEndings(),
+				information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -98,8 +99,8 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             Assert.Equal(
-                "Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')\r\n",
-                information.ToString());
+				"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')".TrimAndFixLineEndings(),
+				information.ToString().TrimAndFixLineEndings());
         }
 
 
@@ -117,8 +118,8 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, "/Account/Edit");
             Assert.Equal(
-                "Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')\r\n",
-                information.ToString());
+				"Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')".TrimAndFixLineEndings(),
+				information.ToString().TrimAndFixLineEndings());
         }
 
 
@@ -145,7 +146,7 @@ Permission (level 5) for operation '/Account/Edit' was denied to group 'Administ
                 @"Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')
 Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -171,7 +172,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
                 @"Permission (level 5) for operation '/Account/Edit' was denied to group 'Administrators' on 'everything' ('Ayende' is a member of 'Administrators')
 Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -190,7 +191,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'everything'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
 
@@ -210,7 +211,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'everything'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -229,7 +230,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on 'Account: south sand' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -248,7 +249,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to group 'Administrators' on 'Account: south sand' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -267,7 +268,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'Account: south sand'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
 
@@ -287,7 +288,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on 'Account: south sand'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -305,7 +306,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')' ('Ayende' is a member of 'Administrators')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -323,7 +324,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -334,7 +335,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators') on 'Account: south sand' or any of the groups 'Account: south sand' is associated with ('Important Accounts')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
         //Todo: had to session flush for the test to pass.
         [Fact]
@@ -350,7 +351,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('not assoicated with any group') on 'Account: south sand' or any of the groups 'Account: south sand' is associated with ('not assoicated with any group')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -369,7 +370,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was denied to 'Ayende' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -388,7 +389,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')'
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -410,7 +411,7 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             string expected =
                 @"Permission for operation '/Account/Edit' was not granted to user 'Ayende' or to the groups 'Ayende' is associated with ('Administrators') on 'Account: south sand' or any of the groups 'Account: south sand' is associated with ('Important Accounts')
 ";
-            Assert.Equal(expected, information.ToString());
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
 
         [Fact]
@@ -434,9 +435,16 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");
             string expected =
-                @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')' ('Ayende' is a member of 'Helpdesk -> Administrators')
-";
-            Assert.Equal(expected, information.ToString());
+                @"Permission (level 1) for operation '/Account/Edit' was granted to group 'Administrators' on ''Important Accounts' ('Account: south sand' is a member of 'Important Accounts')' ('Ayende' is a member of 'Helpdesk -> Administrators')";
+			Assert.Equal(expected.TrimAndFixLineEndings(), information.ToString().TrimAndFixLineEndings());
         }
     }
+
+	public static class StringExt
+	{
+		public static string TrimAndFixLineEndings(this string s)
+		{
+			return s.Replace("\r\n", "\n").Replace("\n", Environment.NewLine).Trim();
+		}
+	}
 }
