@@ -241,6 +241,31 @@ namespace Rhino.Security.Tests
 		}
 
         [Fact]
+        public void WillReturnTrueOnAccountIfPermissionWasAllowedToUserOnTheNestedEntityGroupIsAssociatedWith()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+            authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+            authorizationRepository.CreateChildEntityGroupOf("Manager Accounts", "Employee Accounts");
+
+            authorizationRepository.AssociateEntityWith(beto, "Employee Accounts");
+
+            permissionsBuilderService
+                .Allow("/Account/Edit")
+                .For(user)
+                .On("Executive Accounts")
+                .DefaultLevel()
+                .Save();
+
+            session.Flush();
+
+            bool isAllowed = authorizationService.IsAllowed(user, beto, "/Account/Edit");
+            Assert.True(isAllowed);
+        }
+
+        [Fact]
         public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnEntitiesGroup()
         {
             permissionsBuilderService
@@ -262,6 +287,34 @@ namespace Rhino.Security.Tests
             bool IsAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
             Assert.True(IsAllowed);
         }
+
+	    [Fact]
+	    public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnNestedEntitiesGroup()
+	    {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+            authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+            authorizationRepository.CreateChildEntityGroupOf("Manager Accounts", "Employee Accounts");
+
+            authorizationRepository.AssociateEntityWith(beto, "Employee Accounts");
+
+	        permissionsBuilderService
+	            .Allow("/Account/Edit")
+	            .For(user)
+	            .OnEverything()
+	            .DefaultLevel()
+	            .Save();
+	        permissionsBuilderService
+	            .Deny("/Account/Edit")
+	            .For(user)
+	            .On("Executive Accounts")
+	            .DefaultLevel()
+	            .Save();
+	        bool IsAllowed = authorizationService.IsAllowed(user, "/Account/Edit");
+            Assert.True(IsAllowed);
+	    }
 
         [Fact]
         public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnSpecificEntity()

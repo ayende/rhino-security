@@ -24,6 +24,22 @@ namespace Rhino.Security.Tests
         }
 
         [Fact]
+        public void DeeplyNestedEntitiesGroup()
+        {
+            EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Root");
+
+            for (int j = 0; j < 50; j++)
+            {
+                group = authorizationRepository.CreateChildEntityGroupOf(group.Name, "Child #" + j);
+            }
+
+            authorizationRepository.AssociateEntityWith(account, "Child #49");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(account, "Root");
+            Assert.Equal(51, groups.Length);
+        }
+        //Todo: had to session flush for the test pass.
+        [Fact]
         public void CanOnlyAssignAccountsThatAreAssignedToMe()
         {
             // during first deploy
@@ -40,6 +56,8 @@ namespace Rhino.Security.Tests
 
             authorizationRepository.AssociateEntityWith(account, "Assigned to " + user.Name);
 
+            // have to commit the transaction for it to work
+            session.Flush();
             // validate that I can assign a case
             bool allowed = authorizationService.IsAllowed(user, account, "/Account/Assign");
             Assert.True(allowed);
@@ -53,7 +71,7 @@ namespace Rhino.Security.Tests
             authorizationRepository.AssociateEntityWith(account, "Assigned to " + secondUser.Name);
 
             // have to commit the transaction for it to work
-
+            session.Flush();
             // validate that I can not longer assign a case
             allowed = authorizationService.IsAllowed(user, account, "/Account/Assign");
             Assert.False(allowed);

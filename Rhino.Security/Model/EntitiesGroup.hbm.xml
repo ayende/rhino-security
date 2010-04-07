@@ -26,6 +26,20 @@
 							not-null="true"
 							unique="true"/>
 		</property>
+    <many-to-one name="Parent"
+                 access="property"
+                 class="EntitiesGroup"
+                 column="Parent" />
+    <set name="DirectChildren"
+         access="property"
+         table="EntitiesGroup"
+         lazy="true"
+         inverse="true">
+      <cache usage="read-write"
+             region="rhino-security"/>
+      <key column="Parent" />
+      <one-to-many class="EntitiesGroup"/>
+    </set>
 		<set name="Entities"
 				 access="property"
 				 table="EntityReferencesToEntitiesGroups"
@@ -36,5 +50,26 @@
 			<many-to-many class="EntityReference"
 										column="EntityReferenceId"/>
 		</set>
+    <set name="AllChildren"
+         access="property"
+         table="EntityGroupsHierarchy"
+         lazy="true"
+         inverse="true">
+      <cache usage="read-write"
+             region="rhino-security"/>
+      <key column="ParentGroup" />
+      <many-to-many class="EntitiesGroup"
+                    column="ChildGroup"/>
+    </set>
+    <set name="AllParents"
+         access="property"
+         table="EntityGroupsHierarchy"
+         lazy="true">
+      <cache usage="read-write"
+             region="rhino-security"/>
+      <key column="ChildGroup"/>
+      <many-to-many class="EntitiesGroup"
+                    column="ParentGroup"/>
+    </set>
 	</class>
 </hibernate-mapping>

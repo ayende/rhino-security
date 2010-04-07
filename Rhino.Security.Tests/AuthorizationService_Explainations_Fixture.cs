@@ -336,13 +336,14 @@ Permission (level 1) for operation '/Account/Edit' was granted to 'Ayende' on 'e
 ";
             Assert.Equal(expected, information.ToString());
         }
-
+        //Todo: had to session flush for the test to pass.
         [Fact]
         public void ExplainWhyDeniedOnAccountWhenHaveNoGroupsOnUserOrEntity()
         {
             authorizationRepository.DetachUserFromGroup(user, "Administrators");
             authorizationRepository.DetachEntityFromGroup(account, "Important Accounts");
             
+            session.Flush();
 
             AuthorizationInformation information =
                 authorizationService.GetAuthorizationInformation(user, account, "/Account/Edit");

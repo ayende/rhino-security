@@ -288,6 +288,29 @@ namespace Rhino.Security.Tests
             Assert.Equal("DBA", groups[1].Name);
         }
 
+        [Fact]
+        public void CanAssociateAccountWithNestedGroup()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            EntitiesGroup group = authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+
+            authorizationRepository.AssociateEntityWith(beto,"Manager Accounts");
+            
+            session.Flush();
+            session.Evict(beto);
+            session.Evict(group);
+
+            EntitiesGroup[] groups = authorizationRepository.GetAssociatedEntitiesGroupsFor(beto);
+            Assert.Equal(2, groups.Length);
+            Assert.Equal("Executive Accounts",groups[0].Name);
+            Assert.Equal("Manager Accounts", groups[1].Name);
+        }
+
 
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWithNested()
@@ -311,6 +334,26 @@ namespace Rhino.Security.Tests
         }
 
         [Fact]
+        public void CanGetAncestryAssociationOfAccountWithGroupWithNested()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+
+            authorizationRepository.AssociateEntityWith(beto, "Manager Accounts");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(beto,
+                                                                                            "Executive Accounts");
+            Assert.Equal(2,groups.Length);
+            Assert.Equal("Manager Accounts", groups[0].Name);
+            Assert.Equal("Executive Accounts", groups[1].Name);
+        }
+
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupDirect()
         {
             User ayende = new User();
@@ -329,6 +372,22 @@ namespace Rhino.Security.Tests
         }
 
         [Fact]
+        public void CanGetAncestryAssociationOfAccountWithGroupDirect()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            authorizationRepository.AssociateEntityWith(beto,"Executive Accounts");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(beto, "Executive Accounts");
+            Assert.Equal(1, groups.Length);
+            Assert.Equal("Executive Accounts", groups[0].Name);
+        }
+
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereNonExists()
         {
             User ayende = new User();
@@ -341,6 +400,19 @@ namespace Rhino.Security.Tests
 
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.Equal(0, groups.Length);
+        }
+        
+        [Fact]
+        public void CanGetAncestryAssociationOfEntityWithGroupWhereNonExists()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(beto, "Executive Accounts");
+            Assert.Equal(0,groups.Length);
         }
 
         [Fact]
@@ -362,6 +434,25 @@ namespace Rhino.Security.Tests
             UsersGroup[] groups = authorizationRepository.GetAncestryAssociation(ayende, "Admins");
             Assert.Equal(1, groups.Length);
             Assert.Equal("Admins", groups[0].Name);
+        }
+
+        [Fact]
+        public void CanGetAncestryAssociationOfAccountWithGroupWhereThereIsDirectPathShouldSelectThat()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+            
+            authorizationRepository.AssociateEntityWith(beto,"Executive Accounts");
+            authorizationRepository.AssociateEntityWith(beto, "Manager Accounts");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(beto, "Executive Accounts");
+            Assert.Equal(1, groups.Length);
+            Assert.Equal("Executive Accounts",groups[0].Name);
         }
 
         [Fact]
@@ -389,6 +480,28 @@ namespace Rhino.Security.Tests
         }
 
         [Fact]
+        public void CanGetAncestryAssociationOfAccountWithGroupWhereThereIsTwoLevelNesting()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+
+            authorizationRepository.CreateChildEntityGroupOf("Manager Accounts", "Employee Accounts");
+
+            authorizationRepository.AssociateEntityWith(beto, "Employee Accounts");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(beto, "Executive Accounts");
+            Assert.Equal(3, groups.Length);
+            Assert.Equal("Employee Accounts", groups[0].Name);
+            Assert.Equal("Manager Accounts", groups[1].Name);
+            Assert.Equal("Executive Accounts", groups[2].Name);
+        }
+
+        [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsMoreThanOneIndirectPathShouldSelectShortest()
         {
             User ayende = new User();
@@ -410,6 +523,29 @@ namespace Rhino.Security.Tests
             Assert.Equal(2, groups.Length);
             Assert.Equal("DBA", groups[0].Name);
             Assert.Equal("Admins", groups[1].Name);
+        }
+
+        [Fact]
+        public void CanGetAncestryAssociationOfAccountWithGroupWhereThereIsMoreThanOneIndirectPathShouldSelectShortest()
+        {
+            Account beto = new Account();
+            beto.Name = "beto account";
+
+            session.Save(beto);
+            authorizationRepository.CreateEntitiesGroup("Executive Accounts");
+
+            authorizationRepository.CreateChildEntityGroupOf("Executive Accounts", "Manager Accounts");
+
+            authorizationRepository.CreateChildEntityGroupOf("Manager Accounts", "Employee Accounts");
+
+            authorizationRepository.AssociateEntityWith(account, "Manager Accounts");
+            authorizationRepository.AssociateEntityWith(account, "Employee Accounts");
+
+            EntitiesGroup[] groups = authorizationRepository.GetAncestryAssociationOfEntity(account,
+                                                                                            "Executive Accounts");
+            Assert.Equal(2, groups.Length);
+            Assert.Equal("Manager Accounts", groups[0].Name);
+            Assert.Equal("Executive Accounts", groups[1].Name);
         }
 
         [Fact]
@@ -482,6 +618,16 @@ namespace Rhino.Security.Tests
                  () => authorizationRepository.RemoveUsersGroup("Administrators"));
         }
 
+        [Fact]
+        public void RemovingParentEntityGroupWillFail()
+        {
+            authorizationRepository.CreateChildEntityGroupOf("Important Accounts", "Regular Accounts");
+
+            Assert.Throws<InvalidOperationException>(
+                 "Cannot remove entity group 'Important Accounts' because is has child groups. Remove those groups and try again.",
+                 () => authorizationRepository.RemoveEntitiesGroup("Important Accounts"));
+        }
+
 
         [Fact]
         public void WhenRemovingUsersGroupThatHasAssociatedPermissionsThoseShouldBeRemoved()
@@ -528,6 +674,22 @@ namespace Rhino.Security.Tests
         }
 
         [Fact]
+        public void CanRemoveNestedEntityGroup()
+        {
+            EntitiesGroup regularAccounts = authorizationRepository.CreateChildEntityGroupOf("Important Accounts",
+                                                                                            "Regular Accounts");
+            authorizationRepository.RemoveEntitiesGroup("Regular Accounts");
+
+            Assert.Null(authorizationRepository.GetEntitiesGroupByName("Regular Accounts"));
+
+            EntitiesGroup importantAccounts = authorizationRepository.GetEntitiesGroupByName("Important Accounts");
+
+            Assert.Equal(0, importantAccounts.DirectChildren.Count);
+            Assert.Equal(0, importantAccounts.AllChildren.Count);
+            Assert.Equal(0, regularAccounts.AllParents.Count);
+        }
+
+        [Fact]
         public void UsersAreNotAssociatedWithRemovedGroups()
         {
             authorizationRepository.CreateChildUserGroupOf("Administrators", "DBA");
@@ -546,6 +708,25 @@ namespace Rhino.Security.Tests
 
             associedGroups = authorizationRepository.GetAssociatedUsersGroupFor(user);
             Assert.Equal(1, associedGroups.Length);
+        }
+
+        [Fact]
+        public void AccountsAreNotAssociatedWithRemovedGroups()
+        {
+            authorizationRepository.CreateChildEntityGroupOf("Important Accounts", "Regular Accounts");
+            
+            authorizationRepository.AssociateEntityWith(account,"Regular Accounts");
+            
+            session.Flush();
+
+            EntitiesGroup[] associatedGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(account);
+            Assert.Equal(2, associatedGroups.Length);
+            
+            authorizationRepository.RemoveEntitiesGroup("Regular Accounts");
+            session.Flush();
+
+            associatedGroups = authorizationRepository.GetAssociatedEntitiesGroupsFor(account);
+            Assert.Equal(1, associatedGroups.Length);
         }
 
         [Fact]
