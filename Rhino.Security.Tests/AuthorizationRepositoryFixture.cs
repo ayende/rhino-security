@@ -5,6 +5,7 @@ using Xunit;
 namespace Rhino.Security.Tests
 {
     using System;
+    using NHibernate.Criterion;
 
     public class AuthorizationRepositoryFixture : DatabaseFixture
     {
@@ -806,5 +807,52 @@ namespace Rhino.Security.Tests
             session.Delete(user);
 
         }
+
+		  [Fact]
+		  public void DetachingEntityFromGroupDoesNotOrphanEntityReference() {
+			  // Create new account and associate it with two groups
+			  Account account = new Account() { Name = "JohnDoe" };
+			  session.Save(account);
+
+			  authorizationRepository.AssociateEntityWith<Account>(account, "Important Accounts");
+			  authorizationRepository.CreateEntitiesGroup("Very Important Accounts");
+			  authorizationRepository.AssociateEntityWith<Account>(account, "Very Important Accounts");
+			  session.Flush();
+
+			  Guid key = Security.ExtractKey(account);
+
+			  // Confirm EntityReference for the new account exists.
+			  EntityReference reference = session.CreateCriteria<EntityReference>()
+					.Add(Restrictions.Eq("EntitySecurityKey", key))
+					.SetCacheable(true)
+					.UniqueResult<EntityReference>();
+
+			  Assert.True(reference != null);
+
+			  // Detach the account from one group and check if its 
+			  // EntityReference still exists.
+			  authorizationRepository.DetachEntityFromGroup<Account>(account, "Important Accounts");
+			  session.Flush();
+
+			  reference = session.CreateCriteria<EntityReference>()
+					.Add(Restrictions.Eq("EntitySecurityKey", key))
+					.SetCacheable(true)
+					.UniqueResult<EntityReference>();
+
+			  Assert.True(reference != null);
+
+
+			  // Detach the account from the other group and check
+			  // if its EntityReference was removed.
+			  authorizationRepository.DetachEntityFromGroup<Account>(account, "Important Accounts");
+			  session.Flush();
+
+			  reference = session.CreateCriteria<EntityReference>()
+					.Add(Restrictions.Eq("EntitySecurityKey", key))
+					.SetCacheable(true)
+					.UniqueResult<EntityReference>();
+
+			  Assert.True(reference == null);
+		  }
     }
 }

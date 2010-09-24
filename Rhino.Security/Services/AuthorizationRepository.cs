@@ -501,6 +501,7 @@ namespace Rhino.Security.Services
 
 			EntityReference reference = GetOrCreateEntityReference<TEntity>(key);
 			entitiesGroup.Entities.Remove(reference);
+			RemoveOrphanedEntityReference<TEntity>(entity, reference);
 		}
 
 
@@ -587,6 +588,14 @@ namespace Rhino.Security.Services
 			    session.Save(entityType);
 			}
 			return entityType;
+		}
+
+		private void RemoveOrphanedEntityReference<TEntity>(TEntity entity, EntityReference reference) where TEntity : class 
+		{
+			EntitiesGroup[] entitiesGroups = this.GetAssociatedEntitiesGroupsFor<TEntity>(entity);
+			if (entitiesGroups.Length <= 1) {
+				session.Delete(reference);
+			}
 		}
 	}
 }
