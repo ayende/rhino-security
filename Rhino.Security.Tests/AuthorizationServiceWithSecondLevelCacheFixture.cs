@@ -1,6 +1,8 @@
+using System;
 using System.IO;
 using Microsoft.Practices.ServiceLocation;
 using Rhino.Security.Interfaces;
+using Rhino.Security.Model;
 using Xunit;
 
 namespace Rhino.Security.Tests
@@ -71,6 +73,49 @@ namespace Rhino.Security.Tests
                 Assert.True(anotherAuthorizationService.IsAllowed(user, account, "/Account/Edit"));
 
                 s3.Transaction.Commit();
+            }
+        }
+
+        [Fact]
+        public void RemovingUserFromGroupInvalidatesSecondLevelCache()
+        {
+            var users = authorizationRepository.CreateUsersGroup("Users");
+            authorizationRepository.AssociateUserWith(user, users);
+
+            session.Flush();
+            session.Transaction.Commit();
+            session.Dispose();
+            
+            using (var s1 = factory.OpenSession())
+            using (var tx = s1.BeginTransaction())
+            {
+                SillyContainer.SessionProvider = () => s1;
+                var anotherAuthorizationRepository = ServiceLocator.Current.GetInstance<IAuthorizationRepository>();
+                UsersGroup[] initialGroups = anotherAuthorizationRepository.GetAssociatedUsersGroupFor(user);
+                Assert.Equal(2, initialGroups.Length);
+                Assert.Equal("Administrators", initialGroups[0].Name);
+                Assert.Equal("Users", initialGroups[1].Name);
+                tx.Commit();
+            }
+
+            using (var s2 = factory.OpenSession())
+            using (var tx = s2.BeginTransaction())
+            {
+                SillyContainer.SessionProvider = () => s2;
+                var anotherAuthorizationRepository = ServiceLocator.Current.GetInstance<IAuthorizationRepository>();
+                anotherAuthorizationRepository.DetachUserFromGroup(user, "Users");
+                tx.Commit();
+            }
+
+            using (var s3 = factory.OpenSession())
+            using (var tx = s3.BeginTransaction())
+            {
+                SillyContainer.SessionProvider = () => s3;
+                var anotherAuthorizationRepository = ServiceLocator.Current.GetInstance<IAuthorizationRepository>();
+                UsersGroup[] newGroups = anotherAuthorizationRepository.GetAssociatedUsersGroupFor(user);
+                Assert.Equal(1, newGroups.Length);
+                Assert.Equal("Administrators", newGroups[0].Name);
+                tx.Commit();
             }
         }
     }
