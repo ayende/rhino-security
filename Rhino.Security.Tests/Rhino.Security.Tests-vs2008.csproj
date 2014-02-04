@@ -91,6 +91,7 @@
     <Compile Include="AuthorizationService_Queries_Fixture.cs" />
     <Compile Include="PermissionsServiceFixture.cs" />
     <Compile Include="DatabaseFixture.cs" />
+    <Compile Include="DeleteEntityEventListenerFixture.cs" />
     <Compile Include="ScenariosFixture.cs" />
     <Compile Include="SecrityInfoFixture.cs" />
     <Compile Include="SillyContainer.cs" />
