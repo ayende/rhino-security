@@ -15,14 +15,12 @@ properties {
 } 
 
 include .\psake_ext.ps1
-include .\SharedLibs\build-ext\x64detection.ps1
 	
 task default -depends Release
 
 task Clean { 
   remove-item -force -recurse $buildartifacts_dir -ErrorAction SilentlyContinue 
   remove-item -force -recurse $release_dir -ErrorAction SilentlyContinue 
-  Build-SharedLibs-For-Processor 
 } 
 
 task Init -depends Clean { 
@@ -59,7 +57,7 @@ task Init -depends Clean {
 } 
 
 task Compile -depends Init { 
-  & msbuild "$sln_file" "/p:OutDir=$build_dir\\" /p:Configuration=Release
+  & msbuild "$sln_file" "/p:OutDir=$build_dir\\" "/p:OutputPath=$build_dir\\" /p:Configuration=Release /p:CopySQLiteInteropFiles=True
   if ($lastExitCode -ne 0) {
         throw "Error: Failed to execute msbuild"
   }
