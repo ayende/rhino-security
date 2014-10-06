@@ -39,7 +39,7 @@ namespace Rhino.Security.Tests
                 .SetProperty(Environment.ConnectionDriver, typeof(SQLite20Driver).AssemblyQualifiedName)
                 .SetProperty(Environment.Dialect, typeof(SQLiteDialect).AssemblyQualifiedName)
                 .SetProperty(Environment.ConnectionString, ConnectionString)
-                .SetProperty(Environment.ProxyFactoryFactoryClass, typeof(NHibernate.Bytecode.IProxyFactoryFactory).AssemblyQualifiedName)
+                .SetProperty(Environment.ProxyFactoryFactoryClass, typeof(NHibernate.Bytecode.DefaultProxyFactoryFactory).AssemblyQualifiedName)
                 .SetProperty(Environment.ReleaseConnections, "on_close")
                 .SetProperty(Environment.UseSecondLevelCache, "true")
                 .SetProperty(Environment.UseQueryCache, "true")
