@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using log4net;
 using Microsoft.Practices.ServiceLocation;
 using NHibernate.Cfg;
 using NHibernate.UserTypes;
@@ -21,8 +20,6 @@ namespace Rhino.Security
 
 		private static readonly Dictionary<Type, Func<string>> GetSecurityKeyPropertyCache =
 			new Dictionary<Type, Func<string>>();
-
-	    private ILog logger = LogManager.GetLogger(typeof (Security));
 
 		/// <summary>
 		/// Extracts the key from the specified entity.
