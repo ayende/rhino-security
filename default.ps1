@@ -10,6 +10,8 @@ properties {
   $release_dir = "$base_dir\Release"
   $uploadCategory = "Rhino-Security"
   $uploader = "..\Uploader\S3Uploader.exe"
+  $xunitVersion = "1.9.2"
+  $xunitPath = "$base_dir\packages\xunit.runners.${xunitVersion}\tools"
 } 
 
 include .\psake_ext.ps1
@@ -67,7 +69,7 @@ task Compile -depends Init {
 task Test -depends Compile {
   $old = pwd
   cd $build_dir
-  exec "$tools_dir\xunit\xunit.console.exe" "$build_dir\Rhino.Security.Tests.dll"
+  exec "$xunitPath\xunit.console.clr4.exe" "$build_dir\Rhino.Security.Tests.dll"
   cd $old		
 }
 
