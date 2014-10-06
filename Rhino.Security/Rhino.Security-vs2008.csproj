@@ -169,6 +169,9 @@
     <EmbeddedResource Include="Model\UsersGroup.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Model\nhibernate-mapping.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
