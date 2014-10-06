@@ -24,7 +24,7 @@ namespace Rhino.Security.Tests
             if (serviceType == typeof(IPermissionsService))
                 return new PermissionsService(GetInstance<IAuthorizationRepository>(), SessionProvider());
             if (serviceType == typeof(IEntityInformationExtractor<Account>))
-                return new AccountInfromationExtractor(SessionProvider());
+                return new AccountInformationExtractor(SessionProvider());
             throw new NotImplementedException();
         }
 

@@ -81,7 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
-    <Compile Include="AccountInfromationExtractor.cs" />
+    <Compile Include="AccountInformationExtractor.cs" />
     <Compile Include="AuthorizationRepositoryFixture.cs" />
     <Compile Include="AuthorizationServiceFixture.cs" />
     <Compile Include="AuthorizationServiceWithSecondLevelCacheFixture.cs" />
