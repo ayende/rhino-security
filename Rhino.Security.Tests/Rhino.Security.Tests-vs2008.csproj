@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthorizationService_LinqQueries_Fixture.cs" />
     <Compile Include="Entities\Account.cs" />
     <Compile Include="AccountInformationExtractor.cs" />
     <Compile Include="AuthorizationRepositoryFixture.cs" />

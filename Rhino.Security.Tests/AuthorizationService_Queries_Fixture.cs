@@ -623,9 +623,8 @@ namespace Rhino.Security.Tests
                 .Save();
             session.Flush();
 
-            var query = session.CreateCriteria(typeof(Entities.Account), "account");
-            authorizationService.AddPermissionsToQuery(user, "/Account/Edit", query);
-            var result = query.List<Entities.Account>();
+            authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            var result = criteria.List<Entities.Account>();
             Assert.NotEmpty(result);
             Assert.Equal(account.Id, result[0].Id);
         }
