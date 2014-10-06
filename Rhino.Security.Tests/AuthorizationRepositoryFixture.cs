@@ -39,7 +39,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanCreateUsersGroup()
         {
-            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Administrators");
 
 
             session.Flush();
@@ -67,12 +67,12 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CannotCreateEntitiesGroupWithSameName()
         {
-            authorizationRepository.CreateEntitiesGroup("Admininstrators");
+            authorizationRepository.CreateEntitiesGroup("Administrators");
             session.Flush();
 
             Exception exception = Assert.Throws<GenericADOException>(() =>
                                                                          {
-                                                                             authorizationRepository.CreateEntitiesGroup("Admininstrators");
+                                                                             authorizationRepository.CreateEntitiesGroup("Administrators");
                                                                              session.Flush();
                                                                          }).InnerException;
             Assert.Contains("unique", exception.Message);
@@ -81,12 +81,12 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CannotCreateUsersGroupsWithSameName()
         {
-            authorizationRepository.CreateUsersGroup("Admininstrators");
+            authorizationRepository.CreateUsersGroup("Administrators");
             session.Flush();
 
             Exception exception = Assert.Throws<GenericADOException>(() =>
                                                                          {
-                                                                             authorizationRepository.CreateUsersGroup("Admininstrators");
+                                                                             authorizationRepository.CreateUsersGroup("Administrators");
                                                                              session.Flush();
                                                                          }).InnerException;
 
@@ -96,12 +96,12 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetUsersGroupByName()
         {
-            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Administrators");
 
             session.Flush();
             session.Evict(group);
 
-            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
+            group = authorizationRepository.GetUsersGroupByName("Administrators");
             Assert.NotNull(group);
         }
 
@@ -121,12 +121,12 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanChangeUsersGroupName()
         {
-            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Administrators");
 
             session.Flush();
             session.Evict(group);
 
-            authorizationRepository.RenameUsersGroup("Admininstrators", "2");
+            authorizationRepository.RenameUsersGroup("Administrators", "2");
 
 
             session.Flush(); 
@@ -134,14 +134,14 @@ namespace Rhino.Security.Tests
 
             group = authorizationRepository.GetUsersGroupByName("2");
             Assert.NotNull(group);
-            group = authorizationRepository.GetUsersGroupByName("Admininstrators");
+            group = authorizationRepository.GetUsersGroupByName("Administrators");
             Assert.Null(group);
         }
 
         [Fact]
         public void CannotRenameUsersGroupToAnAlreadyExistingUsersGroup()
         {
-            UsersGroup group = authorizationRepository.CreateUsersGroup("Admininstrators");
+            UsersGroup group = authorizationRepository.CreateUsersGroup("Administrators");
             UsersGroup group2 = authorizationRepository.CreateUsersGroup("ExistingGroup");
 
             session.Flush();
@@ -152,7 +152,7 @@ namespace Rhino.Security.Tests
             Exception exception = Assert.Throws<GenericADOException>(
                 () =>
                     {
-                        authorizationRepository.RenameUsersGroup("Admininstrators", "ExistingGroup");
+                        authorizationRepository.RenameUsersGroup("Administrators", "ExistingGroup");
                         session.Flush();
                     }).InnerException;
             Assert.Contains("unique", exception.Message);
