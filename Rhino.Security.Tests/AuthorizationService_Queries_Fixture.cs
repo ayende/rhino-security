@@ -611,5 +611,23 @@ namespace Rhino.Security.Tests
             authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", detachedCriteria);
             Assert.NotEmpty(detachedCriteria.GetExecutableCriteria(session).List());
         }
+
+        [Fact]
+        public void WillReturnResultForUserIfOperationIsAccount()
+        {
+            permissionsBuilderService
+                .Allow("/Account")
+                .For(user)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            session.Flush();
+
+            var query = session.CreateCriteria(typeof(Entities.Account), "account");
+            authorizationService.AddPermissionsToQuery(user, "/Account/Edit", query);
+            var result = query.List<Entities.Account>();
+            Assert.NotEmpty(result);
+            Assert.Equal(account.Id, result[0].Id);
+        }
     }
 }
