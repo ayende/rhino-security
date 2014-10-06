@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>Rhino.Security</id>
+        <version>1.3.1</version>
+        <title>Rhino Security 1.3.1</title>
+        <authors>Hibernating Rhinos</authors>
+        <owners>Hibernating Rhinos</owners>
+        <licenseUrl>https://github.com/ayende/rhino-security/blob/master/license.txt</licenseUrl>
+        <projectUrl>https://github.com/ayende/rhino-security/</projectUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Security Library for NHibernate 4</description>
+        <dependencies>
+            <dependency id="NHibernate" version="4.0.1.4000" />
+            <dependency id="CommonServiceLocator" version="1.3" />
+        </dependencies>
+        <frameworkAssemblies>
+            <frameworkAssembly assemblyName="System" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Data" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Core" targetFramework="" />
+            <frameworkAssembly assemblyName="System.Xml" targetFramework="" />
+        </frameworkAssemblies>
+    </metadata>
+    <files>
+        <file src="..\build\Rhino.Security.dll" target="lib\net40\Rhino.Security.dll" />
+        <file src="..\build\Rhino.Security.XML" target="lib\net40\Rhino.Security.XML" />
+        <file src="..\acknowledgements.txt" target="acknowledgements.txt" />
+        <file src="..\How to Use.txt" target="How to Use.txt" />
+        <file src="..\license.txt" target="license.txt" />
+    </files>
+</package>
