@@ -80,7 +80,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Account.cs" />
+    <Compile Include="Entities\Account.cs" />
     <Compile Include="AccountInformationExtractor.cs" />
     <Compile Include="AuthorizationRepositoryFixture.cs" />
     <Compile Include="AuthorizationServiceFixture.cs" />
@@ -92,7 +92,7 @@
     <Compile Include="ScenariosFixture.cs" />
     <Compile Include="SecrityInfoFixture.cs" />
     <Compile Include="SillyContainer.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="Entities\User.cs" />
     <Compile Include="UsersGroupsNotReturningAllAssociatedUsers.cs" />
     <Compile Include="VerifyAssociatedUsersOnUsersGroup.cs" />
   </ItemGroup>
@@ -138,8 +138,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Account.hbm.xml" />
-    <EmbeddedResource Include="User.hbm.xml" />
+    <EmbeddedResource Include="Entities\Account.hbm.xml" />
+    <EmbeddedResource Include="Entities\User.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

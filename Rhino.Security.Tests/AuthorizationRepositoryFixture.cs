@@ -11,12 +11,12 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanSaveUser()
         {
-            User ayende = new User {Name = "ayende"};
+            var ayende = new Entities.User { Name = "ayende" };
             session.Save(ayende);
             session.Flush();
             session.Evict(ayende);
 
-            User fromDb = session.Get<User>(ayende.Id);
+            var fromDb = session.Get<Entities.User>(ayende.Id);
             Assert.NotNull(fromDb);
             Assert.Equal(ayende.Name, fromDb.Name);
         }
@@ -24,13 +24,13 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanSaveAccount()
         {
-            Account ayende = new Account {Name = "ayende"};
+            var ayende = new Entities.Account { Name = "ayende" };
             Assert.NotEqual(Guid.Empty, ayende.SecurityKey);
             session.Save(ayende);
             session.Flush();
             session.Evict(ayende);
 
-            Account fromDb = session.Get<Account>(ayende.Id);
+            var fromDb = session.Get<Entities.Account>(ayende.Id);
             Assert.NotNull(fromDb);
             Assert.Equal(ayende.Name, fromDb.Name);
             Assert.Equal(fromDb.SecurityKey, ayende.SecurityKey);
@@ -220,7 +220,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanAssociateUserWithGroup()
         {
-            User ayende = new User {Name = "ayende"};
+            var ayende = new Entities.User { Name = "ayende" };
 
             session.Save(ayende);
             UsersGroup group = authorizationRepository.CreateUsersGroup("Admins");
@@ -240,7 +240,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanAssociateAccountWithMultipleGroups()
         {
-            Account ayende = new Account();
+            var ayende = new Entities.Account();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -267,7 +267,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanAssociateUserWithNestedGroup()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -291,7 +291,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanAssociateAccountWithNestedGroup()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -315,7 +315,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWithNested()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -336,7 +336,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfAccountWithGroupWithNested()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -356,7 +356,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupDirect()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -374,7 +374,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfAccountWithGroupDirect()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -390,7 +390,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereNonExists()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -405,7 +405,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfEntityWithGroupWhereNonExists()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -418,7 +418,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsDirectPathShouldSelectThat()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -439,7 +439,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfAccountWithGroupWhereThereIsDirectPathShouldSelectThat()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -458,7 +458,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsTwoLevelNesting()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -482,7 +482,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfAccountWithGroupWhereThereIsTwoLevelNesting()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -504,7 +504,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfUserWithGroupWhereThereIsMoreThanOneIndirectPathShouldSelectShortest()
         {
-            User ayende = new User();
+            var ayende = new Entities.User();
             ayende.Name = "ayende";
 
             session.Save(ayende);
@@ -528,7 +528,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanGetAncestryAssociationOfAccountWithGroupWhereThereIsMoreThanOneIndirectPathShouldSelectShortest()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             session.Save(beto);
@@ -551,7 +551,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void CanAssociateAccountWithGroup()
         {
-            Account ayende = new Account();
+            var ayende = new Entities.Account();
             ayende.Name = "ayende";
 
             session.Save(ayende);

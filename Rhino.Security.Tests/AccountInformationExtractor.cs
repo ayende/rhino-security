@@ -6,7 +6,7 @@ namespace Rhino.Security.Tests
 {
     using System;
 
-    public class AccountInformationExtractor : IEntityInformationExtractor<Account>
+    public class AccountInformationExtractor : IEntityInformationExtractor<Entities.Account>
     {
         private readonly ISession session;
 
@@ -15,16 +15,16 @@ namespace Rhino.Security.Tests
             this.session = session;
         }
 
-        public Guid GetSecurityKeyFor(Account entity)
+        public Guid GetSecurityKeyFor(Entities.Account entity)
         {
             return entity.SecurityKey;
         }
 
         public string GetDescription(Guid securityKey)
         {
-            Account account = session.CreateCriteria<Account>()
+            var account = session.CreateCriteria<Entities.Account>()
                 .Add(Restrictions.Eq("SecurityKey", securityKey))
-                .UniqueResult<Account>();
+                .UniqueResult<Entities.Account>();
             return string.Format("Account: {0}", account.Name);
         }
 

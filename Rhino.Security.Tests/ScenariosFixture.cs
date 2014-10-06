@@ -45,7 +45,7 @@ namespace Rhino.Security.Tests
             // during first deploy
             Operation operation = authorizationRepository.CreateOperation("/Account/Assign");
 
-            User secondUser = new User();
+            var secondUser = new Entities.User();
             secondUser.Name = "Second user";
             session.Save(secondUser);
 
@@ -104,7 +104,7 @@ namespace Rhino.Security.Tests
             Assert.True(allowed);
         }
 
-        private void AddDefaultPermissions(Operation operation, User toUser)
+        private void AddDefaultPermissions(Operation operation, Entities.User toUser)
         {
             EntitiesGroup group = authorizationRepository.CreateEntitiesGroup("Assigned to " + toUser.Name);
             permissionsBuilderService

@@ -243,7 +243,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void WillReturnTrueOnAccountIfPermissionWasAllowedToUserOnTheNestedEntityGroupIsAssociatedWith()
         {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             authorizationRepository.CreateEntitiesGroup("Executive Accounts");
@@ -291,7 +291,7 @@ namespace Rhino.Security.Tests
 	    [Fact]
 	    public void WillReturnTrueOnGlobalIfPermissionWasAllowedOnGlobalButDeniedOnNestedEntitiesGroup()
 	    {
-            Account beto = new Account();
+            var beto = new Entities.Account();
             beto.Name = "beto account";
 
             authorizationRepository.CreateEntitiesGroup("Executive Accounts");
