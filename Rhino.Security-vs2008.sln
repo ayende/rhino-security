@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security-vs2008", "Rhino.Security\Rhino.Security-vs2008.csproj", "{DBA372FE-3D52-45B3-AF82-B37696328764}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rhino.Security.Tests-vs2008", "Rhino.Security.Tests\Rhino.Security.Tests-vs2008.csproj", "{558B3AE3-C408-4DB0-AC79-386BC12379BE}"

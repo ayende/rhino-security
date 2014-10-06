@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Practices.ServiceLocation;
 using NHibernate;
-using NHibernate.ByteCode.Castle;
 using NHibernate.Cache;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
@@ -40,7 +39,7 @@ namespace Rhino.Security.Tests
                 .SetProperty(Environment.ConnectionDriver, typeof(SQLite20Driver).AssemblyQualifiedName)
                 .SetProperty(Environment.Dialect, typeof(SQLiteDialect).AssemblyQualifiedName)
                 .SetProperty(Environment.ConnectionString, ConnectionString)
-                .SetProperty(Environment.ProxyFactoryFactoryClass, typeof(ProxyFactoryFactory).AssemblyQualifiedName)
+                .SetProperty(Environment.ProxyFactoryFactoryClass, typeof(NHibernate.Bytecode.IProxyFactoryFactory).AssemblyQualifiedName)
                 .SetProperty(Environment.ReleaseConnections, "on_close")
                 .SetProperty(Environment.UseSecondLevelCache, "true")
                 .SetProperty(Environment.UseQueryCache, "true")
