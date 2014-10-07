@@ -32,11 +32,15 @@ namespace Rhino.Security.Services
 
             var userIdPropName = Security.GetUserTypeIdPropertyName(session);
             var lambdaParamUser = LinqExpr.Parameter(Security.UserType, "u");
+
+            // u.Id == user.SecurityInfo.Identifier
             var isSameId = LinqExpr.Lambda(
                 LinqExpr.Equal(LinqExpr.PropertyOrField(lambdaParamUser, userIdPropName), LinqExpr.Constant(user.SecurityInfo.Identifier)),
                 lambdaParamUser);
 
             var lambdaParamUsersGroup = LinqExpr.Parameter(typeof(UsersGroup), "ug");
+
+            // ((ICollection<TUser>)ug.Users).Any(u => u.Id == user.SecurityInfo.Identifier)
             var usersCollection = LinqExpr.Convert(LinqExpr.PropertyOrField(lambdaParamUsersGroup, "Users"), typeof(System.Collections.Generic.ICollection<>).MakeGenericType(Security.UserType));
             var isUserInGroup = LinqExpr.Call(userAnyFunc, usersCollection, isSameId);
 
@@ -91,6 +95,8 @@ namespace Rhino.Security.Services
             var groupAnyFunc = anyFunc.MakeGenericMethod(typeof(UsersGroup));
 
             var lambdaParamUser = LinqExpr.Parameter(Security.UserType, "u");
+
+            // u.Id == user.SecurityInfo.Identifier
             var isSameUserId = LinqExpr.Lambda(
                 LinqExpr.Equal(LinqExpr.PropertyOrField(lambdaParamUser, userIdPropName), LinqExpr.Constant(user.SecurityInfo.Identifier)),
                 lambdaParamUser);
@@ -98,12 +104,17 @@ namespace Rhino.Security.Services
             System.Linq.Expressions.Expression<Func<UsersGroup, bool>> isInGroupIds = g => directGroupIds.Contains(g.Id);
 
             var lambdaParamUsersGroup = LinqExpr.Parameter(typeof(UsersGroup), "ug");
+
+            // ((ICollection<TUser>)ug.Users).Any(u => u.Id == user.SecurityInfo.Identifier)
             var usersCollection = LinqExpr.Convert(LinqExpr.PropertyOrField(lambdaParamUsersGroup, "Users"), typeof(ICollection<>).MakeGenericType(Security.UserType));
             var isUserInGroup = LinqExpr.Call(userAnyFunc, usersCollection, isSameUserId);
 
+            // ug.AllChildren.Any(g => directGroupIds.Contains(g.Id))
             var allChildrenCollection = LinqExpr.PropertyOrField(lambdaParamUsersGroup, "AllChildren");
             var isInChildGroup = LinqExpr.Call(groupAnyFunc, allChildrenCollection, isInGroupIds);
 
+            // ((ICollection<TUser>)ug.Users).Any(u => u.Id == user.SecurityInfo.Identifier)
+            // || ug.AllChildren.Any(g => directGroupIds.Contains(g.Id))
             var cond = LinqExpr.Lambda<Func<UsersGroup, bool>>(LinqExpr.OrElse(isUserInGroup, isInChildGroup), lambdaParamUsersGroup);
 
             var query = session.Query<UsersGroup>()
