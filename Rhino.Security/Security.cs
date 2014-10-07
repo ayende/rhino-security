@@ -55,6 +55,41 @@ namespace Rhino.Security
 			return extractor.GetSecurityKeyFor(entity);
 		}
 
+        /// <summary>
+        /// Extracts the key from the specified entity using the given object.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <returns>If no IEntityInformationExtractor{TEntity} class is registered in the IoC container
+        /// for the entity's runtime type this returns an empty Guid, otherwise the security
+        /// key of the given entity.</returns>
+        /// <remarks>It is recommended to use the ExtractKey{TEntity}(TEntity) method if possible 
+        /// as this code uses reflection to extract the entity security key.</remarks>
+        internal static Guid ExtractKey(object entity)
+        {
+            Guard.Against<ArgumentNullException>(entity == null, "entity");
+            Type[] entityType = { entity.GetType() };
+            Guard.Against<ArgumentException>(!entityType[0].IsClass, "Entity must be a class object");
+
+            Type extractorType = typeof(IEntityInformationExtractor<>);
+            Type genericExtractor = extractorType.MakeGenericType(entityType);
+            object extractor = null;
+
+            try
+            {
+                extractor = ServiceLocator.Current.GetInstance(genericExtractor);
+            }
+            catch (ActivationException)
+            {
+                // If no IEntityInformationExtractor is registered then the entity isn't 
+                // secured by Rhino.Security. Ignore the error and return an empty Guid.
+                return Guid.Empty;
+            }
+
+            object key = genericExtractor.InvokeMember("GetSecurityKeyFor", BindingFlags.InvokeMethod, null, extractor, new object[] { entity });
+
+            return (Guid)key;
+        }
+
 		/// <summary>
 		/// Gets a human readable description for the specified entity
 		/// </summary>
@@ -101,6 +136,7 @@ namespace Rhino.Security
             cfg.AddAssembly(typeof (IUser).Assembly);
             new SchemaChanger(cfg, securityTableStructure).Change();
             new UserMapper(cfg, typeof(TUserType)).Map();
+            cfg.SetListener(NHibernate.Event.ListenerType.PreDelete, new DeleteEntityEventListener());
         }
 	}
 }

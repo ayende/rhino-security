@@ -72,6 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeleteEntityEventListener.cs" />
     <Compile Include="Impl\CollectionExtensions.cs" />
     <Compile Include="Impl\Guard.cs" />
     <Compile Include="Impl\MappingRewriting\SchemaChanger.cs" />
