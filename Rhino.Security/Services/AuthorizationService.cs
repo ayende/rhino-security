@@ -229,15 +229,27 @@ namespace Rhino.Security.Services
             var entityRefParam = LinqExpr.Parameter(typeof(EntityReference), "er");
             var permParam = LinqExpr.Parameter(typeof(Permission), "p");
 
+            // .Any<EntityReference>(...)
             var anyEntityRef = SecurityCriterions.anyFunc.MakeGenericMethod(typeof(EntityReference));
-            var isEqPermSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), "Value"), LinqExpr.PropertyOrField(entityParam, securityKeyProperty));
+
+            // p.EntitySecurityKey == e.SecurityKey
+            var isEqPermSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.PropertyOrField(entityParam, securityKeyProperty), typeof(Guid?)));
+
+            // er.EntitySecurityKey == e.SecurityKey
             var isEqEntityRefSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(entityRefParam, "EntitySecurityKey"), LinqExpr.PropertyOrField(entityParam, securityKeyProperty));
+
+            // IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
             var isAnyEqEntitySecKey = LinqExpr.Call(anyEntityRef, LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), "Entities"),
                 LinqExpr.Lambda(isEqEntityRefSecKey, entityRefParam));
+
+            // p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null
             var isNullSecKeyOrGroup = LinqExpr.AndAlso(
                 LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.Constant(null), typeof(Guid?))),
                 LinqExpr.ReferenceEqual(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), LinqExpr.Constant(null)));
 
+            // (p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null)
+            // || p.EntitySecurityKey == e.SecurityKey
+            // || IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
             var isPermMatch = LinqExpr.OrElse(isNullSecKeyOrGroup, LinqExpr.OrElse(isEqPermSecKey, isAnyEqEntitySecKey));
 
             LinqExprs.Expression<Func<bool>> isPermAllowed = () => true == session.Query<Permission>()
@@ -268,15 +280,27 @@ namespace Rhino.Security.Services
             var entityRefParam = LinqExpr.Parameter(typeof(EntityReference), "er");
             var permParam = LinqExpr.Parameter(typeof(Permission), "p");
 
+            // .Any<EntityReference>(...)
             var anyEntityRef = SecurityCriterions.anyFunc.MakeGenericMethod(typeof(EntityReference));
-            var isEqPermSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), "Value"), LinqExpr.PropertyOrField(entityParam, securityKeyProperty));
+
+            // p.EntitySecurityKey == e.SecurityKey
+            var isEqPermSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.PropertyOrField(entityParam, securityKeyProperty), typeof(Guid?)));
+
+            // er.EntitySecurityKey == e.SecurityKey
             var isEqEntityRefSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(entityRefParam, "EntitySecurityKey"), LinqExpr.PropertyOrField(entityParam, securityKeyProperty));
+
+            // IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
             var isAnyEqEntitySecKey = LinqExpr.Call(anyEntityRef, LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), "Entities"),
                 LinqExpr.Lambda(isEqEntityRefSecKey, entityRefParam));
+
+            // p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null
             var isNullSecKeyOrGroup = LinqExpr.AndAlso(
                 LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.Constant(null), typeof(Guid?))),
                 LinqExpr.ReferenceEqual(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), LinqExpr.Constant(null)));
 
+            // (p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null)
+            // || p.EntitySecurityKey == e.SecurityKey
+            // || IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
             var isPermMatch = LinqExpr.OrElse(isNullSecKeyOrGroup, LinqExpr.OrElse(isEqPermSecKey, isAnyEqEntitySecKey));
 
             LinqExprs.Expression<Func<bool>> isPermAllowed = () => true == session.Query<Permission>()
