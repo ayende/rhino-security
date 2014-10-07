@@ -33,7 +33,7 @@ namespace Rhino.Security.Services
             var userIdPropName = Security.GetUserTypeIdPropertyName(session);
             var lambdaParamUser = LinqExpr.Parameter(Security.UserType, "u");
 
-            // u.Id == user.SecurityInfo.Identifier
+            // u => u.Id == user.SecurityInfo.Identifier
             var isSameId = LinqExpr.Lambda(
                 LinqExpr.Equal(LinqExpr.PropertyOrField(lambdaParamUser, userIdPropName), LinqExpr.Constant(user.SecurityInfo.Identifier)),
                 lambdaParamUser);
@@ -96,7 +96,7 @@ namespace Rhino.Security.Services
 
             var lambdaParamUser = LinqExpr.Parameter(Security.UserType, "u");
 
-            // u.Id == user.SecurityInfo.Identifier
+            // u => u.Id == user.SecurityInfo.Identifier
             var isSameUserId = LinqExpr.Lambda(
                 LinqExpr.Equal(LinqExpr.PropertyOrField(lambdaParamUser, userIdPropName), LinqExpr.Constant(user.SecurityInfo.Identifier)),
                 lambdaParamUser);
