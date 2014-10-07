@@ -252,9 +252,22 @@ namespace Rhino.Security.Services
             // || IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
             var isPermMatch = LinqExpr.OrElse(isNullSecKeyOrGroup, LinqExpr.OrElse(isEqPermSecKey, isAnyEqEntitySecKey));
 
+            // p.User.Id == user.SecurityInfo.Identifier
+            var userIdPropName = Security.GetUserTypeIdPropertyName(session);
+            var isSameUserId = LinqExpr.Equal(LinqExpr.PropertyOrField(LinqExpr.Convert(LinqExpr.PropertyOrField(permParam, "User"), Security.UserType), userIdPropName), LinqExpr.Constant(user.SecurityInfo.Identifier));
+
+            // userGroupIds.Contains(p.UsersGroup.Id)
+            var containsGuid = SecurityCriterions.containsFunc.MakeGenericMethod(typeof(Guid));
+            var isInUsersGroup = LinqExpr.Call(containsGuid, LinqExpr.Constant(userGroupIds), LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "UsersGroup"), "Id"));
+
+            // p => (p.User.Id == user.SecurityInfo.Identifier) || userGroupIds.Contains(p.UsersGroup.Id)
+            var isSameUserOrInUserGroup = LinqExpr.Lambda<Func<Permission, bool>>(
+                LinqExpr.OrElse(isSameUserId, isInUsersGroup),
+                permParam);
+
             LinqExprs.Expression<Func<bool>> isPermAllowed = () => true == session.Query<Permission>()
                 .Where(p => operationNames.Contains(p.Operation.Name))
-                .Where(p => p.User == user || userGroupIds.Contains(p.UsersGroup.Id))
+                .Where(isSameUserOrInUserGroup)
                 .Where(LinqExpr.Lambda<Func<Permission, bool>>(isPermMatch, permParam))
                 .OrderByDescending(p => p.Level)
                 .ThenBy(p => p.Allow)

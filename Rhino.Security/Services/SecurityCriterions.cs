@@ -19,6 +19,10 @@ namespace Rhino.Security.Services
             typeof(System.Linq.Enumerable).GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
                 .Single(x => x.Name == "Any" && x.GetParameters().Length == 2);
 
+        internal static readonly System.Reflection.MethodInfo containsFunc =
+            typeof(System.Linq.Enumerable).GetMethods(System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)
+                .Single(x => x.Name == "Contains" && x.GetParameters().Length == 2);
+
 		public static DetachedCriteria DirectUsersGroups(IUser user)
 		{
 			return DetachedCriteria.For<UsersGroup>()
