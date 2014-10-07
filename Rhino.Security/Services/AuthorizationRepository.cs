@@ -483,7 +483,14 @@ namespace Rhino.Security.Services
 			UsersGroup group = GetUsersGroupByName(usersGroupName);
 			Guard.Against(group == null, "There is no users group named: " + usersGroupName);
 
-			group.Users.Remove(user);
+            var comparable = user.SecurityInfo.Identifier as IComparable;
+            var userToRemove = group.Users.SingleOrDefault(x => comparable.CompareTo(x.SecurityInfo.Identifier) == 0);
+            if (userToRemove != null)
+            {
+                group.Users.Remove(userToRemove);
+                // The query cache might return invalid results...
+                session.SessionFactory.EvictQueries();
+            }
 		}
 
 		/// <summary>
@@ -524,8 +531,8 @@ namespace Rhino.Security.Services
 				group.Users.Remove(user);
 			}
 
-		    session.CreateQuery("delete Permission p where p.User = :user")
-		        .SetEntity("user", user)
+		    session.CreateQuery("delete Permission p where p.User.id = :user")
+		        .SetEntity("user", user.SecurityInfo.Identifier)
 		        .ExecuteUpdate();
 		}
 
