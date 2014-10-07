@@ -22,11 +22,11 @@ namespace Rhino.Security.Tests
             authorizationRepository = ServiceLocator.Current.GetInstance<IAuthorizationRepository>();
             session.BeginTransaction();
 
-            User ayende = new User { Name = "ayende" };
+            var ayende = new Entities.User { Name = "ayende" };
             session.Save(ayende);
             session.Flush();
             session.Evict(ayende);
-            User marcus = new User { Name = "marcus" };
+            var marcus = new Entities.User { Name = "marcus" };
             session.Save(marcus);
             session.Flush();
             session.Evict(marcus);
@@ -34,10 +34,10 @@ namespace Rhino.Security.Tests
             idAyende = ayende.Id;
             idMarcus = marcus.Id;
 
-            User fromDb = session.Get<User>(idAyende);
+            var fromDb = session.Get<Entities.User>(idAyende);
             Assert.NotNull(fromDb);
             Assert.Equal(ayende.Name, fromDb.Name);
-            fromDb = session.Get<User>(idMarcus);
+            fromDb = session.Get<Entities.User>(idMarcus);
             Assert.NotNull(fromDb);
             Assert.Equal(marcus.Name, fromDb.Name);
 
@@ -57,13 +57,13 @@ namespace Rhino.Security.Tests
             permissionService = ServiceLocator.Current.GetInstance<IPermissionsService>();
             permissionsBuilderService = ServiceLocator.Current.GetInstance<IPermissionsBuilderService>();
             authorizationRepository = ServiceLocator.Current.GetInstance<IAuthorizationRepository>();
-            
-            User marcus = session.Get<User>(Convert.ToInt64(idMarcus));
+
+            var marcus = session.Get<Entities.User>(Convert.ToInt64(idMarcus));
             UsersGroup[] marcusGroups = authorizationRepository.GetAssociatedUsersGroupFor(marcus);
             Assert.Equal(1, marcusGroups.Length);
             Assert.Equal(2, marcusGroups[0].Users.Count);
 
-            User ayende = session.Get<User>(Convert.ToInt64(idAyende));
+            var ayende = session.Get<Entities.User>(Convert.ToInt64(idAyende));
             UsersGroup[] ayendeGroups = authorizationRepository.GetAssociatedUsersGroupFor(ayende);
             Assert.Equal(1, ayendeGroups.Length);
             Assert.Equal(2, ayendeGroups[0].Users.Count);

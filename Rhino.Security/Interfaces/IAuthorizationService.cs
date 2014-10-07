@@ -1,6 +1,7 @@
 using NHibernate;
 using NHibernate.Criterion;
 using Rhino.Security.Model;
+using System.Linq;
 
 namespace Rhino.Security.Interfaces
 {
@@ -11,14 +12,30 @@ namespace Rhino.Security.Interfaces
 	///</summary>
 	public interface IAuthorizationService
 	{
-		/// <summary>
+        /// <summary>
+        /// Adds the permissions to the linq query.
+        /// </summary>
+        /// <param name="user">The user.</param>
+        /// <param name="operation">The operation.</param>
+        /// <param name="query">The query.</param>
+        IQueryable<TEntity> AddPermissionsToQuery<TEntity>(IUser user, string operation, IQueryable<TEntity> query) where TEntity : class;
+
+        ///<summary>
+        /// Adds the permissions to the linq query for the given usersgroup
+        ///</summary>
+        ///<param name="usersgroup">The usersgroup. Only permissions directly related to this usergroup 
+        /// are taken into account</param>
+        ///<param name="operation">The operation</param>
+        /// <param name="query">The query.</param>
+        IQueryable<TEntity> AddPermissionsToQuery<TEntity>(UsersGroup usersgroup, string operation, IQueryable<TEntity> query) where TEntity : class;
+
+        /// <summary>
 		/// Adds the permissions to the criteria query.
 		/// </summary>
 		/// <param name="user">The user.</param>
 		/// <param name="criteria">The criteria.</param>
 		/// <param name="operation">The operation.</param>
 		void AddPermissionsToQuery(IUser user, string operation, ICriteria criteria);
-
 
         ///<summary>
         /// Adds the permissions to the criteria query for the given usersgroup

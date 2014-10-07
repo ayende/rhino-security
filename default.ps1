@@ -4,23 +4,23 @@ properties {
   $build_dir = "$base_dir\build" 
   $buildartifacts_dir = "$build_dir\" 
   $sln_file = "$base_dir\Rhino.Security-vs2008.sln" 
-  $version = "1.3.0.0"
+  $version = "1.3.1"
   $humanReadableversion = "1.3"
   $tools_dir = "$base_dir\Tools"
   $release_dir = "$base_dir\Release"
   $uploadCategory = "Rhino-Security"
   $uploader = "..\Uploader\S3Uploader.exe"
+  $xunitVersion = "1.9.2"
+  $xunitPath = "$base_dir\packages\xunit.runners.${xunitVersion}\tools"
 } 
 
 include .\psake_ext.ps1
-include .\SharedLibs\build-ext\x64detection.ps1
 	
 task default -depends Release
 
 task Clean { 
   remove-item -force -recurse $buildartifacts_dir -ErrorAction SilentlyContinue 
   remove-item -force -recurse $release_dir -ErrorAction SilentlyContinue 
-  Build-SharedLibs-For-Processor 
 } 
 
 task Init -depends Clean { 
@@ -57,7 +57,7 @@ task Init -depends Clean {
 } 
 
 task Compile -depends Init { 
-  & msbuild "$sln_file" "/p:OutDir=$build_dir\\" /p:Configuration=Release
+  & msbuild "$sln_file" "/p:OutDir=$build_dir\\" "/p:OutputPath=$build_dir\\" /p:Configuration=Release /p:CopySQLiteInteropFiles=True
   if ($lastExitCode -ne 0) {
         throw "Error: Failed to execute msbuild"
   }
@@ -67,7 +67,7 @@ task Compile -depends Init {
 task Test -depends Compile {
   $old = pwd
   cd $build_dir
-  exec "$tools_dir\xunit\xunit.console.exe" "$build_dir\Rhino.Security.Tests.dll"
+  exec "$xunitPath\xunit.console.clr4.exe" "$build_dir\Rhino.Security.Tests.dll"
   cd $old		
 }
 

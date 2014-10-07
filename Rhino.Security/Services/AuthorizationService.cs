@@ -6,6 +6,10 @@ using Rhino.Security.Impl.Util;
 using Rhino.Security.Interfaces;
 using Rhino.Security.Model;
 using Rhino.Security.Properties;
+using System.Linq;
+using NHibernate.Linq;
+using LinqExpr = System.Linq.Expressions.Expression;
+using LinqExprs = System.Linq.Expressions;
 
 namespace Rhino.Security.Services
 {
@@ -18,6 +22,9 @@ namespace Rhino.Security.Services
 		private readonly IAuthorizationRepository authorizationRepository;
 
 		private readonly IPermissionsService permissionsService;
+
+        private static readonly System.Reflection.PropertyInfo getQueryProviderSession =
+            typeof(DefaultQueryProvider).GetProperty("Session", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AuthorizationService"/> class.
@@ -166,7 +173,7 @@ namespace Rhino.Security.Services
 				.CreateAlias("entityGroup.Entities", "entityKey", JoinType.LeftOuterJoin)
 				.SetProjection(Projections.Property("Allow"))
 				.Add(Restrictions.In("op.Name", operationNames))
-				.Add(Restrictions.Eq("User", user) 
+				.Add(Restrictions.Eq("User.id", user.SecurityInfo.Identifier) 
 				|| Subqueries.PropertyIn("UsersGroup.Id", 
 										 SecurityCriterions.AllGroups(user).SetProjection(Projections.Id())))
 				.Add(
@@ -207,6 +214,122 @@ namespace Rhino.Security.Services
             return Subqueries.Eq(true, criteria);
         }
 
+        private static IQueryable<TEntity> GetPermissionQueryInternal<TEntity>(IUser user, string operation, IQueryable<TEntity> query) where TEntity : class
+        {
+            var nhQuery = (NhQueryable<TEntity>)query;
+            var nhQueryProvider = (DefaultQueryProvider)nhQuery.Provider;
+            var session = (ISession)getQueryProviderSession.GetValue(nhQueryProvider, null);
+
+            var securityKeyProperty = Security.GetSecurityKeyProperty(typeof(TEntity));
+
+            string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
+            var userGroupIds = SecurityCriterions.AllGroups(user, session).Select(x => x.Id);
+
+            var entityParam = LinqExpr.Parameter(typeof(TEntity), "e");
+            var entityRefParam = LinqExpr.Parameter(typeof(EntityReference), "er");
+            var permParam = LinqExpr.Parameter(typeof(Permission), "p");
+
+            // .Any<EntityReference>(...)
+            var anyEntityRef = SecurityCriterions.anyFunc.MakeGenericMethod(typeof(EntityReference));
+
+            // p.EntitySecurityKey == e.SecurityKey
+            var isEqPermSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.PropertyOrField(entityParam, securityKeyProperty), typeof(Guid?)));
+
+            // er.EntitySecurityKey == e.SecurityKey
+            var isEqEntityRefSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(entityRefParam, "EntitySecurityKey"), LinqExpr.PropertyOrField(entityParam, securityKeyProperty));
+
+            // IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
+            var isAnyEqEntitySecKey = LinqExpr.Call(anyEntityRef, LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), "Entities"),
+                LinqExpr.Lambda(isEqEntityRefSecKey, entityRefParam));
+
+            // p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null
+            var isNullSecKeyOrGroup = LinqExpr.AndAlso(
+                LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.Constant(null), typeof(Guid?))),
+                LinqExpr.ReferenceEqual(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), LinqExpr.Constant(null)));
+
+            // (p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null)
+            // || p.EntitySecurityKey == e.SecurityKey
+            // || IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
+            var isPermMatch = LinqExpr.OrElse(isNullSecKeyOrGroup, LinqExpr.OrElse(isEqPermSecKey, isAnyEqEntitySecKey));
+
+            // p.User.Id == user.SecurityInfo.Identifier
+            var userIdPropName = Security.GetUserTypeIdPropertyName(session);
+            var isSameUserId = LinqExpr.Equal(LinqExpr.PropertyOrField(LinqExpr.Convert(LinqExpr.PropertyOrField(permParam, "User"), Security.UserType), userIdPropName), LinqExpr.Constant(user.SecurityInfo.Identifier));
+
+            // userGroupIds.Contains(p.UsersGroup.Id)
+            var containsGuid = SecurityCriterions.containsFunc.MakeGenericMethod(typeof(Guid));
+            var isInUsersGroup = LinqExpr.Call(containsGuid, LinqExpr.Constant(userGroupIds), LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "UsersGroup"), "Id"));
+
+            // p => (p.User.Id == user.SecurityInfo.Identifier) || userGroupIds.Contains(p.UsersGroup.Id)
+            var isSameUserOrInUserGroup = LinqExpr.Lambda<Func<Permission, bool>>(
+                LinqExpr.OrElse(isSameUserId, isInUsersGroup),
+                permParam);
+
+            LinqExprs.Expression<Func<bool>> isPermAllowed = () => true == session.Query<Permission>()
+                .Where(p => operationNames.Contains(p.Operation.Name))
+                .Where(isSameUserOrInUserGroup)
+                .Where(LinqExpr.Lambda<Func<Permission, bool>>(isPermMatch, permParam))
+                .OrderByDescending(p => p.Level)
+                .ThenBy(p => p.Allow)
+                .Select(p => p.Allow)
+                .FirstOrDefault();
+
+            query = query.Where(LinqExpr.Lambda<Func<TEntity, bool>>(isPermAllowed.Body, entityParam));
+
+            return query;
+        }
+
+        private static IQueryable<TEntity> GetPermissionQueryInternal<TEntity>(UsersGroup usersgroup, string operation, IQueryable<TEntity> query) where TEntity : class
+        {
+            var nhQuery = (NhQueryable<TEntity>)query;
+            var nhQueryProvider = (DefaultQueryProvider)nhQuery.Provider;
+            var session = (ISession)getQueryProviderSession.GetValue(nhQueryProvider, null);
+
+            var securityKeyProperty = Security.GetSecurityKeyProperty(typeof(TEntity));
+
+            string[] operationNames = Strings.GetHierarchicalOperationNames(operation);
+
+            var entityParam = LinqExpr.Parameter(typeof(TEntity), "e");
+            var entityRefParam = LinqExpr.Parameter(typeof(EntityReference), "er");
+            var permParam = LinqExpr.Parameter(typeof(Permission), "p");
+
+            // .Any<EntityReference>(...)
+            var anyEntityRef = SecurityCriterions.anyFunc.MakeGenericMethod(typeof(EntityReference));
+
+            // p.EntitySecurityKey == e.SecurityKey
+            var isEqPermSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.PropertyOrField(entityParam, securityKeyProperty), typeof(Guid?)));
+
+            // er.EntitySecurityKey == e.SecurityKey
+            var isEqEntityRefSecKey = LinqExpr.Equal(LinqExpr.PropertyOrField(entityRefParam, "EntitySecurityKey"), LinqExpr.PropertyOrField(entityParam, securityKeyProperty));
+
+            // IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
+            var isAnyEqEntitySecKey = LinqExpr.Call(anyEntityRef, LinqExpr.PropertyOrField(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), "Entities"),
+                LinqExpr.Lambda(isEqEntityRefSecKey, entityRefParam));
+
+            // p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null
+            var isNullSecKeyOrGroup = LinqExpr.AndAlso(
+                LinqExpr.Equal(LinqExpr.PropertyOrField(permParam, "EntitySecurityKey"), LinqExpr.Convert(LinqExpr.Constant(null), typeof(Guid?))),
+                LinqExpr.ReferenceEqual(LinqExpr.PropertyOrField(permParam, "EntitiesGroup"), LinqExpr.Constant(null)));
+
+            // (p.EntitySecurityKey==(Guid?)null && p.EntitiesGroup==null)
+            // || p.EntitySecurityKey == e.SecurityKey
+            // || IQueryable.Any<EntityReference>(p.EntitiesGroup.Entities, er => er.EntitySecurityKey == e.SecurityKey)
+            var isPermMatch = LinqExpr.OrElse(isNullSecKeyOrGroup, LinqExpr.OrElse(isEqPermSecKey, isAnyEqEntitySecKey));
+
+            LinqExprs.Expression<Func<bool>> isPermAllowed = () => true == session.Query<Permission>()
+                .Where(p => operationNames.Contains(p.Operation.Name))
+                .Where(p => p.UsersGroup == usersgroup)
+                .Where(LinqExpr.Lambda<Func<Permission, bool>>(isPermMatch, permParam))
+                .OrderByDescending(p => p.Level)
+                .ThenBy(p => p.Allow)
+                .Select(p => p.Allow)
+                .FirstOrDefault();
+
+            query = query.Where(LinqExpr.Lambda<Func<TEntity, bool>>(isPermAllowed.Body, entityParam));
+
+            return query;
+        }
+
         private string GetSecurityKeyProperty(DetachedCriteria criteria)
         {
             Type rootType = criteria.GetRootEntityTypeIfAvailable();
@@ -217,6 +340,12 @@ namespace Rhino.Security.Services
         {
             Type rootType = criteria.GetRootEntityTypeIfAvailable();
             return criteria.Alias + "." + Security.GetSecurityKeyProperty(rootType);
+        }
+
+        private string GetSecurityKeyProperty<TEntity>(IQueryable<TEntity> query) where TEntity : class
+        {
+            var rootType = typeof(TEntity);
+            return Security.GetSecurityKeyProperty(rootType);
         }
 
 
@@ -361,5 +490,32 @@ namespace Rhino.Security.Services
 				return entityDescription;
 			return Resources.Everything;
 		}
-	}
+
+        /// <summary>
+        /// Adds the permissions to the linq query.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        /// <param name="user">The user.</param>
+        /// <param name="operation">The operation.</param>
+        /// <param name="query">The linq query.</param>
+        /// <returns>The modified linq query.</returns>
+        public IQueryable<TEntity> AddPermissionsToQuery<TEntity>(IUser user, string operation, IQueryable<TEntity> query) where TEntity : class
+        {
+            return GetPermissionQueryInternal<TEntity>(user, operation, query);
+        }
+
+        /// <summary>
+        /// Adds the permissions to the linq query.
+        /// </summary>
+        /// <typeparam name="TEntity">The entity type.</typeparam>
+        ///<param name="usersgroup">The usersgroup. Only permissions directly related to this usergroup
+        /// are taken into account</param>
+        /// <param name="operation">The operation.</param>
+        /// <param name="query">The linq query.</param>
+        /// <returns>The modified linq query.</returns>
+        public IQueryable<TEntity> AddPermissionsToQuery<TEntity>(UsersGroup usersgroup, string operation, IQueryable<TEntity> query) where TEntity : class
+        {
+            return GetPermissionQueryInternal<TEntity>(usersgroup, operation, query);
+        }
+    }
 }

@@ -42,7 +42,7 @@
     </set>
 		<set name="Entities"
 				 access="property"
-				 table="EntityReferencesToEntitiesGroups"
+				 table="EntityRefsToGroups"
 				 lazy="true">
 			<cache usage="read-write"
 						 region="rhino-security"/>

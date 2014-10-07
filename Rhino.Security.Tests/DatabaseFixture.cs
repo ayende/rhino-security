@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Practices.ServiceLocation;
 using NHibernate;
-using NHibernate.ByteCode.Castle;
 using NHibernate.Cache;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
@@ -16,12 +15,12 @@ namespace Rhino.Security.Tests
 
     public abstract class DatabaseFixture : IDisposable
 	{
-		protected Account account;
+        protected Entities.Account account;
 		protected IAuthorizationRepository authorizationRepository;
 		protected IAuthorizationService authorizationService;
 		protected IPermissionsBuilderService permissionsBuilderService;
 		protected IPermissionsService permissionService;
-		protected User user;
+        protected Entities.User user;
 
         protected ISession session;
         protected readonly ISessionFactory factory;
@@ -40,14 +39,14 @@ namespace Rhino.Security.Tests
                 .SetProperty(Environment.ConnectionDriver, typeof(SQLite20Driver).AssemblyQualifiedName)
                 .SetProperty(Environment.Dialect, typeof(SQLiteDialect).AssemblyQualifiedName)
                 .SetProperty(Environment.ConnectionString, ConnectionString)
-                .SetProperty(Environment.ProxyFactoryFactoryClass, typeof(ProxyFactoryFactory).AssemblyQualifiedName)
+                .SetProperty(Environment.ProxyFactoryFactoryClass, typeof(NHibernate.Bytecode.DefaultProxyFactoryFactory).AssemblyQualifiedName)
                 .SetProperty(Environment.ReleaseConnections, "on_close")
                 .SetProperty(Environment.UseSecondLevelCache, "true")
                 .SetProperty(Environment.UseQueryCache, "true")
                 .SetProperty(Environment.CacheProvider,typeof(HashtableCacheProvider).AssemblyQualifiedName)
-		        .AddAssembly(typeof (User).Assembly);
+                .AddAssembly(typeof(Entities.User).Assembly);
 
-            Security.Configure<User>(cfg, SecurityTableStructure.Prefix);
+            Security.Configure<Entities.User>(cfg, SecurityTableStructure.Prefix);
 
             factory = cfg.BuildSessionFactory();
 
@@ -81,8 +80,8 @@ namespace Rhino.Security.Tests
 
 		private void SetupEntities()
 		{
-			user = new User {Name = "Ayende"};
-		    account = new Account {Name = "south sand"};
+            user = new Entities.User { Name = "Ayende" };
+            account = new Entities.Account { Name = "south sand" };
 
 		    session.Save(user);
 			session.Save(account);

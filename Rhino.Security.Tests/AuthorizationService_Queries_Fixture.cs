@@ -12,7 +12,7 @@ namespace Rhino.Security.Tests
 
         public AuthorizationService_Queries_Fixture()
         {
-            criteria = session.CreateCriteria(typeof(Account), "account");
+            criteria = session.CreateCriteria(typeof(Entities.Account), "account");
         }
 
         [Fact]
@@ -561,7 +561,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void WillReturnNothingIfOperationNotDefined_WithDetachedCriteria()
         {
-            DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>();
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<Entities.Account>();
             authorizationService.AddPermissionsToQuery(user, "/Account/Delete", detachedCriteria);
             Assert.Empty(detachedCriteria.GetExecutableCriteria(session).List());
         }
@@ -570,7 +570,7 @@ namespace Rhino.Security.Tests
         public void WillReturnNothingForUsersGroupIfOperationNotDefined_WithDetachedCriteria()
         {
             UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
-            DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>();
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<Entities.Account>();
             authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Delete", detachedCriteria);
             Assert.Empty(detachedCriteria.GetExecutableCriteria(session).List());
         }
@@ -578,7 +578,7 @@ namespace Rhino.Security.Tests
         [Fact]
         public void WillReturnResultIfAllowPermissionWasDefined_WithDetachedCriteria_AndConditions()
         {
-            DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>()
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<Entities.Account>()
                 .Add(Expression.Like("Name", "South",MatchMode.Start))
                 ;
             permissionsBuilderService
@@ -597,7 +597,7 @@ namespace Rhino.Security.Tests
         public void WillReturnResultForUsersGroupIfAllowPermissionWasDefined_WithDetachedCriteria_AndConditions()
         {
             UsersGroup usersgroup = authorizationRepository.GetUsersGroupByName("Administrators");
-            DetachedCriteria detachedCriteria = DetachedCriteria.For<Account>()
+            DetachedCriteria detachedCriteria = DetachedCriteria.For<Entities.Account>()
                 .Add(Expression.Like("Name", "South", MatchMode.Start))
                 ;
             permissionsBuilderService
@@ -610,6 +610,23 @@ namespace Rhino.Security.Tests
 
             authorizationService.AddPermissionsToQuery(usersgroup, "/Account/Edit", detachedCriteria);
             Assert.NotEmpty(detachedCriteria.GetExecutableCriteria(session).List());
+        }
+
+        [Fact]
+        public void WillReturnResultForUserIfOperationIsAccount()
+        {
+            permissionsBuilderService
+                .Allow("/Account")
+                .For(user)
+                .On("Important Accounts")
+                .DefaultLevel()
+                .Save();
+            session.Flush();
+
+            authorizationService.AddPermissionsToQuery(user, "/Account/Edit", criteria);
+            var result = criteria.List<Entities.Account>();
+            Assert.NotEmpty(result);
+            Assert.Equal(account.Id, result[0].Id);
         }
     }
 }

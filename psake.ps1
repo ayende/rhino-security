@@ -21,7 +21,7 @@
 param(
   [string]$buildFile = 'default.ps1',
   [string[]]$taskList = @(),
-  [string]$framework = '3.5',
+  [string]$framework = '4.0',
   [switch]$debug = $false,
   [switch]$help  = $false,
   [switch]$timing = $false,
@@ -33,7 +33,7 @@ if($help) {
 psake [buildFile] [tasks] [-framework ver] [-debug] [-timing] [-docs]
   where buildFile is the name of the build file, (default: default.ps1)
         tasks is a list of tasks to execute from the build file,
-        ver is the .NET Framework version to target - 1.0, 1.1, 2.0, 3.0, or 3.5 (default)
+        ver is the .NET Framework version to target - 1.0, 1.1, 2.0, 3.0, 3.5, or 4.0 (default)
         debug dumps information on the properties, includes, and tasks, as well as more detailed error information.
         timing prints a report showing how long each task took to execute
         docs prints a list of available tasks
@@ -170,6 +170,7 @@ function Configure-BuildEnvironment {
     '2.0' { $version = 'v2.0.50727' }
     '3.0' { $version = 'v2.0.50727' } # .NET 3.0 uses the .NET 2.0 compilers
     '3.5' { $version = 'v3.5'       }
+    '4.0' { $version = 'v4.0.30319' }
     default { throw "Error: Unknown .NET Framework version, $framework" }
   }
   $frameworkDir = "$env:windir\Microsoft.NET\Framework\$version\"
